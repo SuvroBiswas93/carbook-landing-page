@@ -42,6 +42,7 @@ export interface Booking {
   distance?: number
   distanceFare?: number
   estimatedFare?: number
+  dropoffDate?: string
 }
 
 export interface Pricing {

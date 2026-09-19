@@ -15,12 +15,14 @@ import {
 import { toast } from 'react-toastify'
 import locationsData from '@/data/locations.json'
 import type { Car } from '@/lib/store'
+import { formatDateTime } from '@/lib/utils'
 
 interface BookingFormData {
   car: Car | null
   pickupLocation: string
   dropoffLocation: string
   pickupDate: string
+  dropoffDate?: string
   mobileNumber: string
   tripType: string
 }
@@ -36,13 +38,20 @@ export function Hero({ onContinueClick }: HeroProps) {
   const [pickupLocation, setPickupLocation] = useState('')
   const [dropoffLocation, setDropoffLocation] = useState('')
   const [pickupDate, setPickupDate] = useState('')
+  const [dropoffDate, setDropoffDate] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showDropoffDatePicker, setShowDropoffDatePicker] = useState(false)
   const [pickerDate, setPickerDate] = useState(new Date())
   const [pickerHour, setPickerHour] = useState(12)
   const [pickerMinute, setPickerMinute] = useState(0)
   const [pickerPeriod, setPickerPeriod] = useState<'AM' | 'PM'>('AM')
   const [pickerView, setPickerView] = useState<'date' | 'time'>('date')
+  const [dropoffPickerDate, setDropoffPickerDate] = useState(new Date())
+  const [dropoffPickerHour, setDropoffPickerHour] = useState(12)
+  const [dropoffPickerMinute, setDropoffPickerMinute] = useState(0)
+  const [dropoffPickerPeriod, setDropoffPickerPeriod] = useState<'AM' | 'PM'>('AM')
+  const [dropoffPickerView, setDropoffPickerView] = useState<'date' | 'time'>('date')
   const [showPickupDropdown, setShowPickupDropdown] = useState(false)
   const [showDropoffDropdown, setShowDropoffDropdown] = useState(false)
   const [pickupSearch, setPickupSearch] = useState('')
@@ -77,6 +86,10 @@ export function Hero({ onContinueClick }: HeroProps) {
       toast.error('Please fill in all required fields')
       return
     }
+    if (tripType === 'Round Way' && !dropoffDate) {
+      toast.error('Please select drop-off date and time')
+      return
+    }
     if (!/^[+\d][\d\s-]{7,18}$/.test(mobileNumber.trim())) {
       toast.error('Please enter a valid mobile number')
       return
@@ -90,10 +103,25 @@ export function Hero({ onContinueClick }: HeroProps) {
       pickupLocation,
       dropoffLocation,
       pickupDate,
+      dropoffDate: tripType === 'Round Way' ? dropoffDate : undefined,
       mobileNumber: mobileNumber.trim(),
       tripType,
     }
     onContinueClick?.(data)
+  }
+
+  const handlePickupDateConfirm = () => {
+    const hour24 = pickerPeriod === 'AM' ? (pickerHour === 12 ? 0 : pickerHour) : (pickerHour === 12 ? 12 : pickerHour + 12)
+    const formatted = `${String(pickerDate.getFullYear()).padStart(4,'0')}-${String(pickerDate.getMonth()+1).padStart(2,'0')}-${String(pickerDate.getDate()).padStart(2,'0')}T${String(hour24).padStart(2,'0')}:${String(pickerMinute).padStart(2,'0')}`
+    setPickupDate(formatted)
+    setShowDatePicker(false)
+  }
+
+  const handleDropoffDateConfirm = () => {
+    const hour24 = dropoffPickerPeriod === 'AM' ? (dropoffPickerHour === 12 ? 0 : dropoffPickerHour) : (dropoffPickerHour === 12 ? 12 : dropoffPickerHour + 12)
+    const formatted = `${String(dropoffPickerDate.getFullYear()).padStart(4,'0')}-${String(dropoffPickerDate.getMonth()+1).padStart(2,'0')}-${String(dropoffPickerDate.getDate()).padStart(2,'0')}T${String(hour24).padStart(2,'0')}:${String(dropoffPickerMinute).padStart(2,'0')}`
+    setDropoffDate(formatted)
+    setShowDropoffDatePicker(false)
   }
 
   return (
@@ -276,7 +304,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                     className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
                   >
                     <span className={pickupDate ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
-                      {pickupDate || 'Select date & time'}
+                      {pickupDate ? formatDateTime(pickupDate) : 'Select date & time'}
                     </span>
                     <CalendarDays size={20} className="text-amber-500" />
                   </button>
@@ -427,12 +455,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                             </button>
                             <button
                               type="button"
-                              onClick={() => {
-                                const hour24 = pickerPeriod === 'AM' ? (pickerHour === 12 ? 0 : pickerHour) : (pickerHour === 12 ? 12 : pickerHour + 12)
-                                const formatted = `${String(pickerDate.getFullYear()).padStart(4,'0')}-${String(pickerDate.getMonth()+1).padStart(2,'0')}-${String(pickerDate.getDate()).padStart(2,'0')}T${String(hour24).padStart(2,'0')}:${String(pickerMinute).padStart(2,'0')}`
-                                setPickupDate(formatted)
-                                setShowDatePicker(false)
-                              }}
+                              onClick={handlePickupDateConfirm}
                               className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
                             >
                               ✓ Confirm
@@ -443,6 +466,182 @@ export function Hero({ onContinueClick }: HeroProps) {
                     </div>
                   )}
                 </div>
+                {tripType === 'Round Way' && (
+                  <div className="pt-4 relative">
+                    <label className="flex items-center gap-2 text-base font-bold">
+                      <CalendarDays size={18} /> Return Date &amp; Time <span className="text-[#b94a43]">*</span>
+                    </label>
+                    <div className="mt-2 relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowDropoffDatePicker(!showDropoffDatePicker)}
+                        className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
+                      >
+<span className={dropoffDate ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
+                      {dropoffDate ? formatDateTime(dropoffDate) : 'Select return date & time'}
+                    </span>
+                        <CalendarDays size={20} className="text-amber-500" />
+                      </button>
+                      {showDropoffDatePicker && (
+                        <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl border border-[#eae5dd] bg-white shadow-2xl overflow-hidden" style={{ maxHeight: '320px', overflowY: 'auto' }}>
+                          <div className="flex border-b border-[#eae5dd]">
+                            <button
+                              type="button"
+                              onClick={() => setDropoffPickerView('date')}
+                              className={`flex-1 py-2.5 text-xs font-bold transition-colors ${dropoffPickerView === 'date' ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50/50' : 'text-stone-500'}`}
+                            >
+                              Date
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDropoffPickerView('time')}
+                              className={`flex-1 py-2.5 text-xs font-bold transition-colors ${dropoffPickerView === 'time' ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50/50' : 'text-stone-500'}`}
+                            >
+                              Time
+                            </button>
+                          </div>
+                          {dropoffPickerView === 'date' ? (
+                            <div className="p-3">
+                              <div className="flex items-center justify-between mb-3">
+                                <button
+                                  type="button"
+                                  onClick={() => setDropoffPickerDate(new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth() - 1, dropoffPickerDate.getDate()))}
+                                  className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center transition-colors"
+                                >
+                                  <ChevronUp size={16} className="text-amber-600" />
+                                </button>
+                                <p className="font-bold text-stone-900 text-xs">
+                                  {dropoffPickerDate.toLocaleString('en-US', { month: 'short', year: 'numeric' })}
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => setDropoffPickerDate(new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth() + 1, dropoffPickerDate.getDate()))}
+                                  className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center transition-colors"
+                                >
+                                  <ChevronDown size={16} className="text-amber-600" />
+                                </button>
+                              </div>
+                              <div className="grid grid-cols-7 gap-0.5 text-center">
+                                {Array.from({ length: new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth() + 1, 0).getDate() }).map((_, dayIndex) => {
+                                  const day = dayIndex + 1
+                                  const firstDayOfMonth = new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth(), 1).getDay()
+                                  const isPast = new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth(), day) < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+                                  const isToday = day === new Date().getDate() && dropoffPickerDate.getMonth() === new Date().getMonth() && dropoffPickerDate.getFullYear() === new Date().getFullYear()
+                                  const isSelected = dropoffPickerDate.getDate() === day && dropoffPickerDate.getMonth() === new Date().getMonth() && dropoffPickerDate.getFullYear() === new Date().getFullYear()
+                                  const isEmpty = dayIndex < firstDayOfMonth
+                                  return (
+                                    <button
+                                      key={day}
+                                      type="button"
+                                      onClick={() => {
+                                        if (isEmpty) return
+                                        const d = new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth(), day)
+                                        setDropoffPickerDate(d)
+                                        const formatted = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+                                        setDropoffDate(formatted)
+                                      }}
+                                      disabled={isEmpty}
+                                      className={`h-8 w-8 rounded-full text-xs font-bold transition-all ${isEmpty ? 'invisible' : isToday ? 'bg-amber-600 text-white' : isSelected ? 'bg-amber-600 text-white' : isPast ? 'text-stone-300' : 'text-stone-700 hover:bg-amber-50'}`}
+                                    >
+                                      {day}
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                              <div className="mt-3 flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowDropoffDatePicker(false)}
+                                  className="flex-1 py-2 rounded-xl border border-[#eae5dd] text-stone-600 text-xs font-semibold hover:bg-stone-50 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setShowDropoffDatePicker(false); setDropoffPickerView('time') }}
+                                  className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
+                                >
+                                  Next: Time →
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mt-3">
+                              <p className="text-xs font-bold text-stone-900 mb-3 text-center">Select Time</p>
+                              <div className="flex justify-center gap-3">
+                                <div className="w-24">
+                                  <p className="text-[10px] font-bold text-stone-400 mb-1.5 text-center">HOURS</p>
+                                  <div className="flex flex-col gap-1 max-h-32 overflow-y-auto rounded-xl border border-[#eae5dd] p-1">
+                                    {Array.from({ length: 12 }, (_, i) => {
+                                      const h = i + 1
+                                      return (
+                                        <button
+                                          key={h}
+                                          type="button"
+                                          onClick={() => setDropoffPickerHour(h)}
+                                          className={`w-full py-1 rounded-lg text-[11px] font-bold transition-all ${dropoffPickerHour === h ? 'bg-amber-600 text-white shadow-md' : 'text-stone-600 hover:bg-amber-50'}`}
+                                        >
+                                          {String(h).padStart(2,'0')}
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+                                </div>
+                                <div className="w-24">
+                                  <p className="text-[10px] font-bold text-stone-400 mb-1.5 text-center">MINUTES</p>
+                                  <div className="flex flex-col gap-1 max-h-32 overflow-y-auto rounded-xl border border-[#eae5dd] p-1">
+                                    {Array.from({ length: 60 }, (_, i) => (
+                                      <button
+                                        key={i}
+                                        type="button"
+                                        onClick={() => setDropoffPickerMinute(i)}
+                                        className={`w-full py-1 rounded-lg text-[11px] font-bold transition-all ${dropoffPickerMinute === i ? 'bg-amber-600 text-white shadow-md' : 'text-stone-600 hover:bg-amber-50'}`}
+                                      >
+                                        {String(i).padStart(2,'0')}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-1 justify-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => setDropoffPickerPeriod('AM')}
+                                    className={`w-12 h-8 rounded-lg text-[10px] font-bold transition-all ${dropoffPickerPeriod === 'AM' ? 'bg-amber-600 text-white shadow-md' : 'bg-stone-100 text-stone-600 hover:bg-amber-50'}`}
+                                  >
+                                    AM
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setDropoffPickerPeriod('PM')}
+                                    className={`w-12 h-8 rounded-lg text-[10px] font-bold transition-all ${dropoffPickerPeriod === 'PM' ? 'bg-amber-600 text-white shadow-md' : 'bg-stone-100 text-stone-600 hover:bg-amber-50'}`}
+                                  >
+                                    PM
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="mt-3 flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowDropoffDatePicker(false)}
+                                  className="flex-1 py-2 rounded-xl border border-[#eae5dd] text-stone-600 text-xs font-semibold hover:bg-stone-50 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleDropoffDateConfirm}
+                                  className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
+                                >
+                                  ✓ Confirm
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

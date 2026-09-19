@@ -43,6 +43,7 @@ export default function Page() {
       pickupLocation: data.pickupLocation,
       dropoffLocation: data.dropoffLocation,
       pickupDate: data.pickupDate,
+      dropoffDate: data.dropoffDate ?? '',
       tripType: data.tripType,
       }),
     })

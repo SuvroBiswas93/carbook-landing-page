@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Car, MapPin, CalendarDays, ChevronRight, Route, Phone } from 'lucide-react'
 import { toast } from 'react-toastify'
 import type { Car as CarInfo } from '@/lib/store'
+import { formatDateTime } from '@/lib/utils'
 
 export interface BookingFormData {
   car: CarInfo | null
   pickupLocation: string
   dropoffLocation: string
   pickupDate: string
+  dropoffDate?: string
   mobileNumber: string
   tripType: string
   distance?: number
@@ -30,9 +32,12 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
   const [pickupDate, setPickupDate] = useState('')
   const [tripType, setTripType] = useState('One Way')
 
+  const [dropoffDate, setDropoffDate] = useState('')
+
   useEffect(() => {
     setMobileNumber(bookingData?.mobileNumber ?? '')
     setPickupDate(bookingData?.pickupDate ?? '')
+    setDropoffDate(bookingData?.dropoffDate ?? '')
     setTripType(bookingData?.tripType ?? 'One Way')
   }, [bookingData])
 
@@ -43,13 +48,16 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
       toast.error('Please enter your phone number and pickup date')
       return
     }
-
+    if (tripType === 'Round Way' && !dropoffDate.trim()) {
+      toast.error('Please enter drop-off date and time')
+      return
+    }
     if (!/^[+\d][\d\s-]{7,18}$/.test(mobileNumber.trim())) {
       toast.error('Please enter a valid mobile number')
       return
     }
 
-    const submitted = await onBookConfirm({ ...bookingData, mobileNumber: mobileNumber.trim(), pickupDate: pickupDate.trim(), tripType })
+    const submitted = await onBookConfirm({ ...bookingData, mobileNumber: mobileNumber.trim(), pickupDate: pickupDate.trim(), tripType, dropoffDate })
     if (submitted === false) return
     toast.success('Car booking request has been sent! A person will contact you shortly.', { autoClose: 5000 })
   }
@@ -148,7 +156,7 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
                     </h4>
                     <div className="space-y-2">
                       {bookingData.pickupDate ? (
-                        <p className="text-sm text-stone-600">{pickupDate}</p>
+                        <p className="text-sm text-stone-600">{formatDateTime(pickupDate)}</p>
                       ) : (
                         <input
                           type="datetime-local"
@@ -157,6 +165,19 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
                           className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                           aria-label="Pickup date and time"
                         />
+                      )}
+                      {tripType === 'Round Way' && (
+                        dropoffDate ? (
+                          <p className="text-sm text-stone-600">{formatDateTime(dropoffDate)}</p>
+                        ) : (
+                          <input
+                            type="datetime-local"
+                            value={dropoffDate}
+                            onChange={(event) => setDropoffDate(event.target.value)}
+                            className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                            aria-label="Drop-off date and time"
+                          />
+                        )
                       )}
                       <label className="block text-xs font-bold uppercase tracking-wide text-stone-500">
                         Trip type

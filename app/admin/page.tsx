@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react'
 import type { Booking, Car as FleetCar, Pricing, Review } from '@/lib/store'
+import { formatDateTime } from '@/lib/utils'
 
 const emptyCar: Omit<FleetCar, 'id'> = {
   brand: '',
@@ -500,8 +501,28 @@ function BookingTable({ bookings }: { bookings: Booking[] }) {
                 </td>
                 <td className="p-5 text-[#766e64]">{booking.pickupLocation}</td>
                 <td className="p-5 text-[#766e64]">{booking.dropoffLocation}</td>
-                <td className="p-5">{booking.tripType}</td>
-                <td className="p-5">{booking.pickupDate}</td>
+                <td className="p-5">
+                  {booking.tripType === 'Round Way' ? (
+                    <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+                      {booking.tripType}
+                    </span>
+                  ) : (
+                    <span className="inline-flex rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-700">
+                      {booking.tripType}
+                    </span>
+                  )}
+                </td>
+                <td className="p-5">
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-semibold text-stone-900">{formatDateTime(booking.pickupDate)}</p>
+                    {booking.tripType === 'Round Way' && booking.dropoffDate && (
+                      <div className="mt-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1.5">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Return</p>
+                        <p className="text-sm font-semibold text-stone-900">{formatDateTime(booking.dropoffDate)}</p>
+                      </div>
+                    )}
+                  </div>
+                </td>
                 <td className="p-5 font-bold text-[#a36d16]">
                   {booking.estimatedFare !== undefined ? `$${booking.estimatedFare.toFixed(2)}` : 'N/A'}
                   {booking.distance !== undefined && <span className="block text-xs font-normal text-[#8c8378]">{booking.distance} km</span>}

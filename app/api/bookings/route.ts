@@ -15,6 +15,7 @@ export async function POST(request: Request) {
     pickupLocation: String(body.pickupLocation ?? '').trim(),
     dropoffLocation: String(body.dropoffLocation ?? '').trim(),
     pickupDate: String(body.pickupDate ?? '').trim(),
+    dropoffDate: String(body.dropoffDate ?? '').trim(),
     tripType: String(body.tripType ?? 'One Way').trim(),
     timestamp: new Date().toLocaleString(),
     status: 'Pending',
