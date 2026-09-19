@@ -403,7 +403,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                             <button
                               type="button"
                               onClick={() => { setShowDatePicker(false); setPickerView('time') }}
-                              className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
+                              className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
                             >
                               Next: Time →
                             </button>
@@ -474,7 +474,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                             <button
                               type="button"
                               onClick={handlePickupDateConfirm}
-                              className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
+                              className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
                             >
                               ✓ Confirm
                             </button>
@@ -577,7 +577,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                                 <button
                                   type="button"
                                   onClick={() => { setShowDropoffDatePicker(false); setDropoffPickerView('time') }}
-                                  className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
+                                  className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
                                 >
                                   Next: Time →
                                 </button>
@@ -648,7 +648,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                                 <button
                                   type="button"
                                   onClick={handleDropoffDateConfirm}
-                                  className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
+                                  className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
                                 >
                                   ✓ Confirm
                                 </button>
