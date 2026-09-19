@@ -72,7 +72,7 @@ export function Contact() {
           >
             {/* Phone */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
                   <Phone size={24} />
                 </div>
@@ -85,7 +85,7 @@ export function Contact() {
 
             {/* Email */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
                   <Mail size={24} />
                 </div>
@@ -98,7 +98,7 @@ export function Contact() {
 
             {/* Address */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
                   <MapPin size={24} />
                 </div>
@@ -111,7 +111,7 @@ export function Contact() {
 
             {/* Hours */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
                   <Clock size={24} />
                 </div>
@@ -226,7 +226,7 @@ export function Contact() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Send size={20} />
                 {isSubmitting ? 'Sending...' : 'Send Message'}
