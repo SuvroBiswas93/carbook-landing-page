@@ -11,6 +11,7 @@ export function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [form, setForm] = useState({ name: '', location: '', rating: 5, text: '' })
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isReviewTriggerExpanded, setIsReviewTriggerExpanded] = useState(false)
 
   const loadReviews = () => {
     fetch('/api/reviews')
@@ -124,20 +125,28 @@ export function Reviews() {
         </div>
       </section>
 
-      {/* Sticky Note Button */}
+      {/* Right-center review trigger */}
       <motion.button
-        initial={{ scale: 0, rotate: -15 }}
-        animate={{ scale: 1, rotate: -8 }}
-        whileHover={{ scale: 1.1, rotate: -5 }}
+        initial={{ opacity: 0, x: 32 }}
+        animate={{ opacity: 1, x: isReviewTriggerExpanded ? 0 : 14 }}
+        whileHover={{ x: -4 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-28 right-6 z-40 w-16 h-20 bg-gradient-to-br from-amber-400 to-yellow-300 shadow-xl hover:shadow-2xl rounded-lg cursor-pointer flex items-center justify-center border-2 border-amber-500/30"
-        title="Leave a Review"
+        onClick={() => {
+          if (isReviewTriggerExpanded) {
+            setIsModalOpen(true)
+            return
+          }
+          setIsReviewTriggerExpanded(true)
+        }}
+        className={`fixed right-2 top-[42%] z-40 flex max-h-[28vh] -translate-y-1/2 flex-col items-center gap-1.5 rounded-full border border-amber-200/70 bg-linear-to-br from-amber-500 via-amber-500 to-yellow-400 px-2 py-3 text-white shadow-[0_8px_24px_rgba(180,83,9,0.28)] ring-2 ring-white/70 backdrop-blur-sm transition-[padding,border-radius,box-shadow] hover:shadow-[0_10px_28px_rgba(180,83,9,0.36)] sm:right-3 sm:top-1/2 sm:gap-2 sm:px-2.5 sm:py-4 md:right-4 lg:right-0 lg:px-3 lg:py-5 ${isReviewTriggerExpanded ? 'rounded-l-xl rounded-r-none' : 'translate-x-3'}`}
+        title={isReviewTriggerExpanded ? 'Open review form' : 'Show review option'}
+        aria-label={isReviewTriggerExpanded ? 'Open review form' : 'Show review option'}
+        aria-expanded={isReviewTriggerExpanded}
       >
-        <Edit3 size={24} className="text-white rotate-[-8deg]" />
-        <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-          <span className="text-white text-[10px] font-bold">+</span>
-        </div>
+        <Edit3 size={18} aria-hidden="true" className="sm:h-5 sm:w-5" />
+        {isReviewTriggerExpanded && (
+          <span className="text-xs font-bold tracking-wide [writing-mode:vertical-rl] sm:text-sm lg:text-base">Review</span>
+        )}
       </motion.button>
 
       {/* Review Modal */}
@@ -197,7 +206,7 @@ export function Reviews() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3.5 rounded-lg transition-all shadow-lg cursor-pointer"
+            className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3.5 rounded-lg transition-all shadow-lg cursor-pointer"
           >
             Submit Review
           </motion.button>
