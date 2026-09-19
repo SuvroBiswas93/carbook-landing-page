@@ -7,15 +7,18 @@ const links = [
   { label: 'Fleet', href: '#cars' },
   { label: 'Fare', href: '#fare-calculator' },
   { label: 'Reviews', href: '#reviews' },
+  { label: 'Services', href: '#services' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Contact', href: '#contact' },
 ]
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeHref, setActiveHref] = useState('')
 
   const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault()
+    setActiveHref(href)
     setIsMobileMenuOpen(false)
 
     if (href === '#top') {
@@ -64,7 +67,11 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               onClick={(event) => handleNavClick(event, link.href)}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-[#d8d0c6] transition hover:bg-white/10 hover:text-white"
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                activeHref === link.href
+                  ? 'bg-[#d6b88c] text-[#191714] shadow-[0_4px_16px_rgba(214,184,140,0.25)]'
+                  : 'text-[#d8d0c6] hover:bg-white/10 hover:text-white'
+              }`}
             >
               {link.label}
             </a>
@@ -102,7 +109,11 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={(event) => handleNavClick(event, link.href)}
-                className="rounded-xl px-4 py-3 text-sm font-semibold text-[#d8d0c6] transition hover:bg-white/10 hover:text-white"
+                className={`rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                  activeHref === link.href
+                    ? 'bg-[#d6b88c] text-[#191714]'
+                    : 'text-[#d8d0c6] hover:bg-white/10 hover:text-white'
+                }`}
               >
                 {link.label}
               </a>

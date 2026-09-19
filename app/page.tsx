@@ -59,9 +59,8 @@ export default function Page() {
       <Hero onContinueClick={handleContinue} />
       <CarSlider />
       <FareCalculator />
-      <Services />
-      
       <Reviews />
+      <Services />
       <FAQ />
       <Contact />
      

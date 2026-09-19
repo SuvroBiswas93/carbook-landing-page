@@ -65,6 +65,24 @@ export function Hero({ onContinueClick }: HeroProps) {
       .catch(() => toast.error('Could not load available cars'))
   }, [])
 
+  useEffect(() => {
+    const handleOutsidePointerDown = (event: PointerEvent) => {
+      const target = event.target
+      if (target instanceof Element && target.closest('[data-hero-dropdown]')) {
+        return
+      }
+
+      setShowCarDropdown(false)
+      setShowPickupDropdown(false)
+      setShowDropoffDropdown(false)
+      setShowDatePicker(false)
+      setShowDropoffDatePicker(false)
+    }
+
+    document.addEventListener('pointerdown', handleOutsidePointerDown)
+    return () => document.removeEventListener('pointerdown', handleOutsidePointerDown)
+  }, [])
+
   const filteredPickup = locationsData.filter(
     (loc) =>
       loc.name.toLowerCase().includes(pickupSearch.toLowerCase()) ||
@@ -138,14 +156,14 @@ export function Hero({ onContinueClick }: HeroProps) {
         <div className="rounded-b-[14px] rounded-tr-[14px] border-t border-[#eae5dd] bg-[#fffdfb] p-5 shadow-[0_16px_42px_rgba(50,44,35,.09)] sm:p-7 lg:p-8">
           <form onSubmit={handleContinue}>
             <div className="grid divide-y divide-[#eae5dd] lg:grid-cols-[1.2fr_1.25fr_1.25fr_1.3fr] lg:divide-x lg:divide-y-0">
-              <div className="pb-5 lg:pb-0 lg:pr-8 relative">
+              <div data-hero-dropdown className="pb-5 lg:pb-0 lg:pr-8 relative">
                 <label className="flex items-center gap-2 text-base font-bold">
                   <CarFront size={18} /> Choose a Car <span className="text-[#b94a43]">*</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowCarDropdown(!showCarDropdown)}
-                  className="mt-4 flex w-full items-center justify-between text-left rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
+                  className="mt-4 flex w-full cursor-pointer items-center justify-between text-left rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <span>
                     {selectedCar ? (
@@ -172,7 +190,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                         key={car.id}
                         type="button"
                         onClick={() => { setSelectedCar(car); setShowCarDropdown(false) }}
-                        className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-[#f3f1ed] transition-colors ${selectedCar?.id === car.id ? 'bg-[#f0edf9] border-l-4 border-[#a8865f]' : ''}`}
+                        className={`w-full cursor-pointer px-4 py-3 text-left flex items-center gap-3 hover:bg-[#f3f1ed] transition-colors ${selectedCar?.id === car.id ? 'bg-[#f0edf9] border-l-4 border-[#a8865f]' : ''}`}
                       >
                         <img src={car.image} alt={car.brand} className="h-12 w-16 rounded-lg object-cover" />
                         <div>
@@ -189,11 +207,11 @@ export function Hero({ onContinueClick }: HeroProps) {
                 <label className="flex items-center gap-2 text-base font-bold">
                   <span className="size-3 rounded-full bg-amber-500 ring-4 ring-amber-100" /> Pickup Location <span className="text-[#b94a43]">*</span>
                 </label>
-                <div className="mt-4 relative">
+                <div data-hero-dropdown className="mt-4 relative">
                   <button
                     type="button"
                     onClick={() => { setShowPickupDropdown(!showPickupDropdown); setShowDropoffDropdown(false) }}
-                    className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
+                    className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
                   >
                     <span className={pickupLocation ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
                       {pickupLocation || 'Select pickup location'}
@@ -227,7 +245,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                             key={loc.id}
                             type="button"
                             onClick={() => { setPickupLocation(loc.name); setShowPickupDropdown(false); setPickupSearch('') }}
-                            className={`w-full px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${pickupLocation === loc.name ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
+                            className={`w-full cursor-pointer px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${pickupLocation === loc.name ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
                           >
                             <p className="font-semibold text-sm text-stone-900">{loc.name}</p>
                             <p className="text-xs text-[#aaa59e]">{loc.address}</p>
@@ -243,11 +261,11 @@ export function Hero({ onContinueClick }: HeroProps) {
                 <label className="flex items-center gap-2 text-base font-bold">
                   <MapPin size={18} className="text-[#9b805d]" /> Drop-off Location <span className="text-[#b94a43]">*</span>
                 </label>
-                <div className="mt-4 relative">
+                <div data-hero-dropdown className="mt-4 relative">
                   <button
                     type="button"
                     onClick={() => { setShowDropoffDropdown(!showDropoffDropdown); setShowPickupDropdown(false) }}
-                    className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
+                    className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
                   >
                     <span className={dropoffLocation ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
                       {dropoffLocation || 'Select drop-off location'}
@@ -281,7 +299,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                             key={loc.id}
                             type="button"
                             onClick={() => { setDropoffLocation(loc.name); setShowDropoffDropdown(false); setDropoffSearch('') }}
-                            className={`w-full px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${dropoffLocation === loc.name ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
+                            className={`w-full cursor-pointer px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${dropoffLocation === loc.name ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
                           >
                             <p className="font-semibold text-sm text-stone-900">{loc.name}</p>
                             <p className="text-xs text-[#aaa59e]">{loc.address}</p>
@@ -297,11 +315,11 @@ export function Hero({ onContinueClick }: HeroProps) {
                 <label className="flex items-center gap-2 text-base font-bold">
                   <CalendarDays size={18} /> Pickup Date &amp; Time <span className="text-[#b94a43]">*</span>
                 </label>
-                <div className="mt-4 relative">
+                <div data-hero-dropdown className="mt-4 relative">
                   <button
                     type="button"
                     onClick={() => setShowDatePicker(!showDatePicker)}
-                    className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
+                    className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
                   >
                     <span className={pickupDate ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
                       {pickupDate ? formatDateTime(pickupDate) : 'Select date & time'}
@@ -475,7 +493,7 @@ export function Hero({ onContinueClick }: HeroProps) {
                       <button
                         type="button"
                         onClick={() => setShowDropoffDatePicker(!showDropoffDatePicker)}
-                        className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
+                        className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
                       >
 <span className={dropoffDate ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
                       {dropoffDate ? formatDateTime(dropoffDate) : 'Select return date & time'}
