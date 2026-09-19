@@ -9,7 +9,7 @@ export function FAQ() {
   const [openId, setOpenId] = useState<number | null>(null)
 
   return (
-    <section id="faq" className="py-20 bg-white">
+    <section id="faq" className="py-14 bg-white sm:py-20">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -18,10 +18,10 @@ export function FAQ() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-xl text-stone-600">
+          <p className="text-base sm:text-xl text-stone-600">
             Everything you need to know about our rental service
           </p>
         </motion.div>
@@ -39,9 +39,9 @@ export function FAQ() {
             >
               <button
                 onClick={() => setOpenId(openId === faq.id ? null : faq.id)}
-                className="w-full px-6 py-4 flex items-center justify-between hover:bg-stone-50 transition-colors"
+                className="w-full px-4 py-4 flex items-center justify-between gap-3 hover:bg-stone-50 transition-colors sm:px-6"
               >
-                <h3 className="text-left font-semibold text-stone-900 text-lg">
+                <h3 className="text-left font-semibold text-stone-900 text-base sm:text-lg">
                   {faq.question}
                 </h3>
                 <motion.div
@@ -63,7 +63,7 @@ export function FAQ() {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <div className="px-6 py-4 bg-stone-50 border-t border-stone-200">
+                <div className="px-4 py-4 bg-stone-50 border-t border-stone-200 sm:px-6">
                   <p className="text-stone-700 leading-relaxed">
                     {faq.answer}
                   </p>

@@ -77,19 +77,19 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 max-h-[90vh] overflow-y-auto"
+            className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto sm:max-h-[90vh] sm:w-full"
           >
             <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-              <div className="bg-linear-to-r from-amber-600 to-amber-700 px-8 py-6">
+              <div className="bg-linear-to-r from-amber-600 to-amber-700 px-5 py-5 sm:px-8 sm:py-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white">Booking Review</h2>
+                  <h2 className="text-xl font-bold text-white sm:text-2xl">Booking Review</h2>
                   <button onClick={onClose} className="rounded-full bg-white/20 p-2 text-white hover:bg-white/30 transition-colors">
                     <X size={20} />
                   </button>
                 </div>
               </div>
 
-              <div className="p-8 space-y-6">
+              <div className="space-y-6 p-4 sm:p-8">
                 <div className="overflow-hidden rounded-xl border border-stone-200">
                   <div className="grid grid-cols-1 md:grid-cols-2">
                     <div className="relative h-56 md:h-auto bg-stone-100">

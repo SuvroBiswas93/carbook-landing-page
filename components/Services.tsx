@@ -26,7 +26,7 @@ export function Services() {
   const [selectedService, setSelectedService] = useState<(typeof servicesData)[0] | null>(null)
 
   return (
-    <section id="services" className="py-20 bg-stone-50">
+    <section id="services" className="py-14 bg-stone-50 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -35,10 +35,10 @@ export function Services() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             Our Premium Services
           </h2>
-          <p className="text-xl text-stone-600">
+          <p className="text-base sm:text-xl text-stone-600">
             Everything you need for a seamless rental experience
           </p>
         </motion.div>
@@ -53,7 +53,7 @@ export function Services() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-              className="bg-white rounded-xl shadow-lg p-8 cursor-pointer transition-all"
+              className="bg-white rounded-xl shadow-lg p-5 sm:p-8 cursor-pointer transition-all"
               onClick={() => setSelectedService(service)}
             >
               <div className="text-amber-600 mb-4">

@@ -45,7 +45,7 @@ export function Contact() {
   }
 
   return (
-    <section id="contact" className="py-20 bg-white">
+    <section id="contact" className="py-14 bg-white sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -54,10 +54,10 @@ export function Contact() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             Get In Touch
           </h2>
-          <p className="text-xl text-stone-600">
+          <p className="text-base sm:text-xl text-stone-600">
             We are here to help. Contact us anytime.
           </p>
         </motion.div>
@@ -146,7 +146,7 @@ export function Contact() {
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="lg:col-span-2 bg-stone-50 rounded-2xl p-8"
+            className="lg:col-span-2 bg-stone-50 rounded-2xl p-4 sm:p-8"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

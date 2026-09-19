@@ -143,8 +143,8 @@ export function Hero({ onContinueClick }: HeroProps) {
   }
 
   return (
-    <section id="hero" className="bg-[#f3f1ed] pb-16 pt-28 sm:pb-24 sm:pt-32">
-      <div className="mx-auto max-w-345 px-4 sm:px-8">
+    <section id="hero" className="bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32">
+      <div className="mx-auto max-w-345 px-3 sm:px-8">
         <div className="max-w-117.5 rounded-t-[14px] bg-[#fffdfb] p-2 shadow-[0_12px_35px_rgba(50,44,35,.07)] sm:p-3">
           <div className="grid grid-cols-1 gap-2">
             <button type="button" className="rounded-lg px-4 py-4 text-sm font-bold sm:text-lg bg-amber-600 text-white">
@@ -153,7 +153,7 @@ export function Hero({ onContinueClick }: HeroProps) {
           </div>
         </div>
 
-        <div className="rounded-b-[14px] rounded-tr-[14px] border-t border-[#eae5dd] bg-[#fffdfb] p-5 shadow-[0_16px_42px_rgba(50,44,35,.09)] sm:p-7 lg:p-8">
+        <div className="rounded-b-[14px] rounded-tr-[14px] border-t border-[#eae5dd] bg-[#fffdfb] p-4 shadow-[0_16px_42px_rgba(50,44,35,.09)] sm:p-7 lg:p-8">
           <form onSubmit={handleContinue}>
             <div className="grid divide-y divide-[#eae5dd] lg:grid-cols-[1.2fr_1.25fr_1.25fr_1.3fr] lg:divide-x lg:divide-y-0">
               <div data-hero-dropdown className="pb-5 lg:pb-0 lg:pr-8 relative">

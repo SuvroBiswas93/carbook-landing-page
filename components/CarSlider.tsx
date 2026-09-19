@@ -68,7 +68,7 @@ export function CarSlider() {
     itemsPerView === 3 ? 'w-[calc((100%_-_4rem)_/_3)]' : 'w-full'
 
   return (
-    <section id="cars" className="py-20 bg-white">
+    <section id="cars" className="py-14 bg-white sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -77,10 +77,10 @@ export function CarSlider() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             Our Car Fleet
           </h2>
-          <p className="text-xl text-stone-600">
+          <p className="text-base sm:text-xl text-stone-600">
             Explore our premium collection of vehicles
           </p>
         </motion.div>
@@ -176,7 +176,7 @@ export function CarSlider() {
               whileTap={{ scale: 0.9 }}
               onClick={handlePrev}
               style={{ visibility: currentIndex <= 0 ? 'hidden' : 'visible' }}
-              className="bg-amber-600 hover:bg-amber-700 text-white w-14 h-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
+                    className="bg-amber-600 hover:bg-amber-700 text-white size-10 sm:size-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
             >
               <ChevronLeft size={28} />
             </motion.button>
@@ -185,7 +185,7 @@ export function CarSlider() {
               whileTap={{ scale: 0.9 }}
               onClick={handleNext}
               style={{ visibility: currentIndex >= maxIndex ? 'hidden' : 'visible' }}
-              className="bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white w-14 h-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
+                    className="bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white size-10 sm:size-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
             >
               <ChevronRight size={28} />
             </motion.button>

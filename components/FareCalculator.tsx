@@ -217,7 +217,7 @@ export function FareCalculator() {
 
   return (
     <>
-    <section id="fare-calculator" className="py-20 bg-linear-to-br from-stone-100 to-amber-50">
+    <section id="fare-calculator" className="py-14 bg-linear-to-br from-stone-100 to-amber-50 sm:py-20">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -226,10 +226,10 @@ export function FareCalculator() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             Fare Calculator
           </h2>
-          <p className="text-xl text-stone-600">
+          <p className="text-base sm:text-xl text-stone-600">
             Estimate your rental cost instantly
           </p>
         </motion.div>
@@ -240,7 +240,7 @@ export function FareCalculator() {
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-white rounded-2xl shadow-xl p-8 space-y-6"
+            className="bg-white rounded-2xl shadow-xl p-4 sm:p-8 space-y-6"
           >
             {/* Car Dropdown */}
             <div className="relative" ref={carDropdownRef}>
@@ -416,7 +416,7 @@ export function FareCalculator() {
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-linear-to-br from-amber-50 to-stone-50 rounded-2xl shadow-xl p-8 border-2 border-amber-200"
+              className="bg-linear-to-br from-amber-50 to-stone-50 rounded-2xl shadow-xl p-4 sm:p-8 border-2 border-amber-200"
             >
               <h3 className="text-2xl font-bold text-stone-900 mb-8 text-center">
                 Estimated Fare
@@ -460,7 +460,7 @@ export function FareCalculator() {
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-linear-to-br from-amber-50 to-stone-50 rounded-2xl shadow-xl p-8 border-2 border-amber-200 flex flex-col justify-center"
+              className="bg-linear-to-br from-amber-50 to-stone-50 rounded-2xl shadow-xl p-4 sm:p-8 border-2 border-amber-200 flex flex-col justify-center"
             >
               <h3 className="text-2xl font-bold text-stone-900 mb-8">
                 How We Calculate

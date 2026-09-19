@@ -63,7 +63,7 @@ export function Reviews() {
 
   return (
     <>
-      <section id="reviews" className="py-20 bg-stone-50">
+      <section id="reviews" className="py-14 bg-stone-50 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -72,10 +72,10 @@ export function Reviews() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
               What Our Customers Say
             </h2>
-            <p className="text-xl text-stone-600">
+            <p className="text-base sm:text-xl text-stone-600">
               Trusted by thousands for premium car rental experiences
             </p>
           </motion.div>

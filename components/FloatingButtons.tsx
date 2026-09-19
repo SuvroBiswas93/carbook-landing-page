@@ -50,7 +50,7 @@ export function FloatingButtons() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleWhatsApp}
-        className="fixed bottom-20 right-6 z-30 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all my-4 cursor-pointer"
+        className="fixed bottom-21 right-3 z-30 cursor-pointer rounded-full bg-green-500 p-3 text-white shadow-lg transition-all hover:bg-green-600 sm:bottom-20 sm:right-6 sm:p-4"
         title="Chat with us on WhatsApp"
       >
         <MessageCircle size={24} />
@@ -64,7 +64,7 @@ export function FloatingButtons() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={scrollToTop}
-        className="fixed bottom-6 right-6 z-30 bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white p-4 rounded-full shadow-lg transition-all cursor-pointer"
+        className="fixed bottom-3 right-3 z-30 cursor-pointer rounded-full bg-linear-to-r from-amber-600 to-amber-700 p-3 text-white shadow-lg transition-all hover:from-amber-700 hover:to-amber-800 sm:bottom-6 sm:right-6 sm:p-4"
         title="Scroll to top"
       >
         <ArrowUp size={24} />
