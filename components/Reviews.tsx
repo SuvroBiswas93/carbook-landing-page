@@ -138,7 +138,7 @@ export function Reviews() {
           }
           setIsReviewTriggerExpanded(true)
         }}
-        className={`fixed right-2 top-[42%] z-40 flex max-h-[28vh] -translate-y-1/2 flex-col items-center gap-1.5 rounded-full border border-amber-200/70 bg-linear-to-br from-amber-500 via-amber-500 to-yellow-400 px-2 py-3 text-white shadow-[0_8px_24px_rgba(180,83,9,0.28)] ring-2 ring-white/70 backdrop-blur-sm transition-[padding,border-radius,box-shadow] hover:shadow-[0_10px_28px_rgba(180,83,9,0.36)] sm:right-3 sm:top-1/2 sm:gap-2 sm:px-2.5 sm:py-4 md:right-4 lg:right-0 lg:px-3 lg:py-5 ${isReviewTriggerExpanded ? 'rounded-l-xl rounded-r-none' : 'translate-x-3'}`}
+        className={`fixed right-2 top-[42%] z-40 flex max-h-[28vh] -translate-y-1/2 cursor-pointer flex-col items-center gap-1.5 rounded-full border border-amber-200/70 bg-linear-to-br from-amber-500 via-amber-500 to-yellow-400 px-2 py-3 text-white shadow-[0_8px_24px_rgba(180,83,9,0.28)] ring-2 ring-white/70 backdrop-blur-sm transition-[padding,border-radius,box-shadow] hover:shadow-[0_10px_28px_rgba(180,83,9,0.36)] sm:right-3 sm:top-1/2 sm:gap-2 sm:px-2.5 sm:py-4 md:right-4 lg:right-0 lg:px-3 lg:py-5 ${isReviewTriggerExpanded ? 'rounded-l-xl rounded-r-none' : 'translate-x-3'}`}
         title={isReviewTriggerExpanded ? 'Open review form' : 'Show review option'}
         aria-label={isReviewTriggerExpanded ? 'Open review form' : 'Show review option'}
         aria-expanded={isReviewTriggerExpanded}
