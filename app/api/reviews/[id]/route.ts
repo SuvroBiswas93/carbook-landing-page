@@ -16,13 +16,23 @@ export async function PUT(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Review not found.' }, { status: 404 })
   }
 
+  const requestedRating = Number(body.rating ?? reviews[index].rating)
   const updated: Review = {
     ...reviews[index],
     name: String(body.name ?? reviews[index].name).trim(),
-    rating: Math.min(5, Math.max(1, Number(body.rating ?? reviews[index].rating))),
+    rating: Number.isFinite(requestedRating)
+      ? Math.min(5, Math.max(1, requestedRating))
+      : reviews[index].rating,
     text: String(body.text ?? reviews[index].text).trim(),
     location: String(body.location ?? reviews[index].location).trim(),
-    hidden: body.hidden ?? reviews[index].hidden,
+    hidden: typeof body.hidden === 'boolean' ? body.hidden : reviews[index].hidden,
+  }
+
+  if (!updated.name || !updated.location || !updated.text) {
+    return NextResponse.json(
+      { error: 'Name, location, and review text are required.' },
+      { status: 400 },
+    )
   }
 
   reviews[index] = updated

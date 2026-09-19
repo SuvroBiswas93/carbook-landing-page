@@ -40,7 +40,7 @@ export function Reviews() {
     setForm({ name: '', location: '', rating: 5, text: '' })
     setIsModalOpen(false)
     loadReviews()
-    toast.success('Thanks for your review!')
+    toast.success('We truly appreciate your valuable feedback.')
   }
 
   const container = {

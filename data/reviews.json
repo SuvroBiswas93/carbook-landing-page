@@ -1,37 +1,56 @@
 [
   {
+    "id": 6,
+    "name": "Suvro Biswas",
+    "rating": 5,
+    "text": "Khubi valo experience",
+    "location": "Magura sadar, Magura",
+    "hidden": false,
+    "createdAt": "2026-09-19T08:41:25.663Z"
+  },
+  {
     "id": 1,
     "name": "Sarah Mitchell",
     "rating": 5,
     "text": "Absolutely fantastic service! The booking process was seamless and the car was immaculate. The staff was professional and helpful. Highly recommended!",
-    "location": "New York, USA"
+    "location": "New York, USA",
+    "hidden": false,
+    "createdAt": ""
   },
   {
     "id": 2,
     "name": "James Chen",
     "rating": 5,
     "text": "Best car rental experience I've had. Flexible options, great prices, and the vehicles are pristine. Will definitely use again.",
-    "location": "Los Angeles, USA"
+    "location": "Los Angeles, USA",
+    "hidden": false,
+    "createdAt": ""
   },
   {
     "id": 3,
     "name": "Emma Rodriguez",
     "rating": 5,
     "text": "Customer service was exceptional. I had a question during my rental and they responded within minutes. The car exceeded my expectations.",
-    "location": "Miami, USA"
+    "location": "Miami, USA",
+    "hidden": false,
+    "createdAt": ""
   },
   {
     "id": 4,
     "name": "Michael Thompson",
     "rating": 4,
     "text": "Great service overall. The only reason it's not 5 stars is the checkout process took a bit longer than expected, but the team was accommodating.",
-    "location": "Chicago, USA"
+    "location": "Chicago, USA",
+    "hidden": false,
+    "createdAt": ""
   },
   {
     "id": 5,
     "name": "Lisa Wong",
     "rating": 5,
     "text": "The ease of booking combined with excellent vehicle maintenance makes this my go-to rental service. Prices are very competitive too!",
-    "location": "San Francisco, USA"
+    "location": "San Francisco, USA",
+    "hidden": false,
+    "createdAt": ""
   }
 ]

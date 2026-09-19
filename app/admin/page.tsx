@@ -258,7 +258,7 @@ export default function AdminPage() {
           {active === 'Reviews' && (
             <Module
               title="Reviews"
-              description="Hide, show, edit, or remove reviews submitted from the website."
+              description="Edit, delete, publish, or unpublish reviews submitted from the website."
             >
               <ReviewCards
                 reviews={reviews}
@@ -379,7 +379,7 @@ function Overview({
   reviews: Review[]
 }) {
   const publishedCars = cars.filter((car) => car.published).length
-  const visibleReviews = reviews.filter((review) => !review.hidden).length
+  const publishedReviews = reviews.filter((review) => !review.hidden).length
 
   return (
     <>
@@ -388,7 +388,7 @@ function Overview({
           ['Bookings', bookings.length],
           ['Published Cars', publishedCars],
           ['Hidden Cars', cars.length - publishedCars],
-          ['Visible Reviews', visibleReviews],
+          ['Published Reviews', publishedReviews],
         ].map(([label, value]) => (
           <article
             key={label as string}
@@ -748,11 +748,11 @@ function ReviewCards({
             <span
               className={`rounded-full px-3 py-1 text-xs font-bold ${
                 review.hidden
-                  ? 'bg-stone-200 text-stone-700'
+                  ? 'bg-amber-100 text-amber-800'
                   : 'bg-green-100 text-green-800'
               }`}
             >
-              {review.hidden ? 'Hidden' : 'Visible'}
+              {review.hidden ? 'Unpublished' : 'Published'}
             </span>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-[#766e64]">
@@ -771,7 +771,7 @@ function ReviewCards({
               className="flex items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
             >
               {review.hidden ? <Eye size={15} /> : <EyeOff size={15} />}
-              {review.hidden ? 'Show' : 'Hide'}
+              {review.hidden ? 'Publish' : 'Unpublish'}
             </button>
             <button
               onClick={() => onDelete(review.id)}
@@ -833,7 +833,7 @@ function ReviewForm({
           checked={form.hidden}
           onChange={(e) => setForm({ ...form, hidden: e.target.checked })}
         />
-        Hide review
+        Unpublish from website
       </label>
       <button
         onClick={onSave}

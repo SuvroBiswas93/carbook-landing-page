@@ -9,13 +9,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const body = (await request.json()) as Partial<Review>
   const reviews = await getReviews(true)
+  const requestedRating = Number(body.rating ?? 5)
   const review: Review = {
     id: nextNumericId(reviews),
     name: String(body.name ?? '').trim(),
-    rating: Math.min(5, Math.max(1, Number(body.rating ?? 5))),
+    rating: Number.isFinite(requestedRating)
+      ? Math.min(5, Math.max(1, requestedRating))
+      : 5,
     text: String(body.text ?? '').trim(),
     location: String(body.location ?? '').trim(),
-    hidden: Boolean(body.hidden),
+    hidden: true,
     createdAt: new Date().toISOString(),
   }
 
