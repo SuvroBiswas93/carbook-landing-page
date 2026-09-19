@@ -1,0 +1,53 @@
+{
+  "company": {
+    "name": "LuxeRide",
+    "tagline": "Premium Car Rental Experience",
+    "phone": "+1 (800) 555-0123",
+    "email": "support@luxeride.com",
+    "address": "123 Main Street, Downtown",
+    "hours": "24/7 Available",
+    "socialLinks": {
+      "facebook": "#",
+      "instagram": "#",
+      "twitter": "#",
+      "linkedin": "#"
+    }
+  },
+  "pricing": {
+    "farePerKm": 5,
+    "minimumFare": 25,
+    "currency": "USD"
+  },
+  "routes": [
+    {
+      "name": "Downtown to Airport",
+      "from": "Downtown Hub",
+      "to": "Airport Terminal",
+      "distance": 25
+    },
+    {
+      "name": "Downtown to Westside",
+      "from": "Downtown Hub",
+      "to": "Westside Plaza",
+      "distance": 12
+    },
+    {
+      "name": "Downtown to Eastside",
+      "from": "Downtown Hub",
+      "to": "Eastside Station",
+      "distance": 18
+    },
+    {
+      "name": "Downtown to Northgate",
+      "from": "Downtown Hub",
+      "to": "Northgate Center",
+      "distance": 22
+    },
+    {
+      "name": "Downtown to Harbor",
+      "from": "Downtown Hub",
+      "to": "Harbor View",
+      "distance": 8
+    }
+  ]
+}

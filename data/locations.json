@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "name": "Dhaka",
+    "address": "Dhaka Central, Bangladesh",
+    "zone": "Dhaka Division"
+  },
+  {
+    "id": 2,
+    "name": "Chittagong",
+    "address": "Chittagong Port Area, Bangladesh",
+    "zone": "Chittagong Division"
+  },
+  {
+    "id": 3,
+    "name": "Sylhet",
+    "address": "Sylhet City Center, Bangladesh",
+    "zone": "Sylhet Division"
+  },
+  {
+    "id": 4,
+    "name": "Rajshahi",
+    "address": "Rajshahi University Area, Bangladesh",
+    "zone": "Rajshahi Division"
+  },
+  {
+    "id": 5,
+    "name": "Khulna",
+    "address": "Khulna Satkhira Highway, Bangladesh",
+    "zone": "Khulna Division"
+  },
+  {
+    "id": 6,
+    "name": "Barisal",
+    "address": "Barisal Town Center, Bangladesh",
+    "zone": "Barisal Division"
+  },
+  {
+    "id": 7,
+    "name": "Rangpur",
+    "address": "Rangpur City Center, Bangladesh",
+    "zone": "Rangpur Division"
+  },
+  {
+    "id": 8,
+    "name": "Mymensingh",
+    "address": "Mymensingh Medical Area, Bangladesh",
+    "zone": "Mymensingh Division"
+  },
+  {
+    "id": 9,
+    "name": "Comilla",
+    "address": "Comilla Cantonment Road, Bangladesh",
+    "zone": "Chittagong Division"
+  },
+  {
+    "id": 10,
+    "name": "Cox's Bazar",
+    "address": "Cox's Bazar Sea Side, Bangladesh",
+    "zone": "Chittagong Division"
+  },
+  {
+    "id": 11,
+    "name": "Jessore",
+    "address": "Jessore City Center, Bangladesh",
+    "zone": "Khulna Division"
+  },
+  {
+    "id": 12,
+    "name": "Dinajpur",
+    "address": "Dinajpur Board Area, Bangladesh",
+    "zone": "Rangpur Division"
+  },
+  {
+    "id": 13,
+    "name": "Noakhali",
+    "address": "Noakhali Sadar, Bangladesh",
+    "zone": "Chittagong Division"
+  },
+  {
+    "id": 14,
+    "name": "Tangail",
+    "address": "Tangail Town Center, Bangladesh",
+    "zone": "Dhaka Division"
+  },
+  {
+    "id": 15,
+    "name": "Kushtia",
+    "address": "Kushtia Land Port, Bangladesh",
+    "zone": "Khulna Division"
+  }
+]

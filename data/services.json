@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "24/7 Roadside Assistance",
+    "description": "Get immediate help whenever you need it with our dedicated support team.",
+    "fullDescription": "Our round-the-clock roadside assistance ensures you're never stranded. With strategic service points across the city and highly trained technicians, we provide fuel delivery, tire changes, battery support, and towing services. Emergency response time is typically under 30 minutes.",
+    "icon": "phone-icon"
+  },
+  {
+    "id": 2,
+    "title": "Free Insurance Coverage",
+    "description": "Drive with peace of mind with comprehensive insurance included.",
+    "fullDescription": "All our rentals include comprehensive insurance coverage with zero liability. We protect against collision damage, theft, and accidents. Additional optional coverage is available for extra protection. Rental duration doesn't affect your insurance premium.",
+    "icon": "shield-icon"
+  },
+  {
+    "id": 3,
+    "title": "Flexible Booking Options",
+    "description": "Book hourly, daily, or monthly with instant confirmation.",
+    "fullDescription": "Our flexible booking system allows you to rent for any duration. Hourly rates are perfect for quick trips, daily rates for weekend getaways, and monthly plans offer exceptional value for long-term use. Modify or cancel your booking up to 2 hours before pickup with no penalties.",
+    "icon": "calendar-icon"
+  },
+  {
+    "id": 4,
+    "title": "Premium Vehicles Only",
+    "description": "Experience luxury and comfort with our well-maintained fleet.",
+    "fullDescription": "Every vehicle in our fleet undergoes rigorous maintenance and safety checks. We invest in modern, premium vehicles that combine comfort, performance, and reliability. All cars are equipped with GPS, modern infotainment systems, and premium interiors.",
+    "icon": "star-icon"
+  },
+  {
+    "id": 5,
+    "title": "Multiple Pickup Locations",
+    "description": "Choose from convenient pickup points across the city.",
+    "fullDescription": "With 15+ pickup locations throughout the metropolitan area, we make car rental accessible. Airport pickup, downtown hubs, and neighborhood centers ensure you can grab a vehicle when and where you need it. Free parking at all our facilities.",
+    "icon": "map-icon"
+  },
+  {
+    "id": 6,
+    "title": "Easy Mobile App",
+    "description": "Manage your rental entirely from your smartphone.",
+    "fullDescription": "Our intuitive mobile app lets you book, track, and manage your rental in seconds. Get real-time updates on your vehicle location, upload documents, manage payments, and access roadside assistance directly from your phone. Available on iOS and Android.",
+    "icon": "smartphone-icon"
+  }
+]
