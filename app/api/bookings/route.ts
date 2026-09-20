@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     dropoffDate: String(body.dropoffDate ?? '').trim(),
     tripType: String(body.tripType ?? 'One Way').trim(),
     timestamp: new Date().toLocaleString(),
-    status: 'Pending',
+    status: 'New',
     distance: Number.isFinite(Number(body.distance)) ? Number(body.distance) : undefined,
     distanceFare: Number.isFinite(Number(body.distanceFare)) ? Number(body.distanceFare) : undefined,
     estimatedFare: Number.isFinite(Number(body.estimatedFare)) ? Number(body.estimatedFare) : undefined,

@@ -9,7 +9,7 @@
     "pickupDate": "2026-09-20T02:00",
     "tripType": "Round Way",
     "timestamp": "9/19/2026, 3:57:28 AM",
-    "status": "Pending"
+    "status": "Confirmed"
   },
   {
     "id": "BD-253762",
@@ -21,7 +21,7 @@
     "pickupDate": "2026-09-20T08:26",
     "tripType": "One Way",
     "timestamp": "9/19/2026, 4:24:13 AM",
-    "status": "Pending",
+    "status": "Called",
     "distance": 140,
     "distanceFare": 700,
     "estimatedFare": 700
@@ -37,6 +37,6 @@
     "dropoffDate": "2026-09-20T03:00",
     "tripType": "Round Way",
     "timestamp": "9/19/2026, 1:48:13 PM",
-    "status": "Pending"
+    "status": "Cancelled"
   }
 ]

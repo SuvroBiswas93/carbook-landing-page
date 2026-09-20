@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 
-export type BookingStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled'
+export type BookingStatus = 'New' | 'Called' | 'Confirmed' | 'Cancelled'
 
 export interface Car {
   id: number
@@ -118,7 +118,29 @@ export async function saveReviews(reviews: Review[]): Promise<void> {
 }
 
 export async function getBookings(): Promise<Booking[]> {
-  return readJson<Booking[]>('bookings.json', [])
+  const bookings = await readJson<Partial<Booking>[]>('bookings.json', [])
+  const validStatuses: BookingStatus[] = ['New', 'Called', 'Confirmed', 'Cancelled']
+
+  return bookings.map((booking) => ({
+    id: String(booking.id ?? ''),
+    carId: Number(booking.carId ?? 0),
+    carName: String(booking.carName ?? 'Unselected car'),
+    customerName: booking.customerName ? String(booking.customerName) : undefined,
+    carType: booking.carType ? String(booking.carType) : undefined,
+    mobileNumber: String(booking.mobileNumber ?? ''),
+    pickupLocation: String(booking.pickupLocation ?? ''),
+    dropoffLocation: String(booking.dropoffLocation ?? ''),
+    pickupDate: String(booking.pickupDate ?? ''),
+    dropoffDate: booking.dropoffDate ? String(booking.dropoffDate) : undefined,
+    tripType: String(booking.tripType ?? 'One Way'),
+    timestamp: String(booking.timestamp ?? ''),
+    status: validStatuses.includes(booking.status as BookingStatus)
+      ? (booking.status as BookingStatus)
+      : 'New',
+    distance: booking.distance !== undefined ? Number(booking.distance) : undefined,
+    distanceFare: booking.distanceFare !== undefined ? Number(booking.distanceFare) : undefined,
+    estimatedFare: booking.estimatedFare !== undefined ? Number(booking.estimatedFare) : undefined,
+  }))
 }
 
 export async function saveBookings(bookings: Booking[]): Promise<void> {
