@@ -12,24 +12,26 @@ const trustItems = [
 
 export function TrustBar() {
   return (
-    <section aria-label="বিশ্বাসের কারণ" className="border-y border-slate-200 bg-white py-5 sm:py-6">
+    <section aria-label="বিশ্বাসের কারণ" className="relative z-10 border-y border-slate-200/80 bg-gradient-to-b from-slate-50/80 to-white py-6 sm:py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 sm:grid-cols-4">
-        {trustItems.map(({ icon: Icon, text }, index) => (
-          <motion.div
-            key={text}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.08 }}
-            className={`group flex min-h-16 items-center gap-2 px-2 py-3 text-sm font-semibold text-brand-navy transition hover:bg-brand-surface sm:min-h-20 sm:justify-center sm:gap-3 sm:px-4 ${index > 0 ? 'border-l border-slate-200' : ''} ${index > 1 ? 'border-t sm:border-t-0' : ''}`}
-          >
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-navy sm:size-9">
-              <Icon size={18} aria-hidden="true" />
-            </span>
-            <span className="leading-5 sm:text-center">{text}</span>
-          </motion.div>
-        ))}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {trustItems.map(({ icon: Icon, text }, index) => (
+            <motion.div
+              key={text}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.08, duration: 0.4 }}
+              className="group flex cursor-pointer items-center gap-4 rounded-2xl border border-slate-200/60 bg-white/90 p-4 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-500/5 hover:bg-slate-50"
+            >
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/15 to-amber-500/5 text-amber-600 ring-1 ring-amber-500/20 transition-all duration-300 group-hover:scale-105 group-hover:bg-amber-100/50 sm:size-14">
+                <Icon size={24} aria-hidden="true" className="sm:size-7" />
+              </span>
+              <span className="text-base font-bold text-slate-800 leading-snug tracking-tight sm:text-lg sm:leading-snug">
+                {text}
+              </span>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
