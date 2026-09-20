@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CarFront, Menu, PhoneCall, X } from 'lucide-react'
 
 const links = [
@@ -13,7 +13,36 @@ const links = [
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [activeHref, setActiveHref] = useState('')
+  const [activeHref, setActiveHref] = useState('#cars')
+
+  useEffect(() => {
+    const sections = document.querySelectorAll<HTMLElement>('section[id]')
+
+    if (!sections.length) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+
+        if (visibleEntry) {
+          setActiveHref(`#${visibleEntry.target.id}`)
+        }
+      },
+      {
+        root: null,
+        threshold: [0.25, 0.5, 0.75],
+        rootMargin: '-20% 0px -45% 0px',
+      },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+
+    return () => observer.disconnect()
+  }, [])
 
   const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault()
@@ -68,7 +97,7 @@ export function Navbar() {
               onClick={(event) => handleNavClick(event, link.href)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition md:max-lg:px-2 md:max-lg:py-1.5 md:max-lg:text-xs ${
                 activeHref === link.href
-                  ? 'bg-brand-navy-soft text-white shadow-[0_4px_16px_rgba(0,0,0,0.2)]'
+                  ? 'bg-[#f6c05c] text-black shadow-[0_4px_16px_rgba(0,0,0,0.2)]'
                   : 'text-white/80 hover:bg-white/10 hover:text-white'
               }`}
             >
@@ -110,7 +139,7 @@ export function Navbar() {
                 onClick={(event) => handleNavClick(event, link.href)}
                 className={`rounded-xl px-4 py-3 text-sm font-semibold transition ${
                   activeHref === link.href
-                    ? 'bg-brand-navy-soft text-white'
+                    ? 'bg-[#16365C] text-white'
                     : 'text-white/80 hover:bg-white/10 hover:text-white'
                 }`}
               >
