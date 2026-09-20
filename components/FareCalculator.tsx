@@ -53,7 +53,7 @@ export function FareCalculator() {
         return response.json()
       })
       .then((data: Pricing) => setPricing(data))
-      .catch(() => setPricing({ farePerKm: 5, minimumFare: 25, currency: 'USD' }))
+      .catch(() => setPricing({ farePerKm: 5, minimumFare: 25, currency: 'BDT' }))
   }, [])
 
   useEffect(() => {
@@ -261,7 +261,7 @@ export function FareCalculator() {
                       <img src={selectedCar.image} alt={selectedCar.brand} className="h-10 w-14 rounded-lg object-cover" />
                       <div>
                         <strong className="block font-serif text-lg text-black">{selectedCar.brand} {selectedCar.model}</strong>
-                        <span className="text-sm text-[#aaa59e]">{selectedCar.seats} Seats · ${selectedCar.pricePerDay}/day</span>
+                        <span className="text-sm text-[#aaa59e]">{selectedCar.seats} Seats · ৳{selectedCar.pricePerDay}/day</span>
                       </div>
                     </div>
                   ) : (
@@ -285,7 +285,7 @@ export function FareCalculator() {
                       <img src={car.image} alt={car.brand} className="h-12 w-16 rounded-lg object-cover" />
                       <div>
                         <p className="font-semibold text-sm text-black">{car.brand} {car.model}</p>
-                        <p className="text-xs text-[#aaa59e]">{car.category} · {car.seats} Seats · ${car.pricePerDay}/day</p>
+                        <p className="text-xs text-[#aaa59e]">{car.category} · {car.seats} Seats · ৳{car.pricePerDay}/day</p>
                       </div>
                     </button>
                   ))}
@@ -436,14 +436,14 @@ export function FareCalculator() {
                 <div className="bg-white rounded-lg p-6">
                   <p className="text-sm text-stone-500 mb-2">Distance Fare</p>
                   <p className="text-2xl font-bold text-amber-700">
-                    ${result.distanceFare.toFixed(2)}
-                  </p>
+                      ৳{result.distanceFare.toFixed(2)}
+                    </p>
                 </div>
 
                 <div className="bg-white rounded-lg p-6 border-2 border-amber-300">
                   <p className="text-sm text-stone-500 mb-2">Total Fare</p>
                   <p className="text-4xl font-bold text-amber-700">
-                    ${result.totalFare.toFixed(2)}
+                    ৳{result.totalFare.toFixed(2)}
                   </p>
                   <p className="text-xs text-stone-500 mt-2">
                     *This is an estimated fare based on current rates
@@ -473,14 +473,14 @@ export function FareCalculator() {
                 <div>
                   <p className="text-sm text-stone-500 mb-2">বেস ভাড়া</p>
                   <p className="text-2xl font-bold text-stone-900">
-                    ${pricing?.minimumFare ?? 25}
-                  </p>
+                      ৳{pricing?.minimumFare ?? 25}
+                    </p>
                 </div>
 
                 <div>
                   <p className="text-sm text-stone-500 mb-2">প্রতি কিলোমিটার ভাড়া</p>
                   <p className="text-2xl font-bold text-amber-700">
-                    ${pricing?.farePerKm ?? 5}/km
+                    ৳{pricing?.farePerKm ?? 5}/km
                   </p>
                 </div>
 

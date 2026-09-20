@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { AdminDataProvider } from './AdminDataProvider'
 import { AdminShell } from './AdminShell'
 
 export const metadata: Metadata = {
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 }
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <AdminShell>{children}</AdminShell>
+  return (
+    <AdminDataProvider>
+      <AdminShell>{children}</AdminShell>
+    </AdminDataProvider>
+  )
 }

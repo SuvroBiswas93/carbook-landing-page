@@ -154,7 +154,7 @@ export async function getPricing(): Promise<Pricing> {
   return {
     farePerKm: Number.isFinite(Number(pricing.farePerKm)) && Number(pricing.farePerKm) >= 0 ? Number(pricing.farePerKm) : 5,
     minimumFare: Number.isFinite(Number(pricing.minimumFare)) && Number(pricing.minimumFare) >= 0 ? Number(pricing.minimumFare) : 25,
-    currency: String(pricing.currency ?? 'USD'),
+    currency: String(pricing.currency ?? 'BDT'),
   }
 }
 

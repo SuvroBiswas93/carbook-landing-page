@@ -25,7 +25,7 @@ export async function PUT(request: Request) {
   const pricing: Pricing = {
     farePerKm,
     minimumFare,
-    currency: String(body.currency ?? 'USD').trim() || 'USD',
+    currency: String(body.currency ?? 'BDT').trim() || 'BDT',
   }
 
   await savePricing(pricing)

@@ -38,5 +38,19 @@
     "tripType": "Round Way",
     "timestamp": "9/19/2026, 1:48:13 PM",
     "status": "Cancelled"
+  },
+  {
+    "id": "BD-748865",
+    "carId": 1,
+    "carName": "BMW 7 Series",
+    "customerName": "test",
+    "carType": "luxury",
+    "mobileNumber": "01742333348",
+    "pickupLocation": "Dhaka",
+    "dropoffLocation": "Dhaka",
+    "pickupDate": "2026-09-22T02:15",
+    "tripType": "One Way",
+    "timestamp": "9/21/2026, 4:52:28 AM",
+    "status": "New"
   }
 ]

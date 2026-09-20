@@ -245,13 +245,13 @@ export function CarSlider() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-3xl font-bold text-amber-700">
-                    ${selectedCar.pricePerDay}
+                    ৳{selectedCar.pricePerDay}
                   </p>
                   <p className="text-sm text-stone-500">per day</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-amber-700">
-                    ${selectedCar.pricePerKm}
+                    ৳{selectedCar.pricePerKm}
                   </p>
                   <p className="text-sm text-stone-500">per km</p>
                 </div>

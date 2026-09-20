@@ -16,7 +16,7 @@
   "pricing": {
     "farePerKm": 5,
     "minimumFare": 25,
-    "currency": "USD"
+    "currency": "BDT"
   },
   "routes": [
     {

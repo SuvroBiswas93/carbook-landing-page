@@ -120,7 +120,7 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
                               <span className="text-sm text-stone-600 capitalize">{bookingData.car.transmission}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-bold text-amber-700">${bookingData.car.pricePerDay}/day</span>
+                              <span className="text-sm font-bold text-amber-700">৳{bookingData.car.pricePerDay}/day</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-stone-600 capitalize">{bookingData.car.fuel}</span>
@@ -215,7 +215,7 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
                         <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Fare estimate</p>
                         <p className="mt-1 text-sm text-stone-600">{bookingData.distance} km route at the current rate</p>
                       </div>
-                      <p className="text-3xl font-black text-amber-700">${bookingData.estimatedFare.toFixed(2)}</p>
+                      <p className="text-3xl font-black text-amber-700">৳{bookingData.estimatedFare.toFixed(2)}</p>
                     </div>
                   </div>
                 )}

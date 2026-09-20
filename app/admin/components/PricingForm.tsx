@@ -44,7 +44,7 @@ export function PricingForm({
         </label>
       </div>
       <p className="mt-4 text-sm text-[#766e64]">
-        Current calculator rate: ${savedPricing.farePerKm}/km. Changes apply to
+        Current calculator rate: ৳{savedPricing.farePerKm}/km. Changes apply to
         the website calculator after saving.
       </p>
       <button

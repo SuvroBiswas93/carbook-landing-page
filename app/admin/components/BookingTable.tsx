@@ -99,7 +99,7 @@ const createColumns = (
       <>
         <span className="font-bold text-[#a36d16]">
           {booking.estimatedFare !== undefined
-            ? `$${booking.estimatedFare.toFixed(2)}`
+            ? `৳${booking.estimatedFare.toFixed(2)}`
             : 'N/A'}
         </span>
         {booking.distance !== undefined && (
