@@ -114,46 +114,46 @@ export function CarSlider() {
                   className={`${isMobile ? 'min-w-[86%] snap-start snap-always' : cardWidthClass} shrink-0 overflow-hidden rounded-xl bg-stone-50 shadow-lg transition-all hover:shadow-2xl`}
                   style={isMobile ? { scrollSnapAlign: 'start', scrollSnapStop: 'always' } : undefined}
                 >
-                  <img src={car.image} alt={`${car.brand} ${car.model}`} className="h-48 w-full object-cover" />
+                  <img src={car.image} alt={`${car.brand} ${car.model}`} className={isMobile ? 'h-40 w-full object-cover' : 'h-48 w-full object-cover'} />
 
-                  <div className="space-y-4 p-6">
+                  <div className={isMobile ? 'space-y-3 p-4' : 'space-y-4 p-6'}>
                     <div>
-                      <h3 className="text-2xl font-bold text-stone-900">
+                      <h3 className={isMobile ? 'text-xl font-bold text-stone-900' : 'text-2xl font-bold text-stone-900'}>
                         {car.brand} {car.model}
                       </h3>
-                      <p className="text-sm text-stone-500 capitalize">{car.category}</p>
+                      <p className="text-xs text-stone-500 capitalize sm:text-sm">{car.category}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 border-y border-stone-200 py-4 sm:grid-cols-4">
+                    <div className={isMobile ? 'grid grid-cols-2 gap-2 border-y border-stone-200 py-3' : 'grid grid-cols-2 gap-3 border-y border-stone-200 py-4 sm:grid-cols-4'}>
                       <div className="text-center">
-                        <Users size={20} className="mx-auto mb-1 text-brand-navy" />
-                        <p className="text-sm font-semibold text-stone-900">{car.seats}</p>
-                        <p className="text-xs text-stone-500">Seats</p>
+                        <Users size={isMobile ? 16 : 20} className="mx-auto mb-1 text-brand-navy" />
+                        <p className="text-xs font-semibold text-stone-900 sm:text-sm">{car.seats}</p>
+                        <p className="text-[10px] text-stone-500 sm:text-xs">Seats</p>
                       </div>
                       <div className="text-center">
-                        <Fuel size={20} className="mx-auto mb-1 text-brand-navy" />
-                        <p className="text-sm font-semibold capitalize text-stone-900">{car.fuel}</p>
-                        <p className="text-xs text-stone-500">Fuel</p>
+                        <Fuel size={isMobile ? 16 : 20} className="mx-auto mb-1 text-brand-navy" />
+                        <p className="text-xs font-semibold capitalize text-stone-900 sm:text-sm">{car.fuel}</p>
+                        <p className="text-[10px] text-stone-500 sm:text-xs">Fuel</p>
                       </div>
                       <div className="text-center">
-                        <Zap size={20} className="mx-auto mb-1 text-brand-navy" />
-                        <p className="text-sm font-semibold capitalize text-stone-900">{car.transmission}</p>
-                        <p className="text-xs text-stone-500">Trans</p>
+                        <Zap size={isMobile ? 16 : 20} className="mx-auto mb-1 text-brand-navy" />
+                        <p className="text-xs font-semibold capitalize text-stone-900 sm:text-sm">{car.transmission}</p>
+                        <p className="text-[10px] text-stone-500 sm:text-xs">Trans</p>
                       </div>
                       <div className="text-center">
-                        <Snowflake size={20} className={`mx-auto mb-1 ${car.hasAc ? 'text-sky-500' : 'text-stone-300'}`} />
-                        <p className="text-sm font-semibold text-stone-900">{car.hasAc ? 'আছে' : 'নেই'}</p>
-                        <p className="text-xs text-stone-500">AC</p>
+                        <Snowflake size={isMobile ? 16 : 20} className={`mx-auto mb-1 ${car.hasAc ? 'text-sky-500' : 'text-stone-300'}`} />
+                        <p className="text-xs font-semibold text-stone-900 sm:text-sm">{car.hasAc ? 'আছে' : 'নেই'}</p>
+                        <p className="text-[10px] text-stone-500 sm:text-xs">AC</p>
                       </div>
                     </div>
 
                     <div>
-                      <p className="mb-2 text-sm text-stone-600">
+                      <p className={isMobile ? 'mb-1 text-xs text-stone-600' : 'mb-2 text-sm text-stone-600'}>
                         From{' '}
-                        <span className="text-2xl font-bold text-amber-700">৳{car.pricePerDay}</span>
-                        <span className="text-stone-500"> থেকে শুরু</span>
+                        <span className={isMobile ? 'text-xl font-bold text-amber-700' : 'text-2xl font-bold text-amber-700'}>৳{car.pricePerDay}</span>
+                        <span className="text-stone-500"> শুরু</span>
                       </p>
-                      <p className="text-xs text-stone-500">৳{car.pricePerKm}/কিমি</p>
+                      <p className="text-[10px] text-stone-500 sm:text-xs">৳{car.pricePerKm}/কিমি</p>
                     </div>
 
                     <button
@@ -161,7 +161,7 @@ export function CarSlider() {
                         window.dispatchEvent(new CustomEvent('car-booking:selected', { detail: car }))
                         document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
                       }}
-                      className="w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800"
+                      className={isMobile ? 'w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-2.5 text-sm font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800' : 'w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800'}
                     >
                       বুক করুন
                     </button>
