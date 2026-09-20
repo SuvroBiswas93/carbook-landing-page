@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { MessageCircle, ArrowUp } from 'lucide-react'
+import config from '@/data/config.json'
 
 export function FloatingButtons() {
   const [isVisible, setIsVisible] = useState(false)
@@ -30,13 +31,16 @@ export function FloatingButtons() {
     })
   }
 
+  const whatsappNumber = config.company.phone.replace(/\D/g, '')
+  const whatsappMessage = encodeURIComponent(
+    'Assalamu alaikum, I want to rent a car. Please share the available options and pricing.'
+  )
+
   const handleWhatsApp = () => {
-    const message = encodeURIComponent(
-      'Hi! I would like to inquire about car rental services.'
-    )
     window.open(
-      `https://wa.me/1234567890?text=${message}`,
-      '_blank'
+      `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`,
+      '_blank',
+      'noopener,noreferrer'
     )
   }
 

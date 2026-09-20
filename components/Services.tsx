@@ -44,7 +44,7 @@ export function Services() {
         </motion.div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible lg:grid-cols-3 lg:gap-6">
           {servicesData.map((service, index) => (
             <motion.div
               key={service.id}
@@ -53,7 +53,7 @@ export function Services() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-              className="cursor-pointer rounded-xl bg-white p-4 shadow-lg transition-all sm:p-7"
+              className="min-w-[86%] snap-start cursor-pointer rounded-xl bg-white p-4 shadow-lg transition-all sm:min-w-[58%] md:min-w-0 md:p-7"
               onClick={() => setSelectedService(service)}
             >
               <div className="mb-3 text-brand-navy sm:mb-4">
@@ -63,7 +63,7 @@ export function Services() {
                 {service.title}
               </h3>
               <p className="mb-4 mt-2 text-sm leading-6 text-stone-600 sm:mb-6 sm:text-base">{service.description}</p>
-              <button className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-brand-navy transition-colors hover:text-brand-navy-soft sm:text-base">
+              <button className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#FFB020] transition-colors hover:text-[#E08E00] sm:text-base">
                 বিস্তারিত দেখুন →
               </button>
             </motion.div>
@@ -94,7 +94,7 @@ export function Services() {
                   setSelectedService(null)
                   document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="flex-1 cursor-pointer bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all"
+                className="flex-1 cursor-pointer bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all"
               >
                 বুকিং সম্পর্কে জানুন
               </button>

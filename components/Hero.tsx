@@ -19,6 +19,7 @@ interface FormErrors {
   pickupLocation?: string
   dropoffLocation?: string
   pickupDate?: string
+  returnDate?: string
   customerName?: string
   mobileNumber?: string
 }
@@ -38,6 +39,7 @@ export function Hero() {
   const [pickupLocation, setPickupLocation] = useState('')
   const [dropoffLocation, setDropoffLocation] = useState('')
   const [pickupDate, setPickupDate] = useState('')
+  const [returnDate, setReturnDate] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
   const [cars, setCars] = useState<Car[]>([])
@@ -66,6 +68,7 @@ export function Hero() {
   const isHourly = activeTab === 'hourly'
   const isIntercity = activeTab === 'intercity'
   const isAirport = activeTab === 'airport'
+  const isRoundTrip = isIntercity && tripType === 'Round Trip'
 
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {}
@@ -73,6 +76,9 @@ export function Hero() {
     if (!pickupLocation) nextErrors.pickupLocation = 'পিকআপ লোকেশন দিন'
     if (!isHourly && !dropoffLocation) nextErrors.dropoffLocation = 'ড্রপ-অফ লোকেশন দিন'
     if (!pickupDate) nextErrors.pickupDate = 'তারিখ ও সময় নির্বাচন করুন'
+    if (isRoundTrip && (!returnDate || new Date(returnDate).getTime() < new Date(pickupDate).getTime())) {
+      nextErrors.returnDate = 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে'
+    }
     if (!customerName.trim()) nextErrors.customerName = 'আপনার নাম লিখুন'
     if (!mobilePattern.test(mobileNumber)) nextErrors.mobileNumber = 'সঠিক ১১ সংখ্যার বাংলাদেশি নম্বর দিন'
     return nextErrors
@@ -90,6 +96,7 @@ export function Hero() {
     if (field === 'pickupLocation') setPickupLocation(value)
     if (field === 'dropoffLocation') setDropoffLocation(value)
     if (field === 'pickupDate') setPickupDate(value)
+    if (field === 'returnDate') setReturnDate(value)
     if (field === 'customerName') setCustomerName(value)
     if (field === 'mobileNumber') setMobileNumber(value.replace(/\D/g, '').slice(0, 11))
 
@@ -103,6 +110,8 @@ export function Hero() {
             ? 'ড্রপ-অফ লোকেশন দিন'
             : field === 'pickupDate' && (!value || new Date(value).getTime() < Date.now())
               ? 'বর্তমান বা ভবিষ্যতের তারিখ নির্বাচন করুন'
+                : field === 'returnDate' && isRoundTrip && (!value || new Date(value).getTime() < new Date(pickupDate).getTime())
+                  ? 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে'
               : field === 'customerName' && !value.trim()
                 ? 'আপনার নাম লিখুন'
                 : field === 'mobileNumber' && !mobilePattern.test(value.replace(/\D/g, ''))
@@ -118,6 +127,7 @@ export function Hero() {
     setActiveTab(tab)
     setErrors({})
     if (tab !== 'intercity') setTripType('One Way')
+    if (tab !== 'intercity') setReturnDate('')
     if (tab === 'hourly') setDropoffLocation('')
   }
 
@@ -143,6 +153,7 @@ export function Hero() {
           pickupLocation,
           dropoffLocation: isHourly ? '' : dropoffLocation,
           pickupDate,
+          dropoffDate: isRoundTrip ? returnDate : '',
           tripType: isIntercity ? tripType : 'One Way',
         }),
       })
@@ -224,6 +235,14 @@ export function Hero() {
                 <input type="datetime-local" min={getMinimumDateTime()} value={pickupDate} onChange={(event) => updateField('pickupDate', event.target.value)} className={inputClass('pickupDate')} />
                 {errors.pickupDate && <span className="mt-1 block text-xs font-medium text-red-600">{errors.pickupDate}</span>}
               </label>
+
+              {isRoundTrip && (
+                <label className="text-sm font-bold text-stone-800">
+                  ফেরার তারিখ ও সময় <span className="text-red-500">*</span>
+                  <input type="datetime-local" min={pickupDate || getMinimumDateTime()} value={returnDate} onChange={(event) => updateField('returnDate', event.target.value)} className={inputClass('returnDate')} />
+                  {errors.returnDate && <span className="mt-1 block text-xs font-medium text-red-600">{errors.returnDate}</span>}
+                </label>
+              )}
 
               <label className="text-sm font-bold text-stone-800">
                 আপনার নাম <span className="text-red-500">*</span>
