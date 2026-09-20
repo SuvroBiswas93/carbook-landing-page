@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CarFront, Menu, PhoneCall, X } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, PhoneCall, X } from 'lucide-react'
 import config from '@/data/config.json'
 
 const links = [
@@ -93,9 +94,13 @@ export function Navbar() {
           className="flex min-w-0 items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-2 py-1.5 transition hover:border-white/30 hover:bg-white/15 sm:gap-3 sm:rounded-full sm:px-3 sm:py-2"
           aria-label="Traveling Bangladesh Rent A Car home"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-brand-amber text-brand-navy shadow-[0_0_18px_rgba(255,176,32,0.3)] sm:size-9 sm:rounded-full">
-            <CarFront aria-hidden="true" className="size-4 sm:size-5" />
-          </span>
+          <Image
+            src="/logo.jpg"
+            alt="Traveling Bangladesh Rent A Car logo"
+            width={36}
+            height={36}
+            className="size-8 shrink-0 rounded-xl object-cover sm:size-9 sm:rounded-full"
+          />
           <span className="max-w-[9rem] font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
             Traveling Bangladesh Rent A Car
           </span>
