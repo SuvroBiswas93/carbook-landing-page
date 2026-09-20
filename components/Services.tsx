@@ -63,7 +63,7 @@ export function Services() {
                 {service.title}
               </h3>
               <p className="mb-4 mt-2 text-sm leading-6 text-stone-600 sm:mb-6 sm:text-base">{service.description}</p>
-              <button className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-brand-navy transition-colors hover:text-brand-navy-soft sm:text-base">
+              <button className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#FFB020] transition-colors hover:text-[#E08E00] sm:text-base">
                 বিস্তারিত দেখুন →
               </button>
             </motion.div>
