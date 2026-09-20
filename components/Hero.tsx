@@ -168,7 +168,7 @@ export function Hero() {
       <div className="mx-auto max-w-345 px-3 sm:px-8">
         <div className="mb-8 max-w-3xl">
           <h1 aria-label={heroHeadline} className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl">
-            <span className="bg-linear-to-r from-[#9b5b2e] via-[#d97706] to-[#b94a43] bg-clip-text text-transparent">{heroHeadline}</span>
+            <span className="bg-linear-to-r from-[#FFB020] via-[#E08E00] to-[#16365C] bg-clip-text text-transparent">{heroHeadline}</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-brand-muted sm:text-xl">
             ফিক্সড প্রাইস, কোনো হিডেন চার্জ নেই। ফর্ম পূরণ করুন, <span className="font-bold text-brand-navy">১০ মিনিটে আমরা কল করবো।</span>
