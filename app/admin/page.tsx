@@ -145,8 +145,8 @@ export default function AdminPage() {
         }`}
       >
         <div className="flex items-center justify-between">
-          <a href="/" className="font-serif text-2xl font-bold">
-            Luxe<span className="text-[#a8865f]">Drive</span>
+          <a href="/" className="max-w-[12rem] font-serif text-lg font-bold leading-tight">
+            Traveling Bangladesh Rent A Car
           </a>
           <button
             className="lg:hidden"

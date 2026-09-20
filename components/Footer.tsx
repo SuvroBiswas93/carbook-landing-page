@@ -16,7 +16,7 @@ export function Footer({ onNavigate }: FooterProps) {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <button type="button" onClick={() => onNavigate('hero')} className="cursor-pointer text-left">
-            <span className="font-serif text-2xl font-bold">Luxe<span className="text-brand-amber">Drive</span></span>
+            <span className="max-w-xs font-serif text-xl font-bold leading-tight sm:text-2xl">Traveling Bangladesh Rent A Car</span>
             <span className="mt-1 block text-sm text-white/65">চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে</span>
           </button>
           <div className="grid gap-3 text-sm text-white/80 sm:grid-cols-3 sm:gap-6">
