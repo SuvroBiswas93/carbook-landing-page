@@ -8,6 +8,7 @@ function carFromBody(body: Partial<Car>, id: number): Car {
     model: String(body.model ?? '').trim(),
     category: String(body.category ?? '').trim(),
     seats: Number(body.seats ?? 4),
+    hasAc: body.hasAc ?? true,
     transmission: String(body.transmission ?? 'automatic').trim(),
     fuel: String(body.fuel ?? 'petrol').trim(),
     pricePerDay: Number(body.pricePerDay ?? 0),

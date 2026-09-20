@@ -1,42 +1,32 @@
 [
   {
     "id": 1,
-    "question": "What documents do I need to rent a car?",
-    "answer": "You'll need a valid driver's license, passport or government-issued ID, and a credit card for the rental deposit. International customers may also need an International Driving Permit (IDP). All documents must be current and valid."
+    "question": "অগ্রিম পেমেন্ট লাগবে কি?",
+    "answer": "না, ফর্ম পূরণ করলেই হবে। গাড়ি কনফার্ম হওয়ার পর ভাড়া পরিশোধ করবেন।"
   },
   {
     "id": 2,
-    "question": "What is your age requirement for rentals?",
-    "answer": "Renters must be at least 21 years old to book a vehicle. We offer standard rates for drivers 25 and above. Young driver surcharges apply for drivers 21-24. Senior rates apply for drivers 70 and above."
+    "question": "গাড়ির সাথে ড্রাইভার থাকে?",
+    "answer": "হ্যাঁ, প্রতিটি গাড়ির সাথে অভিজ্ঞ ড্রাইভার থাকেন।"
   },
   {
     "id": 3,
-    "question": "Can I modify or cancel my booking?",
-    "answer": "Yes, you can modify or cancel your booking up to 2 hours before your pickup time with no additional charges. Cancellations within 2 hours may incur a 20% fee. Check your booking details for specific terms."
+    "question": "ঢাকার বাইরে যাওয়া যাবে?",
+    "answer": "হ্যাঁ, আন্তঃজেলা ও লং ট্রিপ দুটোই বুক করা যায়।"
   },
   {
     "id": 4,
-    "question": "Is fuel included in the rental price?",
-    "answer": "We offer a full-to-full fuel policy. Pick up your vehicle with a full tank and return it full. If you prefer a pre-purchase fuel option, you can refuel at a discounted rate at our partner stations."
+    "question": "বুকিং কীভাবে কনফার্ম হয়?",
+    "answer": "ফর্ম জমা দেওয়ার পর আমরা ফোন করে বিস্তারিত ঠিক করে কনফার্ম করি।"
   },
   {
     "id": 5,
-    "question": "What does your insurance coverage include?",
-    "answer": "Our comprehensive insurance covers collision damage, theft, vandalism, and third-party liability. There's a damage waiver option available at checkout for additional protection. Exclusions apply for off-road driving and intentional damage."
+    "question": "বুকিং ক্যানসেল করলে চার্জ লাগবে?",
+    "answer": "ক্যানসেলেশন চার্জ প্রযোজ্য কি না, তা আমাদের নীতি অনুযায়ী নিশ্চিত করে জানানো হবে।"
   },
   {
     "id": 6,
-    "question": "Can I take the rental car outside the city?",
-    "answer": "Yes, you can take our vehicles on long-distance trips. There's no additional charge for travel within the region. Cross-border travel may require special authorization and documentation. Contact us for details."
-  },
-  {
-    "id": 7,
-    "question": "Is there a mileage limit?",
-    "answer": "Standard rentals include unlimited mileage. Some budget options may have daily mileage limits; check your specific rental terms. Additional mileage charges apply only when you exceed your plan's limit."
-  },
-  {
-    "id": 8,
-    "question": "How do you handle rental disputes?",
-    "answer": "We have a dedicated customer service team to resolve any issues. Document any concerns with photos during pickup/return. Our dispute resolution process typically takes 3-5 business days for assessment."
+    "question": "রাতে বা সারারাতের জন্য গাড়ি পাওয়া যায়?",
+    "answer": "রাতে বা সারারাতের বুকিংয়ের সুবিধা আছে কি না, তা আগে থেকে নিশ্চিত করে জানানো হবে।"
   }
 ]

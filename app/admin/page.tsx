@@ -26,6 +26,7 @@ const emptyCar: Omit<FleetCar, 'id'> = {
   model: '',
   category: '',
   seats: 4,
+  hasAc: true,
   transmission: 'automatic',
   fuel: 'petrol',
   pricePerDay: 0,
@@ -588,6 +589,14 @@ function CarForm({
           placeholder="Seats"
           className="rounded-xl border border-[#e7e0d5] px-4 py-3"
         />
+        <label className="flex items-center gap-3 rounded-xl border border-[#e7e0d5] px-4 py-3 text-sm font-bold">
+          <input
+            type="checkbox"
+            checked={form.hasAc}
+            onChange={(e) => update('hasAc', e.target.checked)}
+          />
+          AC available
+        </label>
         <input
           value={form.transmission}
           onChange={(e) => update('transmission', e.target.value)}
@@ -674,7 +683,7 @@ function CarCards({
                 {car.brand} {car.model}
               </h3>
               <p className="text-sm text-[#8c8378]">
-                {car.category} | {car.seats} seats | ${car.pricePerDay}/day \vert{}$
+                {car.category} | {car.seats} seats | {car.hasAc ? 'AC' : 'Non-AC'} | ৳{car.pricePerDay}/day | ৳
                 {car.pricePerKm}/km
               </p>
               <p className="mt-2 line-clamp-2 text-sm text-[#766e64]">

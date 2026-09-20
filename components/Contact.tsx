@@ -1,239 +1,83 @@
 'use client'
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
-import { toast } from 'react-toastify'
+import { ArrowUpRight, Clock3, MapPin, Phone, PhoneCall } from 'lucide-react'
 import config from '@/data/config.json'
 
 export function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
-  })
+  const whatsappNumber = config.company.phone.replace(/\D/g, '')
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      toast.error('Please fill in all required fields')
-      return
-    }
-
-    setIsSubmitting(true)
-
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false)
-      toast.success('Message sent successfully! We will get back to you soon.')
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
-    }, 1000)
+  const scrollToBookingForm = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
-    <section id="contact" className="py-14 bg-white sm:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <section id="contact" className="relative overflow-hidden bg-[#191714] py-16 text-[#fff8ef] sm:py-24">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_15%,rgba(214,184,140,0.18),transparent_32%),radial-gradient(circle_at_88%_85%,rgba(243,193,111,0.12),transparent_28%)]" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="mx-auto max-w-2xl text-center"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            Get In Touch
+          <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-[#f3c16f]">
+            LuxeDrive
+          </p>
+          <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">
+            যোগাযোগ করুন
           </h2>
-          <p className="text-base sm:text-xl text-stone-600">
-            We are here to help. Contact us anytime.
+          <p className="mt-4 text-base leading-relaxed text-[#d8d0c6] sm:text-xl">
+            গাড়ি বুকিং বা যেকোনো তথ্যের জন্য আমাদের সঙ্গে সরাসরি যোগাযোগ করুন।
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-8"
-          >
-            {/* Phone */}
-            <div className="flex gap-4">
-              <div className="shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
-                  <Phone size={24} />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-stone-900">Phone</h3>
-                <p className="mt-2 text-stone-600">{config.company.phone}</p>
-              </div>
-            </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <a href={`tel:${config.company.phone}`} className="group rounded-2xl border border-white/10 bg-white/8 p-5 transition hover:-translate-y-1 hover:border-[#f3c16f]/70 hover:bg-white/12">
+            <span className="flex size-11 items-center justify-center rounded-xl bg-[#f3c16f] text-[#191714]"><Phone size={21} /></span>
+            <p className="mt-5 text-sm font-semibold text-[#d8d0c6]">ফোনে কথা বলুন</p>
+            <p className="mt-2 break-words font-bold text-white">{config.company.phone}</p>
+            <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#f3c16f]">ট্যাপ করে কল করুন <ArrowUpRight size={16} /></span>
+          </a>
 
-            {/* Email */}
-            <div className="flex gap-4">
-              <div className="shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
-                  <Mail size={24} />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-stone-900">Email</h3>
-                <p className="mt-2 text-stone-600">{config.company.email}</p>
-              </div>
-            </div>
+          <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer" className="group rounded-2xl border border-white/10 bg-white/8 p-5 transition hover:-translate-y-1 hover:border-[#63d391]/70 hover:bg-white/12">
+            <span className="flex size-11 items-center justify-center rounded-xl bg-[#63d391] text-[#12301e]"><PhoneCall size={21} /></span>
+            <p className="mt-5 text-sm font-semibold text-[#d8d0c6]">WhatsApp</p>
+            <p className="mt-2 font-bold text-white">চ্যাট করে বুক করুন</p>
+            <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#7ee7a7]">ট্যাপ করে চ্যাট করুন <ArrowUpRight size={16} /></span>
+          </a>
 
-            {/* Address */}
-            <div className="flex gap-4">
-              <div className="shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
-                  <MapPin size={24} />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-stone-900">Address</h3>
-                <p className="mt-2 text-stone-600">{config.company.address}</p>
-              </div>
-            </div>
+          <div className="rounded-2xl border border-white/10 bg-white/8 p-5">
+            <span className="flex size-11 items-center justify-center rounded-xl bg-[#d6b88c] text-[#191714]"><MapPin size={21} /></span>
+            <p className="mt-5 text-sm font-semibold text-[#d8d0c6]">ঠিকানা</p>
+            <p className="mt-2 font-bold leading-relaxed text-white">{config.company.address}</p>
+          </div>
 
-            {/* Hours */}
-            <div className="flex gap-4">
-              <div className="shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-amber-100 text-amber-600">
-                  <Clock size={24} />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-stone-900">Hours</h3>
-                <p className="mt-2 text-stone-600">{config.company.hours}</p>
-              </div>
-            </div>
+          <div className="rounded-2xl border border-white/10 bg-white/8 p-5">
+            <span className="flex size-11 items-center justify-center rounded-xl bg-[#f3c16f] text-[#191714]"><Clock3 size={21} /></span>
+            <p className="mt-5 text-sm font-semibold text-[#d8d0c6]">সময়</p>
+            <p className="mt-2 text-2xl font-bold text-white">২৪/৭</p>
+            <p className="mt-1 text-sm text-[#d8d0c6]">সবসময় বুকিং সাপোর্ট</p>
+          </div>
+        </motion.div>
 
-            {/* Social Links */}
-            <div className="pt-8 border-t border-stone-200">
-              <h3 className="text-lg font-semibold text-stone-900 mb-4">
-                Follow Us
-              </h3>
-              <div className="flex gap-4">
-                {Object.entries(config.company.socialLinks).map(([name, link]) => (
-                  <a
-                    key={name}
-                    href={link}
-                    className="text-amber-600 hover:text-amber-700 transition-colors font-medium capitalize"
-                  >
-                    {name}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="lg:col-span-2 bg-stone-50 rounded-2xl p-4 sm:p-8"
-          >
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="John Doe"
-                    className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-50 transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="john@example.com"
-                    className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-50 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+1 (555) 000-0000"
-                  className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-50 transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  Subject *
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="How can we help?"
-                  className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-50 transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Your message here..."
-                  rows={5}
-                  className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-50 transition-all resize-none"
-                />
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Send size={20} />
-                {isSubmitting ? 'Sending...' : 'Send Message'}
-              </motion.button>
-            </form>
-          </motion.div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-10 text-center"
+        >
+          <a href="#hero" onClick={scrollToBookingForm} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#f3c16f] px-6 py-3.5 font-bold text-[#191714] shadow-[0_12px_30px_rgba(243,193,111,0.22)] transition hover:-translate-y-0.5 hover:bg-[#ffd38a]">
+            উপরে ফর্ম পূরণ করুন <ArrowUpRight size={19} />
+          </a>
+          <p className="mt-3 text-sm text-[#aaa098]">ফর্ম পূরণ করলেই হবে, অগ্রিম পেমেন্ট লাগবে না</p>
+        </motion.div>
       </div>
     </section>
   )

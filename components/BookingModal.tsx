@@ -224,7 +224,7 @@ export function BookingModal({ isOpen, onClose, bookingData, onBookConfirm }: Bo
 
                 <div className="flex gap-4 pt-2">
                   <button onClick={onClose} className="flex-1 rounded-xl border-2 border-stone-200 bg-white py-3 font-bold text-stone-700 transition-colors hover:border-stone-300 hover:bg-stone-50">Close</button>
-                  <button onClick={handleConfirm} className="flex-1 rounded-xl bg-amber-600 py-3 font-bold text-white transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30">Continue Booking <ChevronRight size={20} /></button>
+                  <button onClick={handleConfirm} className="flex-1 rounded-xl bg-amber-600 py-3 font-bold text-white transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-lg shadow-amber-600/30">বুকিং রিকোয়েস্ট পাঠান <ChevronRight size={20} /></button>
                 </div>
               </div>
             </div>

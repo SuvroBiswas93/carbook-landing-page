@@ -31,6 +31,8 @@ interface HeroProps {
   onContinueClick?: (data: BookingFormData) => void
 }
 
+const heroHeadline = 'চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে'
+
 export function Hero({ onContinueClick }: HeroProps) {
   const [tripType, setTripType] = useState('One Way')
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
@@ -81,6 +83,16 @@ export function Hero({ onContinueClick }: HeroProps) {
 
     document.addEventListener('pointerdown', handleOutsidePointerDown)
     return () => document.removeEventListener('pointerdown', handleOutsidePointerDown)
+  }, [])
+
+  useEffect(() => {
+    const handleCarBooking = (event: Event) => {
+      const car = (event as CustomEvent<Car>).detail
+      if (car) setSelectedCar(car)
+    }
+
+    window.addEventListener('car-booking:selected', handleCarBooking)
+    return () => window.removeEventListener('car-booking:selected', handleCarBooking)
   }, [])
 
   const filteredPickup = locationsData.filter(
@@ -145,6 +157,21 @@ export function Hero({ onContinueClick }: HeroProps) {
   return (
     <section id="hero" className="bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32">
       <div className="mx-auto max-w-345 px-3 sm:px-8">
+        <div className="mb-8 max-w-3xl">
+          <h1
+            aria-label={heroHeadline}
+            className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl"
+          >
+            <span className="bg-linear-to-r from-[#9b5b2e] via-[#d97706] to-[#b94a43] bg-clip-text text-transparent">
+              {heroHeadline}
+            </span>
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#766e64] sm:text-xl">
+            ফিক্সড প্রাইস, কোনো হিডেন চার্জ নেই। ফর্ম পূরণ করুন,{' '}
+            <span className="font-bold text-amber-700">১০ মিনিটে আমরা কল করবো।</span>
+          </p>
+        </div>
+
         <div className="max-w-117.5 rounded-t-[14px] bg-[#fffdfb] p-2 shadow-[0_12px_35px_rgba(50,44,35,.07)] sm:p-3">
           <div className="grid grid-cols-1 gap-2">
             <button type="button" className="rounded-lg px-4 py-4 text-sm font-bold sm:text-lg bg-amber-600 text-white">
@@ -684,9 +711,14 @@ export function Hero({ onContinueClick }: HeroProps) {
                   </button>
                 ))}
               </div>
-              <button type="submit" className="flex items-center justify-center gap-6 rounded-xl bg-amber-600 px-8 py-4 text-base font-bold text-white transition hover:bg-amber-700 cursor-pointer shadow-lg hover:shadow-xl">
-                Continue <ChevronRight size={24} />
-              </button>
+              <div className="text-center sm:text-right">
+                <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-xl bg-amber-600 px-8 py-4 text-base font-bold text-white transition hover:bg-amber-700 cursor-pointer shadow-lg hover:shadow-xl sm:w-auto">
+                  বুকিং রিকোয়েস্ট পাঠান <ChevronRight size={24} />
+                </button>
+                <p className="mt-2 text-xs font-medium text-[#766e64]">
+                  অগ্রিম পেমেন্ট লাগবে না — শুধু ফোন কলেই কনফার্ম
+                </p>
+              </div>
               </div>
             </div>
           </form>

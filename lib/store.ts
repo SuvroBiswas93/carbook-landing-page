@@ -9,6 +9,7 @@ export interface Car {
   model: string
   category: string
   seats: number
+  hasAc: boolean
   transmission: string
   fuel: string
   pricePerDay: number
@@ -78,6 +79,7 @@ export async function getCars(includeUnpublished = false): Promise<Car[]> {
     model: String(car.model ?? ''),
     category: String(car.category ?? ''),
     seats: Number(car.seats ?? 4),
+    hasAc: car.hasAc ?? true,
     transmission: String(car.transmission ?? 'automatic'),
     fuel: String(car.fuel ?? 'petrol'),
     pricePerDay: Number(car.pricePerDay ?? 0),

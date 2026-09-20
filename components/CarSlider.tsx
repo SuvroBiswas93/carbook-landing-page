@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Users, Fuel, Zap } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Users, Fuel, Zap, Snowflake } from 'lucide-react'
 import { Modal } from './Modal'
 import type { Car } from '@/lib/store'
 
@@ -78,10 +78,10 @@ export function CarSlider() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            Our Car Fleet
+            আমাদের গাড়ির তালিকা
           </h2>
           <p className="text-base sm:text-xl text-stone-600">
-            Explore our premium collection of vehicles
+            আপনার প্রয়োজন অনুযায়ী গাড়ি বেছে নিন
           </p>
         </motion.div>
 
@@ -119,7 +119,7 @@ export function CarSlider() {
                     </div>
 
                     {/* Specs */}
-                    <div className="grid grid-cols-3 gap-3 py-4 border-y border-stone-200">
+                    <div className="grid grid-cols-2 gap-3 py-4 border-y border-stone-200 sm:grid-cols-4">
                       <div className="text-center">
                         <Users size={20} className="mx-auto mb-1 text-amber-600" />
                         <p className="text-sm font-semibold text-stone-900">
@@ -141,6 +141,13 @@ export function CarSlider() {
                         </p>
                         <p className="text-xs text-stone-500">Trans</p>
                       </div>
+                      <div className="text-center">
+                        <Snowflake size={20} className={`mx-auto mb-1 ${car.hasAc ? 'text-sky-500' : 'text-stone-300'}`} />
+                        <p className="text-sm font-semibold text-stone-900">
+                          {car.hasAc ? 'আছে' : 'নেই'}
+                        </p>
+                        <p className="text-xs text-stone-500">AC</p>
+                      </div>
                     </div>
 
                     {/* Pricing */}
@@ -148,12 +155,12 @@ export function CarSlider() {
                       <p className="text-sm text-stone-600 mb-2">
                         From{' '}
                         <span className="text-2xl font-bold text-amber-700">
-                          ${car.pricePerDay}
+                          ৳{car.pricePerDay}
                         </span>
-                        <span className="text-stone-500">/day</span>
+                        <span className="text-stone-500"> থেকে শুরু</span>
                       </p>
                       <p className="text-xs text-stone-500">
-                        ${car.pricePerKm}/km
+                        ৳{car.pricePerKm}/কিমি
                       </p>
                     </div>
 
@@ -161,7 +168,7 @@ export function CarSlider() {
                       onClick={() => setSelectedCar(car)}
                       className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all cursor-pointer"
                     >
-                      View Details
+                      বুক করুন
                     </button>
                   </div>
                 </motion.div>
@@ -262,8 +269,15 @@ export function CarSlider() {
               >
                 Close
               </button>
-              <button className="flex-1 bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all">
-                Book Now
+              <button
+                onClick={() => {
+                  setSelectedCar(null)
+                  window.dispatchEvent(new CustomEvent('car-booking:selected', { detail: selectedCar }))
+                  document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="flex-1 bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all"
+              >
+                বুক করুন
               </button>
             </div>
           </div>

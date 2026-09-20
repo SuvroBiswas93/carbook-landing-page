@@ -1,44 +1,44 @@
 [
   {
     "id": 1,
-    "title": "24/7 Roadside Assistance",
-    "description": "Get immediate help whenever you need it with our dedicated support team.",
-    "fullDescription": "Our round-the-clock roadside assistance ensures you're never stranded. With strategic service points across the city and highly trained technicians, we provide fuel delivery, tire changes, battery support, and towing services. Emergency response time is typically under 30 minutes.",
-    "icon": "phone-icon"
+    "title": "ভেরিফাইড ড্রাইভার",
+    "description": "অভিজ্ঞ ও পরিচয় যাচাই করা ড্রাইভার",
+    "fullDescription": "প্রতিটি গাড়ির সঙ্গে অভিজ্ঞ এবং পরিচয় যাচাই করা ড্রাইভার থাকেন, যাতে আপনার যাত্রা নিরাপদ ও স্বস্তিদায়ক হয়।",
+    "icon": "verified-icon"
   },
   {
     "id": 2,
-    "title": "Free Insurance Coverage",
-    "description": "Drive with peace of mind with comprehensive insurance included.",
-    "fullDescription": "All our rentals include comprehensive insurance coverage with zero liability. We protect against collision damage, theft, and accidents. Additional optional coverage is available for extra protection. Rental duration doesn't affect your insurance premium.",
-    "icon": "shield-icon"
+    "title": "ফিক্সড প্রাইস",
+    "description": "বুকিংয়ের আগেই পুরো ভাড়া জানিয়ে দেই, হিডেন চার্জ নেই",
+    "fullDescription": "বুকিং নিশ্চিত করার আগেই আপনাকে ভাড়ার পরিষ্কার ধারণা দেওয়া হয়। কোনো গোপন বা অতিরিক্ত চার্জ নেই।",
+    "icon": "price-icon"
   },
   {
     "id": 3,
-    "title": "Flexible Booking Options",
-    "description": "Book hourly, daily, or monthly with instant confirmation.",
-    "fullDescription": "Our flexible booking system allows you to rent for any duration. Hourly rates are perfect for quick trips, daily rates for weekend getaways, and monthly plans offer exceptional value for long-term use. Modify or cancel your booking up to 2 hours before pickup with no penalties.",
-    "icon": "calendar-icon"
+    "title": "২৪/৭ বুকিং সাপোর্ট",
+    "description": "যেকোনো সময় কল বা WhatsApp করে বুক করুন",
+    "fullDescription": "দিন বা রাত, যেকোনো সময় আমাদের সঙ্গে কল বা WhatsApp-এর মাধ্যমে যোগাযোগ করে গাড়ি বুকিংয়ের সহায়তা নিতে পারবেন।",
+    "icon": "phone-icon"
   },
   {
     "id": 4,
-    "title": "Premium Vehicles Only",
-    "description": "Experience luxury and comfort with our well-maintained fleet.",
-    "fullDescription": "Every vehicle in our fleet undergoes rigorous maintenance and safety checks. We invest in modern, premium vehicles that combine comfort, performance, and reliability. All cars are equipped with GPS, modern infotainment systems, and premium interiors.",
-    "icon": "star-icon"
-  },
-  {
-    "id": 5,
-    "title": "Multiple Pickup Locations",
-    "description": "Choose from convenient pickup points across the city.",
-    "fullDescription": "With 15+ pickup locations throughout the metropolitan area, we make car rental accessible. Airport pickup, downtown hubs, and neighborhood centers ensure you can grab a vehicle when and where you need it. Free parking at all our facilities.",
+    "title": "সারাদেশে সার্ভিস",
+    "description": "ঢাকার ভেতরে ও আন্তঃজেলা — দুটোই পাওয়া যায়",
+    "fullDescription": "ঢাকার ভেতরের যাত্রার পাশাপাশি দেশের বিভিন্ন জেলায় আন্তঃজেলা ও লং ট্রিপের জন্যও আমাদের গাড়ি বুক করা যায়।",
     "icon": "map-icon"
   },
   {
+    "id": 5,
+    "title": "অগ্রিম পেমেন্ট লাগে না",
+    "description": "ফর্ম পূরণ করলেই হবে, আগে টাকা দিতে হয় না",
+    "fullDescription": "প্রথমে শুধু বুকিং ফর্ম পূরণ করুন। গাড়ি ও যাত্রার বিস্তারিত ফোনে নিশ্চিত করার পর ভাড়া পরিশোধ করবেন।",
+    "icon": "no-payment-icon"
+  },
+  {
     "id": 6,
-    "title": "Easy Mobile App",
-    "description": "Manage your rental entirely from your smartphone.",
-    "fullDescription": "Our intuitive mobile app lets you book, track, and manage your rental in seconds. Get real-time updates on your vehicle location, upload documents, manage payments, and access roadside assistance directly from your phone. Available on iOS and Android.",
-    "icon": "smartphone-icon"
+    "title": "দ্রুত কনফার্মেশন",
+    "description": "বুকিংয়ের ১০ মিনিটের মধ্যে কল পাবেন",
+    "fullDescription": "আপনার বুকিং রিকোয়েস্ট পাওয়ার পর সাধারণত ১০ মিনিটের মধ্যে আমাদের টিম ফোন করে যাত্রার বিস্তারিত নিশ্চিত করে।",
+    "icon": "speed-icon"
   }
 ]

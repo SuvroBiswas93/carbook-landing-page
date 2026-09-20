@@ -4,12 +4,11 @@ import { useState } from 'react'
 import { CarFront, Menu, PhoneCall, X } from 'lucide-react'
 
 const links = [
-  { label: 'Fleet', href: '#cars' },
-  { label: 'Fare', href: '#fare-calculator' },
-  { label: 'Reviews', href: '#reviews' },
-  { label: 'Services', href: '#services' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'গাড়ি', href: '#cars' },
+  { label: 'ভাড়া', href: '#fare-calculator' },
+  { label: 'মতামত', href: '#reviews' },
+  { label: 'সেবা', href: '#services' },
+  { label: 'প্রশ্নোত্তর', href: '#faq' },
 ]
 
 export function Navbar() {

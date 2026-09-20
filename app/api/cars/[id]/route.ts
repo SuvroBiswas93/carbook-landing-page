@@ -22,6 +22,7 @@ export async function PUT(request: Request, context: RouteContext) {
     model: String(body.model ?? cars[index].model).trim(),
     category: String(body.category ?? cars[index].category).trim(),
     seats: Number(body.seats ?? cars[index].seats),
+    hasAc: body.hasAc ?? cars[index].hasAc,
     transmission: String(body.transmission ?? cars[index].transmission).trim(),
     fuel: String(body.fuel ?? cars[index].fuel).trim(),
     pricePerDay: Number(body.pricePerDay ?? cars[index].pricePerDay),

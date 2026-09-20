@@ -4,22 +4,22 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Phone,
-  Shield,
-  Calendar,
-  Star,
   MapPin,
-  Smartphone,
+  BadgeCheck,
+  Banknote,
+  CreditCard,
+  Zap,
 } from 'lucide-react'
 import { Modal } from './Modal'
 import servicesData from '@/data/services.json'
 
 const iconMap: Record<string, React.ReactNode> = {
+  'verified-icon': <BadgeCheck size={32} />,
+  'price-icon': <Banknote size={32} />,
   'phone-icon': <Phone size={32} />,
-  'shield-icon': <Shield size={32} />,
-  'calendar-icon': <Calendar size={32} />,
-  'star-icon': <Star size={32} />,
   'map-icon': <MapPin size={32} />,
-  'smartphone-icon': <Smartphone size={32} />,
+  'no-payment-icon': <CreditCard size={32} />,
+  'speed-icon': <Zap size={32} />,
 }
 
 export function Services() {
@@ -36,10 +36,10 @@ export function Services() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            Our Premium Services
+            আমাদের সেবাসমূহ
           </h2>
           <p className="text-base sm:text-xl text-stone-600">
-            Everything you need for a seamless rental experience
+            আপনার যাত্রাকে সহজ, নিরাপদ ও নিশ্চিন্ত করতে আমাদের সেবা
           </p>
         </motion.div>
 
@@ -63,8 +63,8 @@ export function Services() {
                 {service.title}
               </h3>
               <p className="text-stone-600 mb-6">{service.description}</p>
-              <button className="text-amber-600 font-semibold hover:text-amber-700 transition-colors inline-flex items-center gap-2">
-                View Details →
+              <button className="cursor-pointer text-amber-600 font-semibold hover:text-amber-700 transition-colors inline-flex items-center gap-2">
+                বিস্তারিত দেখুন →
               </button>
             </motion.div>
           ))}
@@ -85,12 +85,12 @@ export function Services() {
             <div className="mt-8 pt-6 border-t border-stone-200 flex gap-4">
               <button
                 onClick={() => setSelectedService(null)}
-                className="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-900 font-semibold py-3 rounded-lg transition-colors"
+                className="flex-1 cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-900 font-semibold py-3 rounded-lg transition-colors"
               >
                 Close
               </button>
-              <button className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all">
-                Learn More
+              <button className="flex-1 cursor-pointer bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all">
+                বুকিং সম্পর্কে জানুন
               </button>
             </div>
           </div>

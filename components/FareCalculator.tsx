@@ -227,10 +227,13 @@ export function FareCalculator() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            Fare Calculator
+            ভাড়া হিসাব করুন
           </h2>
           <p className="text-base sm:text-xl text-stone-600">
-            Estimate your rental cost instantly
+            বুকিং করার আগেই আনুমানিক ভাড়া জেনে নিন
+          </p>
+          <p className="mt-3 inline-flex rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-800">
+            প্রাইসিং মডেল: বেস ভাড়া + প্রতি কিলোমিটার
           </p>
         </motion.div>
 
@@ -463,19 +466,19 @@ export function FareCalculator() {
               className="bg-linear-to-br from-amber-50 to-stone-50 rounded-2xl shadow-xl p-4 sm:p-8 border-2 border-amber-200 flex flex-col justify-center"
             >
               <h3 className="text-2xl font-bold text-stone-900 mb-8">
-                How We Calculate
+                আমরা যেভাবে ভাড়া হিসাব করি
               </h3>
 
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm text-stone-500 mb-2">Base Fare</p>
+                  <p className="text-sm text-stone-500 mb-2">বেস ভাড়া</p>
                   <p className="text-2xl font-bold text-stone-900">
                     ${pricing?.minimumFare ?? 25}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-stone-500 mb-2">Per Kilometer Rate</p>
+                  <p className="text-sm text-stone-500 mb-2">প্রতি কিলোমিটার ভাড়া</p>
                   <p className="text-2xl font-bold text-amber-700">
                     ${pricing?.farePerKm ?? 5}/km
                   </p>
@@ -483,9 +486,9 @@ export function FareCalculator() {
 
                 <div className="bg-white rounded-lg p-6">
                   <p className="text-sm text-stone-600 leading-relaxed">
-                    Total fare is calculated as the greater of the base fare or
-                    the distance-based fare. Select your vehicle, locations, and
-                    calculate above to get an instant estimate.
+                    মোট ভাড়া হিসাব করা হয় বেস ভাড়া অথবা দূরত্বভিত্তিক ভাড়ার
+                    মধ্যে যেটি বেশি, সেটি অনুযায়ী। গাড়ি ও যাত্রার স্থান বেছে
+                    হিসাব করুন এবং বুকিংয়ের আগেই আনুমানিক ভাড়া জেনে নিন।
                   </p>
                 </div>
               </div>

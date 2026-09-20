@@ -73,7 +73,7 @@ export function Reviews() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-              What Our Customers Say
+              কাস্টমাররা যা বলছেন
             </h2>
             <p className="text-base sm:text-xl text-stone-600">
               Trusted by thousands for premium car rental experiences
