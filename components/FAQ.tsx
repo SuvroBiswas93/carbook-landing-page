@@ -39,7 +39,7 @@ export function FAQ() {
             >
               <button
                 onClick={() => setOpenId(openId === faq.id ? null : faq.id)}
-                className="w-full px-4 py-4 flex items-center justify-between gap-3 hover:bg-stone-50 transition-colors sm:px-6"
+                className="w-full px-4 py-4 flex items-center justify-between gap-3 hover:bg-stone-50 transition-colors cursor-pointer sm:px-6"
               >
                 <h3 className="text-left font-semibold text-stone-900 text-base sm:text-lg">
                   {faq.question}
