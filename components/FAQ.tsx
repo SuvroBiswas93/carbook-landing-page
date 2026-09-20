@@ -73,23 +73,7 @@ export function FAQ() {
           ))}
         </div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-16 text-center"
-        >
-          <p className="text-lg text-stone-600 mb-4">
-            Can&apos;t find your answer?
-          </p>
-          <a
-            href="#contact"
-            className="inline-block bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 px-8 rounded-lg transition-all"
-          >
-            ফর্ম পূরণ করুন
-          </a>
-        </motion.div>
+        
       </div>
     </section>
   )
