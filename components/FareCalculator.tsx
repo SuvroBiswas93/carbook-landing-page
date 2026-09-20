@@ -260,7 +260,7 @@ export function FareCalculator() {
                     <div className="flex items-center gap-3">
                       <img src={selectedCar.image} alt={selectedCar.brand} className="h-10 w-14 rounded-lg object-cover" />
                       <div>
-                        <strong className="block font-serif text-lg">{selectedCar.brand} {selectedCar.model}</strong>
+                        <strong className="block font-serif text-lg text-black">{selectedCar.brand} {selectedCar.model}</strong>
                         <span className="text-sm text-[#aaa59e]">{selectedCar.seats} Seats · ${selectedCar.pricePerDay}/day</span>
                       </div>
                     </div>
@@ -284,7 +284,7 @@ export function FareCalculator() {
                     >
                       <img src={car.image} alt={car.brand} className="h-12 w-16 rounded-lg object-cover" />
                       <div>
-                        <p className="font-semibold text-sm">{car.brand} {car.model}</p>
+                        <p className="font-semibold text-sm text-black">{car.brand} {car.model}</p>
                         <p className="text-xs text-[#aaa59e]">{car.category} · {car.seats} Seats · ${car.pricePerDay}/day</p>
                       </div>
                     </button>
