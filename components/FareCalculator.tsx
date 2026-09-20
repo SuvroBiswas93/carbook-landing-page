@@ -217,7 +217,7 @@ export function FareCalculator() {
 
   return (
     <>
-    <section id="fare-calculator" className="py-14 bg-linear-to-br from-stone-100 to-amber-50 sm:py-20">
+    <section id="fare-calculator" className="py-14 bg-brand-surface sm:py-20">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -232,7 +232,7 @@ export function FareCalculator() {
           <p className="text-base sm:text-xl text-stone-600">
             বুকিং করার আগেই আনুমানিক ভাড়া জেনে নিন
           </p>
-          <p className="mt-3 inline-flex rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-800">
+          <p className="mt-3 inline-flex rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-brand-navy">
             প্রাইসিং মডেল: বেস ভাড়া + প্রতি কিলোমিটার
           </p>
         </motion.div>
@@ -407,7 +407,7 @@ export function FareCalculator() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleCalculate}
-              className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 mt-8 cursor-pointer"
+              className="w-full bg-[#FFB020] hover:bg-[#E08E00] text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 mt-8 cursor-pointer"
             >
               <Calculator size={20} />
               Calculate Fare
@@ -419,7 +419,7 @@ export function FareCalculator() {
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-linear-to-br from-amber-50 to-stone-50 rounded-2xl shadow-xl p-4 sm:p-8 border-2 border-amber-200"
+              className="bg-brand-surface rounded-2xl shadow-xl p-4 sm:p-8 border-2 border-blue-100"
             >
               <h3 className="text-2xl font-bold text-stone-900 mb-8 text-center">
                 Estimated Fare
@@ -463,7 +463,7 @@ export function FareCalculator() {
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-linear-to-br from-amber-50 to-stone-50 rounded-2xl shadow-xl p-4 sm:p-8 border-2 border-amber-200 flex flex-col justify-center"
+              className="bg-brand-surface rounded-2xl shadow-xl p-4 sm:p-8 border-2 border-blue-100 flex flex-col justify-center"
             >
               <h3 className="text-2xl font-bold text-stone-900 mb-8">
                 আমরা যেভাবে ভাড়া হিসাব করি

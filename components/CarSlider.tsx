@@ -121,21 +121,21 @@ export function CarSlider() {
                     {/* Specs */}
                     <div className="grid grid-cols-2 gap-3 py-4 border-y border-stone-200 sm:grid-cols-4">
                       <div className="text-center">
-                        <Users size={20} className="mx-auto mb-1 text-amber-600" />
+                        <Users size={20} className="mx-auto mb-1 text-brand-navy" />
                         <p className="text-sm font-semibold text-stone-900">
                           {car.seats}
                         </p>
                         <p className="text-xs text-stone-500">Seats</p>
                       </div>
                       <div className="text-center">
-                        <Fuel size={20} className="mx-auto mb-1 text-amber-600" />
+                        <Fuel size={20} className="mx-auto mb-1 text-brand-navy" />
                         <p className="text-sm font-semibold text-stone-900 capitalize">
                           {car.fuel}
                         </p>
                         <p className="text-xs text-stone-500">Fuel</p>
                       </div>
                       <div className="text-center">
-                        <Zap size={20} className="mx-auto mb-1 text-amber-600" />
+                        <Zap size={20} className="mx-auto mb-1 text-brand-navy" />
                         <p className="text-sm font-semibold text-stone-900 capitalize">
                           {car.transmission}
                         </p>
@@ -183,7 +183,7 @@ export function CarSlider() {
               whileTap={{ scale: 0.9 }}
               onClick={handlePrev}
               style={{ visibility: currentIndex <= 0 ? 'hidden' : 'visible' }}
-                    className="bg-amber-600 hover:bg-amber-700 text-white size-10 sm:size-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
+                    className="bg-brand-navy hover:bg-brand-navy-soft text-white size-10 sm:size-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
             >
               <ChevronLeft size={28} />
             </motion.button>
@@ -192,7 +192,7 @@ export function CarSlider() {
               whileTap={{ scale: 0.9 }}
               onClick={handleNext}
               style={{ visibility: currentIndex >= maxIndex ? 'hidden' : 'visible' }}
-                    className="bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white size-10 sm:size-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
+                    className="bg-brand-navy hover:bg-brand-navy-soft text-white size-10 sm:size-14 rounded-full shadow-lg transition-all flex items-center justify-center pointer-events-auto z-10 cursor-pointer"
             >
               <ChevronRight size={28} />
             </motion.button>

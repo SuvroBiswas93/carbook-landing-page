@@ -44,19 +44,19 @@ export function Navbar() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#191714]/90 text-[#fff8ef] shadow-[0_14px_40px_rgba(25,23,20,0.18)] backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-brand-navy/95 text-white shadow-[0_14px_40px_rgba(11,37,69,0.22)] backdrop-blur-xl">
       <div className="mx-auto flex min-h-18 max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6 md:max-lg:gap-2 md:max-lg:px-4 lg:px-8">
         <a
           href="#top"
           onClick={(event) => handleNavClick(event, '#top')}
-          className="flex min-w-0 items-center gap-2 rounded-2xl border border-[#d6b88c]/25 bg-[#d6b88c]/10 px-2 py-1.5 transition hover:border-[#d6b88c]/50 hover:bg-[#d6b88c]/15 sm:gap-3 sm:rounded-full sm:border-white/10 sm:bg-white/6 sm:px-3 sm:py-2 sm:hover:bg-white/9"
+          className="flex min-w-0 items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-2 py-1.5 transition hover:border-white/30 hover:bg-white/15 sm:gap-3 sm:rounded-full sm:px-3 sm:py-2"
           aria-label="LuxeDrive home"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#d6b88c] text-[#191714] shadow-[0_0_18px_rgba(214,184,140,0.3)] sm:size-9 sm:rounded-full sm:shadow-[0_0_24px_rgba(214,184,140,0.35)]">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-brand-amber text-brand-navy shadow-[0_0_18px_rgba(255,176,32,0.3)] sm:size-9 sm:rounded-full">
             <CarFront aria-hidden="true" className="size-4 sm:size-5" />
           </span>
           <span className="font-serif text-base font-bold leading-none tracking-tight sm:text-xl sm:tracking-normal md:max-lg:text-lg">
-            Luxe<span className="text-[#d6b88c]">Drive</span>
+            Luxe<span className="text-brand-amber">Drive</span>
           </span>
         </a>
 
@@ -68,8 +68,8 @@ export function Navbar() {
               onClick={(event) => handleNavClick(event, link.href)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition md:max-lg:px-2 md:max-lg:py-1.5 md:max-lg:text-xs ${
                 activeHref === link.href
-                  ? 'bg-[#d6b88c] text-[#191714] shadow-[0_4px_16px_rgba(214,184,140,0.25)]'
-                  : 'text-[#d8d0c6] hover:bg-white/10 hover:text-white'
+                  ? 'bg-brand-navy-soft text-white shadow-[0_4px_16px_rgba(0,0,0,0.2)]'
+                  : 'text-white/80 hover:bg-white/10 hover:text-white'
               }`}
             >
               {link.label}
@@ -79,10 +79,10 @@ export function Navbar() {
 
         <a
           href="tel:+1555014782"
-          className="call-attention group relative inline-flex h-11 w-auto min-w-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-[#f3d29f]/50 bg-[#f3c16f] px-2 text-[10px] font-black text-[#191714] shadow-[0_12px_34px_rgba(243,193,111,0.35)] transition hover:-translate-y-0.5 hover:bg-[#ffd38a] hover:shadow-[0_16px_42px_rgba(243,193,111,0.48)] sm:gap-2 sm:px-5 sm:py-3 sm:text-sm md:max-lg:px-2"
+          className="call-attention group relative inline-flex h-11 w-auto min-w-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-white/25 bg-brand-navy-soft px-2 text-[10px] font-black text-white shadow-[0_12px_34px_rgba(0,0,0,0.2)] transition hover:-translate-y-0.5 hover:bg-[#214a78] sm:gap-2 sm:px-5 sm:py-3 sm:text-sm md:max-lg:px-2"
           aria-label="Call LuxeDrive at +1 (555) 014-782"
         >
-          <span className="call-ring flex size-7 shrink-0 items-center justify-center rounded-full bg-[#191714] text-[#f8f1e7] sm:size-8">
+          <span className="call-ring flex size-7 shrink-0 items-center justify-center rounded-full bg-white/15 text-white sm:size-8">
             <PhoneCall aria-hidden="true" className="size-4" />
           </span>
           <span className="hidden text-xs uppercase tracking-[0.12em] sm:inline md:max-lg:hidden">Book by call</span>
@@ -101,7 +101,7 @@ export function Navbar() {
       </div>
 
       {isMobileMenuOpen && (
-        <nav className="border-t border-white/10 bg-[#191714] px-3 py-3 shadow-2xl md:hidden">
+        <nav className="border-t border-white/10 bg-brand-navy px-3 py-3 shadow-2xl md:hidden">
           <div className="mx-auto grid max-w-7xl gap-1">
             {links.map((link) => (
               <a
@@ -110,8 +110,8 @@ export function Navbar() {
                 onClick={(event) => handleNavClick(event, link.href)}
                 className={`rounded-xl px-4 py-3 text-sm font-semibold transition ${
                   activeHref === link.href
-                    ? 'bg-[#d6b88c] text-[#191714]'
-                    : 'text-[#d8d0c6] hover:bg-white/10 hover:text-white'
+                    ? 'bg-brand-navy-soft text-white'
+                    : 'text-white/80 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 {link.label}

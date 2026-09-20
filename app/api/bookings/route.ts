@@ -11,6 +11,8 @@ export async function POST(request: Request) {
     id: `BD-${String(Date.now()).slice(-6)}`,
     carId: Number(body.carId ?? 0),
     carName: String(body.carName ?? 'Unselected car'),
+    customerName: String(body.customerName ?? '').trim(),
+    carType: String(body.carType ?? '').trim(),
     mobileNumber: String(body.mobileNumber ?? '').trim(),
     pickupLocation: String(body.pickupLocation ?? '').trim(),
     dropoffLocation: String(body.dropoffLocation ?? '').trim(),
@@ -24,8 +26,20 @@ export async function POST(request: Request) {
     estimatedFare: Number.isFinite(Number(body.estimatedFare)) ? Number(body.estimatedFare) : undefined,
   }
 
-  if (!booking.mobileNumber || !booking.pickupLocation || !booking.dropoffLocation || !booking.pickupDate) {
-    return NextResponse.json({ error: 'Mobile number, pickup, drop-off, and date are required.' }, { status: 400 })
+  if (!booking.mobileNumber || !booking.pickupLocation || !booking.pickupDate) {
+    return NextResponse.json({ error: 'Mobile number, pickup, and date are required.' }, { status: 400 })
+  }
+
+  if (booking.customerName && !booking.carType) {
+    return NextResponse.json({ error: 'Car type is required.' }, { status: 400 })
+  }
+
+  if (booking.customerName && !/^01[3-9]\d{8}$/.test(booking.mobileNumber)) {
+    return NextResponse.json({ error: 'Enter a valid Bangladesh mobile number.' }, { status: 400 })
+  }
+
+  if (booking.customerName && new Date(booking.pickupDate).getTime() < Date.now()) {
+    return NextResponse.json({ error: 'Pickup date must be in the future.' }, { status: 400 })
   }
 
   const bookings = await getBookings()

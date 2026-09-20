@@ -1,7 +1,4 @@
 'use client'
-
-import { useState } from 'react'
-import type { ComponentProps } from 'react'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Navbar } from '@/components/Navbar'
@@ -14,49 +11,12 @@ import { FareCalculator } from '@/components/FareCalculator'
 import { FloatingButtons } from '@/components/FloatingButtons'
 import { Contact } from '@/components/Contact'
 import { Footer } from '@/components/Footer'
-import { BookingModal } from '@/components/BookingModal'
-
-type BookingFormData = Parameters<
-  NonNullable<ComponentProps<typeof Hero>['onContinueClick']>
->[0]
 
 export default function Page() {
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
-  const [pendingBooking, setPendingBooking] = useState<BookingFormData | null>(null)
-
-  const handleContinue = (data: BookingFormData) => {
-    setPendingBooking(data)
-    setIsBookingModalOpen(true)
-  }
-
-  const handleBookConfirm = async (data: BookingFormData): Promise<boolean> => {
-    if (!data.car) {
-      return false
-    }
-    const response = await fetch('/api/bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-      carId: data.car.id,
-      carName: `${data.car.brand} ${data.car.model}`,
-      mobileNumber: data.mobileNumber,
-      pickupLocation: data.pickupLocation,
-      dropoffLocation: data.dropoffLocation,
-      pickupDate: data.pickupDate,
-      dropoffDate: data.dropoffDate ?? '',
-      tripType: data.tripType,
-      }),
-    })
-    if (!response.ok) return false
-    setIsBookingModalOpen(false)
-    setPendingBooking(null)
-    return true
-  }
-
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <Hero onContinueClick={handleContinue} />
+      <Hero />
       <CarSlider />
       <FareCalculator />
       <Reviews />
@@ -65,15 +25,6 @@ export default function Page() {
       <Contact />
      
       <FloatingButtons />
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={() => {
-          setIsBookingModalOpen(false)
-          setPendingBooking(null)
-        }}
-        bookingData={pendingBooking as ComponentProps<typeof BookingModal>['bookingData']}
-        onBookConfirm={handleBookConfirm}
-      />
       <ToastContainer
         position="bottom-right"
         autoClose={3000}

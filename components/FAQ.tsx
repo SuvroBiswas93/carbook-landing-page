@@ -49,7 +49,7 @@ export function FAQ() {
                   transition={{ duration: 0.3 }}
                   className="shrink-0 ml-4"
                 >
-                  <ChevronDown size={24} className="text-amber-600" />
+                  <ChevronDown size={24} className="text-brand-navy" />
                 </motion.div>
               </button>
 

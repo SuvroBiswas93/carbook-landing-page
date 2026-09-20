@@ -56,14 +56,14 @@ export function Services() {
               className="bg-white rounded-xl shadow-lg p-5 sm:p-8 cursor-pointer transition-all"
               onClick={() => setSelectedService(service)}
             >
-              <div className="text-amber-600 mb-4">
+              <div className="text-brand-navy mb-4">
                 {iconMap[service.icon as keyof typeof iconMap]}
               </div>
               <h3 className="text-xl font-bold text-stone-900 mb-3">
                 {service.title}
               </h3>
               <p className="text-stone-600 mb-6">{service.description}</p>
-              <button className="cursor-pointer text-amber-600 font-semibold hover:text-amber-700 transition-colors inline-flex items-center gap-2">
+              <button className="cursor-pointer text-brand-navy font-semibold hover:text-brand-navy-soft transition-colors inline-flex items-center gap-2">
                 বিস্তারিত দেখুন →
               </button>
             </motion.div>

@@ -36,8 +36,8 @@ export function Footer({ onNavigate }: FooterProps) {
           >
             <h3 className="text-2xl font-bold mb-4">
               <span
-                style={{
-                  background: 'linear-gradient(135deg, #b4956f 0%, #d4af85 100%)',
+                  style={{
+                  background: 'linear-gradient(135deg, #ffffff 0%, #8fb0d2 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -64,7 +64,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <li key={link.id}>
                   <button
                     onClick={() => onNavigate(link.id)}
-                    className="text-stone-400 hover:text-amber-500 transition-colors"
+                    className="text-stone-400 hover:text-white transition-colors"
                   >
                     {link.label}
                   </button>
@@ -86,7 +86,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <li key={link.label}>
                   <button
                     onClick={() => link.id && onNavigate(link.id)}
-                    className="text-stone-400 hover:text-amber-500 transition-colors"
+                    className="text-stone-400 hover:text-white transition-colors"
                   >
                     {link.label}
                   </button>
@@ -121,13 +121,13 @@ export function Footer({ onNavigate }: FooterProps) {
             <div className="flex gap-6">
               <a
                 href="#"
-                className="text-stone-400 hover:text-amber-500 transition-colors text-sm"
+                    className="text-stone-400 hover:text-white transition-colors text-sm"
               >
                 Privacy Policy
               </a>
               <a
                 href="#"
-                className="text-stone-400 hover:text-amber-500 transition-colors text-sm"
+                    className="text-stone-400 hover:text-white transition-colors text-sm"
               >
                 Terms & Conditions
               </a>

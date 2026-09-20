@@ -33,6 +33,8 @@ export interface Booking {
   id: string
   carId: number
   carName: string
+  customerName?: string
+  carType?: string
   mobileNumber: string
   pickupLocation: string
   dropoffLocation: string

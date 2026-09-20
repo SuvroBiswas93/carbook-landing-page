@@ -102,7 +102,7 @@ export function Reviews() {
                       size={20}
                       className={
                         i < review.rating
-                          ? 'fill-amber-400 text-amber-400'
+                          ? 'fill-[#FFB020] text-[#FFB020]'
                           : 'text-stone-200'
                       }
                     />
@@ -138,7 +138,7 @@ export function Reviews() {
           }
           setIsReviewTriggerExpanded(true)
         }}
-        className={`fixed right-0 top-[42%] z-40 flex max-h-[28vh] -translate-y-1/2 cursor-pointer flex-col items-center gap-1.5 rounded-l-xl rounded-r-none border border-r-0 border-amber-200/70 bg-linear-to-br from-amber-500 via-amber-500 to-yellow-400 px-2 py-3 text-white shadow-[0_8px_24px_rgba(180,83,9,0.28)] ring-2 ring-white/70 backdrop-blur-sm transition-[padding,border-radius,box-shadow] hover:shadow-[0_10px_28px_rgba(180,83,9,0.36)] sm:right-3 sm:top-1/2 sm:gap-2 sm:rounded-l-xl sm:rounded-r-none sm:border-r sm:px-2.5 sm:py-4 md:right-4 lg:right-0 lg:px-3 lg:py-5 ${isReviewTriggerExpanded ? '' : 'sm:translate-x-3'}`}
+        className={`fixed right-0 top-[42%] z-40 flex max-h-[28vh] -translate-y-1/2 cursor-pointer flex-col items-center gap-1.5 rounded-l-xl rounded-r-none border border-r-0 border-white/20 bg-brand-navy px-2 py-3 text-white shadow-[0_8px_24px_rgba(11,37,69,0.28)] ring-2 ring-white/70 backdrop-blur-sm transition-[padding,border-radius,box-shadow] hover:bg-brand-navy-soft hover:shadow-[0_10px_28px_rgba(11,37,69,0.36)] sm:right-3 sm:top-1/2 sm:gap-2 sm:rounded-l-xl sm:rounded-r-none sm:border-r sm:px-2.5 sm:py-4 md:right-4 lg:right-0 lg:px-3 lg:py-5 ${isReviewTriggerExpanded ? '' : 'sm:translate-x-3'}`}
         title={isReviewTriggerExpanded ? 'Open review form' : 'Show review option'}
         aria-label={isReviewTriggerExpanded ? 'Open review form' : 'Show review option'}
         aria-expanded={isReviewTriggerExpanded}
@@ -163,7 +163,7 @@ export function Reviews() {
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
+                className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-brand-navy focus:ring-2 focus:ring-blue-100 transition-all"
                 placeholder="Enter your name"
                 required
               />
@@ -174,7 +174,7 @@ export function Reviews() {
                 type="text"
                 value={form.location}
                 onChange={(e) => setForm((prev) => ({ ...prev, location: e.target.value }))}
-                className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
+                className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-brand-navy focus:ring-2 focus:ring-blue-100 transition-all"
                 placeholder="Your city"
                 required
               />
@@ -185,7 +185,7 @@ export function Reviews() {
             <select
               value={form.rating}
               onChange={(e) => setForm((prev) => ({ ...prev, rating: Number(e.target.value) }))}
-              className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all bg-white"
+              className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-brand-navy focus:ring-2 focus:ring-blue-100 transition-all bg-white"
             >
               {[5, 4, 3, 2, 1].map((rating) => (
                 <option key={rating} value={rating}>{rating} Star{rating !== 1 ? 's' : ''}</option>
@@ -197,7 +197,7 @@ export function Reviews() {
             <textarea
               value={form.text}
               onChange={(e) => setForm((prev) => ({ ...prev, text: e.target.value }))}
-              className="w-full min-h-32 rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
+              className="w-full min-h-32 rounded-lg border border-stone-200 px-4 py-3 outline-none focus:border-brand-navy focus:ring-2 focus:ring-blue-100 transition-all"
               placeholder="Tell us about your experience"
               required
             />
@@ -206,7 +206,7 @@ export function Reviews() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3.5 rounded-lg transition-all shadow-lg cursor-pointer"
+            className="w-full bg-brand-navy hover:bg-brand-navy-soft text-white font-bold py-3.5 rounded-lg transition-all shadow-lg cursor-pointer"
           >
             Submit Review
           </motion.button>

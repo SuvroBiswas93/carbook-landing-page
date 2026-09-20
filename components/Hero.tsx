@@ -1,725 +1,266 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import {
-  CalendarDays,
-  CarFront,
-  ChevronDown,
-  ChevronRight,
-  MapPin,
-  Phone,
-  Search,
-  X,
-  ChevronUp,
-} from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { CalendarDays, CarFront, CheckCircle2, LoaderCircle } from 'lucide-react'
 import { toast } from 'react-toastify'
 import locationsData from '@/data/locations.json'
 import type { Car } from '@/lib/store'
-import { formatDateTime } from '@/lib/utils'
 
-interface BookingFormData {
-  car: Car | null
-  pickupLocation: string
-  dropoffLocation: string
-  pickupDate: string
-  dropoffDate?: string
-  mobileNumber: string
-  tripType: string
-}
-
-interface HeroProps {
-  onContinueClick?: (data: BookingFormData) => void
-}
+type BookingTab = 'city' | 'hourly' | 'intercity' | 'airport'
+type TripType = 'One Way' | 'Round Trip'
 
 const heroHeadline = 'চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে'
+const carTypes = ['Sedan', 'Noah-Hiace', 'Premio', 'Microbus', 'SUV']
+const mobilePattern = /^01[3-9]\d{8}$/
 
-export function Hero({ onContinueClick }: HeroProps) {
-  const [tripType, setTripType] = useState('One Way')
+interface FormErrors {
+  carType?: string
+  pickupLocation?: string
+  dropoffLocation?: string
+  pickupDate?: string
+  customerName?: string
+  mobileNumber?: string
+}
+
+const getMinimumDateTime = () => {
+  const now = new Date()
+  const offset = now.getTimezoneOffset() * 60000
+  return new Date(now.getTime() - offset).toISOString().slice(0, 16)
+}
+
+export function Hero() {
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<BookingTab>('city')
+  const [tripType, setTripType] = useState<TripType>('One Way')
+  const [carType, setCarType] = useState('')
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
-  const [showCarDropdown, setShowCarDropdown] = useState(false)
   const [pickupLocation, setPickupLocation] = useState('')
   const [dropoffLocation, setDropoffLocation] = useState('')
   const [pickupDate, setPickupDate] = useState('')
-  const [dropoffDate, setDropoffDate] = useState('')
+  const [customerName, setCustomerName] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
-  const [showDatePicker, setShowDatePicker] = useState(false)
-  const [showDropoffDatePicker, setShowDropoffDatePicker] = useState(false)
-  const [pickerDate, setPickerDate] = useState(new Date())
-  const [pickerHour, setPickerHour] = useState(12)
-  const [pickerMinute, setPickerMinute] = useState(0)
-  const [pickerPeriod, setPickerPeriod] = useState<'AM' | 'PM'>('AM')
-  const [pickerView, setPickerView] = useState<'date' | 'time'>('date')
-  const [dropoffPickerDate, setDropoffPickerDate] = useState(new Date())
-  const [dropoffPickerHour, setDropoffPickerHour] = useState(12)
-  const [dropoffPickerMinute, setDropoffPickerMinute] = useState(0)
-  const [dropoffPickerPeriod, setDropoffPickerPeriod] = useState<'AM' | 'PM'>('AM')
-  const [dropoffPickerView, setDropoffPickerView] = useState<'date' | 'time'>('date')
-  const [showPickupDropdown, setShowPickupDropdown] = useState(false)
-  const [showDropoffDropdown, setShowDropoffDropdown] = useState(false)
-  const [pickupSearch, setPickupSearch] = useState('')
-  const [dropoffSearch, setDropoffSearch] = useState('')
   const [cars, setCars] = useState<Car[]>([])
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     fetch('/api/cars')
       .then((response) => response.json())
       .then((data: Car[]) => setCars(data))
-      .catch(() => toast.error('Could not load available cars'))
-  }, [])
-
-  useEffect(() => {
-    const handleOutsidePointerDown = (event: PointerEvent) => {
-      const target = event.target
-      if (target instanceof Element && target.closest('[data-hero-dropdown]')) {
-        return
-      }
-
-      setShowCarDropdown(false)
-      setShowPickupDropdown(false)
-      setShowDropoffDropdown(false)
-      setShowDatePicker(false)
-      setShowDropoffDatePicker(false)
-    }
-
-    document.addEventListener('pointerdown', handleOutsidePointerDown)
-    return () => document.removeEventListener('pointerdown', handleOutsidePointerDown)
+      .catch(() => toast.error('গাড়ির তালিকা লোড করা যায়নি'))
   }, [])
 
   useEffect(() => {
     const handleCarBooking = (event: Event) => {
       const car = (event as CustomEvent<Car>).detail
-      if (car) setSelectedCar(car)
+      if (!car) return
+      setSelectedCar(car)
+      setCarType(carTypes.find((type) => `${car.brand} ${car.model}`.toLowerCase().includes(type.toLowerCase())) ?? 'Sedan')
     }
 
     window.addEventListener('car-booking:selected', handleCarBooking)
     return () => window.removeEventListener('car-booking:selected', handleCarBooking)
   }, [])
 
-  const filteredPickup = locationsData.filter(
-    (loc) =>
-      loc.name.toLowerCase().includes(pickupSearch.toLowerCase()) ||
-      loc.zone.toLowerCase().includes(pickupSearch.toLowerCase())
-  )
-  const filteredDropoff = locationsData.filter(
-    (loc) =>
-      loc.name.toLowerCase().includes(dropoffSearch.toLowerCase()) ||
-      loc.zone.toLowerCase().includes(dropoffSearch.toLowerCase())
-  )
+  const isHourly = activeTab === 'hourly'
+  const isIntercity = activeTab === 'intercity'
+  const isAirport = activeTab === 'airport'
 
-  const handleContinue = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedCar) {
-      toast.error('Please select a car')
-      return
-    }
-    if (!pickupLocation || !dropoffLocation || !pickupDate || !mobileNumber.trim()) {
-      toast.error('Please fill in all required fields')
-      return
-    }
-    if (tripType === 'Round Way' && !dropoffDate) {
-      toast.error('Please select drop-off date and time')
-      return
-    }
-    if (!/^[+\d][\d\s-]{7,18}$/.test(mobileNumber.trim())) {
-      toast.error('Please enter a valid mobile number')
-      return
-    }
-    if (pickupLocation === dropoffLocation) {
-      toast.error('Pickup and drop-off locations must be different')
-      return
-    }
-    const data: BookingFormData = {
-      car: selectedCar,
-      pickupLocation,
-      dropoffLocation,
-      pickupDate,
-      dropoffDate: tripType === 'Round Way' ? dropoffDate : undefined,
-      mobileNumber: mobileNumber.trim(),
-      tripType,
-    }
-    onContinueClick?.(data)
+  const validate = (): FormErrors => {
+    const nextErrors: FormErrors = {}
+    if (!carType) nextErrors.carType = 'গাড়ির ধরন নির্বাচন করুন'
+    if (!pickupLocation) nextErrors.pickupLocation = 'পিকআপ লোকেশন দিন'
+    if (!isHourly && !dropoffLocation) nextErrors.dropoffLocation = 'ড্রপ-অফ লোকেশন দিন'
+    if (!pickupDate) nextErrors.pickupDate = 'তারিখ ও সময় নির্বাচন করুন'
+    if (!customerName.trim()) nextErrors.customerName = 'আপনার নাম লিখুন'
+    if (!mobilePattern.test(mobileNumber)) nextErrors.mobileNumber = 'সঠিক ১১ সংখ্যার বাংলাদেশি নম্বর দিন'
+    return nextErrors
   }
 
-  const handlePickupDateConfirm = () => {
-    const hour24 = pickerPeriod === 'AM' ? (pickerHour === 12 ? 0 : pickerHour) : (pickerHour === 12 ? 12 : pickerHour + 12)
-    const formatted = `${String(pickerDate.getFullYear()).padStart(4,'0')}-${String(pickerDate.getMonth()+1).padStart(2,'0')}-${String(pickerDate.getDate()).padStart(2,'0')}T${String(hour24).padStart(2,'0')}:${String(pickerMinute).padStart(2,'0')}`
-    setPickupDate(formatted)
-    setShowDatePicker(false)
+  const updateField = <K extends keyof FormErrors>(field: K, value: string) => {
+    if (field === 'carType') {
+      setCarType(value)
+      const matchingCar = cars.find((car) => {
+        const label = `${car.brand} ${car.model}`.toLowerCase()
+        return label.includes(value.toLowerCase()) || car.category.toLowerCase() === value.toLowerCase()
+      })
+      setSelectedCar(matchingCar ?? cars[0] ?? null)
+    }
+    if (field === 'pickupLocation') setPickupLocation(value)
+    if (field === 'dropoffLocation') setDropoffLocation(value)
+    if (field === 'pickupDate') setPickupDate(value)
+    if (field === 'customerName') setCustomerName(value)
+    if (field === 'mobileNumber') setMobileNumber(value.replace(/\D/g, '').slice(0, 11))
+
+    const nextErrors = { ...errors }
+    const fieldError =
+      field === 'carType' && !value
+        ? 'গাড়ির ধরন নির্বাচন করুন'
+        : field === 'pickupLocation' && !value
+          ? 'পিকআপ লোকেশন দিন'
+          : field === 'dropoffLocation' && !value && !isHourly
+            ? 'ড্রপ-অফ লোকেশন দিন'
+            : field === 'pickupDate' && (!value || new Date(value).getTime() < Date.now())
+              ? 'বর্তমান বা ভবিষ্যতের তারিখ নির্বাচন করুন'
+              : field === 'customerName' && !value.trim()
+                ? 'আপনার নাম লিখুন'
+                : field === 'mobileNumber' && !mobilePattern.test(value.replace(/\D/g, ''))
+                  ? 'সঠিক ১১ সংখ্যার বাংলাদেশি নম্বর দিন'
+                  : undefined
+
+    if (fieldError) nextErrors[field] = fieldError
+    else delete nextErrors[field]
+    setErrors(nextErrors)
   }
 
-  const handleDropoffDateConfirm = () => {
-    const hour24 = dropoffPickerPeriod === 'AM' ? (dropoffPickerHour === 12 ? 0 : dropoffPickerHour) : (dropoffPickerHour === 12 ? 12 : dropoffPickerHour + 12)
-    const formatted = `${String(dropoffPickerDate.getFullYear()).padStart(4,'0')}-${String(dropoffPickerDate.getMonth()+1).padStart(2,'0')}-${String(dropoffPickerDate.getDate()).padStart(2,'0')}T${String(hour24).padStart(2,'0')}:${String(dropoffPickerMinute).padStart(2,'0')}`
-    setDropoffDate(formatted)
-    setShowDropoffDatePicker(false)
+  const handleTabChange = (tab: BookingTab) => {
+    setActiveTab(tab)
+    setErrors({})
+    if (tab !== 'intercity') setTripType('One Way')
+    if (tab === 'hourly') setDropoffLocation('')
   }
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (isSubmitting) return
+
+    const nextErrors = validate()
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          carId: selectedCar?.id ?? 0,
+          carName: selectedCar ? `${selectedCar.brand} ${selectedCar.model}` : carType,
+          carType,
+          customerName: customerName.trim(),
+          mobileNumber,
+          pickupLocation,
+          dropoffLocation: isHourly ? '' : dropoffLocation,
+          pickupDate,
+          tripType: isIntercity ? tripType : 'One Way',
+        }),
+      })
+
+      if (!response.ok) {
+        const result = (await response.json()) as { error?: string }
+        toast.error(result.error ?? 'বুকিং পাঠানো যায়নি')
+        return
+      }
+
+      router.push('/thank-you')
+    } catch {
+      toast.error('ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const inputClass = (field: keyof FormErrors) => `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100 ${errors[field] ? 'border-red-400 ring-2 ring-red-100' : 'border-[#eae5dd]'}`
 
   return (
     <section id="hero" className="bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32">
       <div className="mx-auto max-w-345 px-3 sm:px-8">
         <div className="mb-8 max-w-3xl">
-          <h1
-            aria-label={heroHeadline}
-            className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl"
-          >
-            <span className="bg-linear-to-r from-[#9b5b2e] via-[#d97706] to-[#b94a43] bg-clip-text text-transparent">
-              {heroHeadline}
-            </span>
+          <h1 aria-label={heroHeadline} className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl">
+            <span className="bg-linear-to-r from-[#9b5b2e] via-[#d97706] to-[#b94a43] bg-clip-text text-transparent">{heroHeadline}</span>
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#766e64] sm:text-xl">
-            ফিক্সড প্রাইস, কোনো হিডেন চার্জ নেই। ফর্ম পূরণ করুন,{' '}
-            <span className="font-bold text-amber-700">১০ মিনিটে আমরা কল করবো।</span>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-brand-muted sm:text-xl">
+            ফিক্সড প্রাইস, কোনো হিডেন চার্জ নেই। ফর্ম পূরণ করুন, <span className="font-bold text-brand-navy">১০ মিনিটে আমরা কল করবো।</span>
           </p>
         </div>
 
-        <div className="max-w-117.5 rounded-t-[14px] bg-[#fffdfb] p-2 shadow-[0_12px_35px_rgba(50,44,35,.07)] sm:p-3">
-          <div className="grid grid-cols-1 gap-2">
-            <button type="button" className="rounded-lg px-4 py-4 text-sm font-bold sm:text-lg bg-amber-600 text-white">
-              <CarFront className="mr-2 inline" size={17} /> Car Rental
-            </button>
+        <div className="overflow-hidden rounded-2xl border border-[#eae5dd] bg-[#fffdfb] shadow-[0_16px_42px_rgba(50,44,35,.12)]">
+          <div className="grid grid-cols-2 border-b border-[#eae5dd] sm:grid-cols-4">
+            {([['city', 'সিটি'], ['hourly', 'আওয়ারলি'], ['intercity', 'ইন্টারসিটি'], ['airport', 'এয়ারপোর্ট']] as const).map(([tab, label]) => (
+              <button key={tab} type="button" onClick={() => handleTabChange(tab)} className={`cursor-pointer px-3 py-4 text-sm font-bold transition sm:px-5 sm:text-base ${activeTab === tab ? 'bg-brand-navy text-white' : 'text-brand-muted hover:bg-brand-surface'}`}>
+                {label}
+              </button>
+            ))}
           </div>
-        </div>
 
-        <div className="rounded-b-[14px] rounded-tr-[14px] border-t border-[#eae5dd] bg-[#fffdfb] p-4 shadow-[0_16px_42px_rgba(50,44,35,.09)] sm:p-7 lg:p-8">
-          <form onSubmit={handleContinue}>
-            <div className="grid divide-y divide-[#eae5dd] lg:grid-cols-[1.2fr_1.25fr_1.25fr_1.3fr] lg:divide-x lg:divide-y-0">
-              <div data-hero-dropdown className="pb-5 lg:pb-0 lg:pr-8 relative">
-                <label className="flex items-center gap-2 text-base font-bold">
-                  <CarFront size={18} /> Choose a Car <span className="text-[#b94a43]">*</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setShowCarDropdown(!showCarDropdown)}
-                  className="mt-4 flex w-full cursor-pointer items-center justify-between text-left rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <span>
-                    {selectedCar ? (
-                      <div className="flex items-center gap-3">
-                        <img src={selectedCar.image} alt={selectedCar.brand} className="h-10 w-14 rounded-lg object-cover" />
-                        <div>
-                          <strong className="block font-serif text-lg">{selectedCar.brand} {selectedCar.model}</strong>
-                          <span className="text-sm text-[#aaa59e]">{selectedCar.seats} Seats · ${selectedCar.pricePerDay}/day</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-[#aaa59e]">Select a car...</span>
-                    )}
-                  </span>
-                  <ChevronDown size={22} />
-                </button>
-                {showCarDropdown && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-[#eae5dd] bg-white shadow-xl max-h-64 overflow-y-auto">
-                    {cars.length === 0 && (
-                      <p className="px-4 py-3 text-sm text-[#aaa59e]">No published cars available.</p>
-                    )}
-                    {cars.map((car) => (
-                      <button
-                        key={car.id}
-                        type="button"
-                        onClick={() => { setSelectedCar(car); setShowCarDropdown(false) }}
-                        className={`w-full cursor-pointer px-4 py-3 text-left flex items-center gap-3 hover:bg-[#f3f1ed] transition-colors ${selectedCar?.id === car.id ? 'bg-[#f0edf9] border-l-4 border-[#a8865f]' : ''}`}
-                      >
-                        <img src={car.image} alt={car.brand} className="h-12 w-16 rounded-lg object-cover" />
-                        <div>
-                          <p className="font-semibold text-sm">{car.brand} {car.model}</p>
-                          <p className="text-xs text-[#aaa59e]">{car.category} · {car.seats} Seats · ${car.pricePerDay}/day</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+          <form onSubmit={handleSubmit} noValidate className="p-4 sm:p-7 lg:p-8">
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              <label className="text-sm font-bold text-stone-800">
+                গাড়ির ধরন <span className="text-red-500">*</span>
+                <select value={carType} onChange={(event) => updateField('carType', event.target.value)} className={inputClass('carType')}>
+                  <option value="">গাড়ি বেছে নিন</option>
+                  {carTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+                </select>
+                {errors.carType && <span className="mt-1 block text-xs font-medium text-red-600">{errors.carType}</span>}
+              </label>
 
-              <div className="py-5 lg:px-8 lg:py-0 relative">
-                <label className="flex items-center gap-2 text-base font-bold">
-                  <span className="size-3 rounded-full bg-amber-500 ring-4 ring-amber-100" /> Pickup Location <span className="text-[#b94a43]">*</span>
-                </label>
-                <div data-hero-dropdown className="mt-4 relative">
-                  <button
-                    type="button"
-                    onClick={() => { setShowPickupDropdown(!showPickupDropdown); setShowDropoffDropdown(false) }}
-                    className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
-                  >
-                    <span className={pickupLocation ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
-                      {pickupLocation || 'Select pickup location'}
-                    </span>
-                    <ChevronDown size={20} className="text-[#aaa59e]" />
-                  </button>
-                  {showPickupDropdown && (
-                    <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-[#eae5dd] bg-white shadow-xl overflow-hidden">
-                      <div className="relative p-2 border-b border-[#eae5dd]">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa59e]" />
-                        <input
-                          type="text"
-                          placeholder="Search location..."
-                          value={pickupSearch}
-                          onChange={(e) => setPickupSearch(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2 rounded-lg border border-[#eae5dd] text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
-                        />
-                        {pickupSearch && (
-                          <button
-                            type="button"
-                            onClick={() => setPickupSearch('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aaa59e] hover:text-stone-600"
-                          >
-                            <X size={16} />
-                          </button>
-                        )}
-                      </div>
-                      <div className="max-h-48 overflow-y-auto">
-                        {filteredPickup.map((loc) => (
-                          <button
-                            key={loc.id}
-                            type="button"
-                            onClick={() => { setPickupLocation(loc.name); setShowPickupDropdown(false); setPickupSearch('') }}
-                            className={`w-full cursor-pointer px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${pickupLocation === loc.name ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
-                          >
-                            <p className="font-semibold text-sm text-stone-900">{loc.name}</p>
-                            <p className="text-xs text-[#aaa59e]">{loc.address}</p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+              <label className="text-sm font-bold text-stone-800">
+                পিকআপ লোকেশন <span className="text-red-500">*</span>
+                <input list="pickup-locations" type="text" value={pickupLocation} onChange={(event) => updateField('pickupLocation', event.target.value)} placeholder="যেখান থেকে উঠবেন" className={inputClass('pickupLocation')} />
+                <datalist id="pickup-locations">
+                  {locationsData.map((location) => <option key={location.id} value={location.name} />)}
+                </datalist>
+                {errors.pickupLocation && <span className="mt-1 block text-xs font-medium text-red-600">{errors.pickupLocation}</span>}
+              </label>
+
+              {!isHourly && (
+                <label className="text-sm font-bold text-stone-800">
+                  {isAirport ? 'এয়ারপোর্টে ড্রপ-অফ' : 'ড্রপ-অফ লোকেশন'} <span className="text-red-500">*</span>
+                  {isIntercity || isAirport ? (
+                    <select value={dropoffLocation} onChange={(event) => updateField('dropoffLocation', event.target.value)} className={inputClass('dropoffLocation')}>
+                      <option value="">ড্রপ-অফ লোকেশন বেছে নিন</option>
+                      {locationsData.map((location) => <option key={location.id} value={location.name}>{location.name}</option>)}
+                    </select>
+                  ) : (
+                    <input type="text" value={dropoffLocation} onChange={(event) => updateField('dropoffLocation', event.target.value)} placeholder="যেখানে যাবেন" className={inputClass('dropoffLocation')} />
                   )}
-                </div>
-              </div>
-
-              <div className="py-5 lg:px-8 lg:py-0 relative">
-                <label className="flex items-center gap-2 text-base font-bold">
-                  <MapPin size={18} className="text-[#9b805d]" /> Drop-off Location <span className="text-[#b94a43]">*</span>
+                  {errors.dropoffLocation && <span className="mt-1 block text-xs font-medium text-red-600">{errors.dropoffLocation}</span>}
                 </label>
-                <div data-hero-dropdown className="mt-4 relative">
-                  <button
-                    type="button"
-                    onClick={() => { setShowDropoffDropdown(!showDropoffDropdown); setShowPickupDropdown(false) }}
-                    className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
-                  >
-                    <span className={dropoffLocation ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
-                      {dropoffLocation || 'Select drop-off location'}
-                    </span>
-                    <ChevronDown size={20} className="text-[#aaa59e]" />
-                  </button>
-                  {showDropoffDropdown && (
-                    <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-[#eae5dd] bg-white shadow-xl overflow-hidden">
-                      <div className="relative p-2 border-b border-[#eae5dd]">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa59e]" />
-                        <input
-                          type="text"
-                          placeholder="Search location..."
-                          value={dropoffSearch}
-                          onChange={(e) => setDropoffSearch(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2 rounded-lg border border-[#eae5dd] text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
-                        />
-                        {dropoffSearch && (
-                          <button
-                            type="button"
-                            onClick={() => setDropoffSearch('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aaa59e] hover:text-stone-600"
-                          >
-                            <X size={16} />
-                          </button>
-                        )}
-                      </div>
-                      <div className="max-h-48 overflow-y-auto">
-                        {filteredDropoff.map((loc) => (
-                          <button
-                            key={loc.id}
-                            type="button"
-                            onClick={() => { setDropoffLocation(loc.name); setShowDropoffDropdown(false); setDropoffSearch('') }}
-                            className={`w-full cursor-pointer px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${dropoffLocation === loc.name ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
-                          >
-                            <p className="font-semibold text-sm text-stone-900">{loc.name}</p>
-                            <p className="text-xs text-[#aaa59e]">{loc.address}</p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
 
-              <div className="pt-5 lg:pl-8 lg:pt-0 relative">
-                <label className="flex items-center gap-2 text-base font-bold">
-                  <CalendarDays size={18} /> Pickup Date &amp; Time <span className="text-[#b94a43]">*</span>
-                </label>
-                <div data-hero-dropdown className="mt-4 relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowDatePicker(!showDatePicker)}
-                    className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
-                  >
-                    <span className={pickupDate ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
-                      {pickupDate ? formatDateTime(pickupDate) : 'Select date & time'}
-                    </span>
-                    <CalendarDays size={20} className="text-amber-500" />
-                  </button>
-                  {showDatePicker && (
-                    <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl border border-[#eae5dd] bg-white shadow-2xl overflow-hidden" style={{ maxHeight: '320px', overflowY: 'auto' }}>
-                      <div className="flex border-b border-[#eae5dd]">
-                        <button
-                          type="button"
-                          onClick={() => setPickerView('date')}
-                          className={`flex-1 py-2.5 text-xs font-bold transition-colors ${pickerView === 'date' ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50/50' : 'text-stone-500'}`}
-                        >
-                          Date
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPickerView('time')}
-                          className={`flex-1 py-2.5 text-xs font-bold transition-colors ${pickerView === 'time' ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50/50' : 'text-stone-500'}`}
-                        >
-                          Time
-                        </button>
-                      </div>
-                      {pickerView === 'date' ? (
-                        <div className="p-3">
-                          <div className="flex items-center justify-between mb-3">
-                            <button
-                              type="button"
-                              onClick={() => setPickerDate(new Date(pickerDate.getFullYear(), pickerDate.getMonth() - 1, pickerDate.getDate()))}
-                              className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center transition-colors"
-                            >
-                              <ChevronUp size={16} className="text-amber-600" />
-                            </button>
-                            <p className="font-bold text-stone-900 text-xs">
-                              {pickerDate.toLocaleString('en-US', { month: 'short', year: 'numeric' })}
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => setPickerDate(new Date(pickerDate.getFullYear(), pickerDate.getMonth() + 1, pickerDate.getDate()))}
-                              className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center transition-colors"
-                            >
-                              <ChevronDown size={16} className="text-amber-600" />
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-7 gap-0.5 text-center">
-                            {Array.from({ length: new Date(pickerDate.getFullYear(), pickerDate.getMonth() + 1, 0).getDate() }).map((_, dayIndex) => {
-                              const day = dayIndex + 1
-                              const firstDayOfMonth = new Date(pickerDate.getFullYear(), pickerDate.getMonth(), 1).getDay()
-                              const isPast = new Date(pickerDate.getFullYear(), pickerDate.getMonth(), day) < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
-                              const isToday = day === new Date().getDate() && pickerDate.getMonth() === new Date().getMonth() && pickerDate.getFullYear() === new Date().getFullYear()
-                              const isSelected = pickerDate.getDate() === day && pickerDate.getMonth() === new Date().getMonth() && pickerDate.getFullYear() === new Date().getFullYear()
-                              const isEmpty = dayIndex < firstDayOfMonth
-                              return (
-                                <button
-                                  key={day}
-                                  type="button"
-                                  onClick={() => {
-                                    if (isEmpty) return
-                                    const d = new Date(pickerDate.getFullYear(), pickerDate.getMonth(), day)
-                                    setPickerDate(d)
-                                    const formatted = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
-                                    setPickupDate(formatted)
-                                  }}
-                                  disabled={isEmpty}
-                                  className={`h-8 w-8 rounded-full text-xs font-bold transition-all ${isEmpty ? 'invisible' : isToday ? 'bg-amber-600 text-white' : isSelected ? 'bg-amber-600 text-white' : isPast ? 'text-stone-300' : 'text-stone-700 hover:bg-amber-50'}`}
-                                >
-                                  {day}
-                                </button>
-                              )
-                            })}
-                          </div>
-                          <div className="mt-3 flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setShowDatePicker(false)}
-                              className="flex-1 py-2 rounded-xl border border-[#eae5dd] text-stone-600 text-xs font-semibold hover:bg-stone-50 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => { setShowDatePicker(false); setPickerView('time') }}
-                              className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
-                            >
-                              Next: Time →
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="mt-3">
-                          <p className="text-xs font-bold text-stone-900 mb-3 text-center">Select Time</p>
-                          <div className="flex justify-center gap-3">
-                            <div className="w-24">
-                              <p className="text-[10px] font-bold text-stone-400 mb-1.5 text-center">HOURS</p>
-                              <div className="flex flex-col gap-1 max-h-32 overflow-y-auto rounded-xl border border-[#eae5dd] p-1">
-                                {Array.from({ length: 12 }, (_, i) => {
-                                  const h = i + 1
-                                  return (
-                                    <button
-                                      key={h}
-                                      type="button"
-                                      onClick={() => setPickerHour(h)}
-                                      className={`w-full py-1 rounded-lg text-[11px] font-bold transition-all ${pickerHour === h ? 'bg-amber-600 text-white shadow-md' : 'text-stone-600 hover:bg-amber-50'}`}
-                                    >
-                                      {String(h).padStart(2,'0')}
-                                    </button>
-                                  )
-                                })}
-                              </div>
-                            </div>
-                            <div className="w-24">
-                              <p className="text-[10px] font-bold text-stone-400 mb-1.5 text-center">MINUTES</p>
-                              <div className="flex flex-col gap-1 max-h-32 overflow-y-auto rounded-xl border border-[#eae5dd] p-1">
-                                {Array.from({ length: 60 }, (_, i) => (
-                                  <button
-                                    key={i}
-                                    type="button"
-                                    onClick={() => setPickerMinute(i)}
-                                    className={`w-full py-1 rounded-lg text-[11px] font-bold transition-all ${pickerMinute === i ? 'bg-amber-600 text-white shadow-md' : 'text-stone-600 hover:bg-amber-50'}`}
-                                  >
-                                    {String(i).padStart(2,'0')}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex flex-col gap-1 justify-center">
-                              <button
-                                type="button"
-                                onClick={() => setPickerPeriod('AM')}
-                                className={`w-12 h-8 rounded-lg text-[10px] font-bold transition-all ${pickerPeriod === 'AM' ? 'bg-amber-600 text-white shadow-md' : 'bg-stone-100 text-stone-600 hover:bg-amber-50'}`}
-                              >
-                                AM
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setPickerPeriod('PM')}
-                                className={`w-12 h-8 rounded-lg text-[10px] font-bold transition-all ${pickerPeriod === 'PM' ? 'bg-amber-600 text-white shadow-md' : 'bg-stone-100 text-stone-600 hover:bg-amber-50'}`}
-                              >
-                                PM
-                              </button>
-                            </div>
-                          </div>
-                          <div className="mt-3 flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setShowDatePicker(false)}
-                              className="flex-1 py-2 rounded-xl border border-[#eae5dd] text-stone-600 text-xs font-semibold hover:bg-stone-50 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handlePickupDateConfirm}
-                              className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
-                            >
-                              ✓ Confirm
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-                {tripType === 'Round Way' && (
-                  <div className="pt-4 relative">
-                    <label className="flex items-center gap-2 text-base font-bold">
-                      <CalendarDays size={18} /> Return Date &amp; Time <span className="text-[#b94a43]">*</span>
-                    </label>
-                    <div className="mt-2 relative">
-                      <button
-                        type="button"
-                        onClick={() => setShowDropoffDatePicker(!showDropoffDatePicker)}
-                        className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
-                      >
-<span className={dropoffDate ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
-                      {dropoffDate ? formatDateTime(dropoffDate) : 'Select return date & time'}
-                    </span>
-                        <CalendarDays size={20} className="text-amber-500" />
-                      </button>
-                      {showDropoffDatePicker && (
-                        <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl border border-[#eae5dd] bg-white shadow-2xl overflow-hidden" style={{ maxHeight: '320px', overflowY: 'auto' }}>
-                          <div className="flex border-b border-[#eae5dd]">
-                            <button
-                              type="button"
-                              onClick={() => setDropoffPickerView('date')}
-                              className={`flex-1 py-2.5 text-xs font-bold transition-colors ${dropoffPickerView === 'date' ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50/50' : 'text-stone-500'}`}
-                            >
-                              Date
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setDropoffPickerView('time')}
-                              className={`flex-1 py-2.5 text-xs font-bold transition-colors ${dropoffPickerView === 'time' ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50/50' : 'text-stone-500'}`}
-                            >
-                              Time
-                            </button>
-                          </div>
-                          {dropoffPickerView === 'date' ? (
-                            <div className="p-3">
-                              <div className="flex items-center justify-between mb-3">
-                                <button
-                                  type="button"
-                                  onClick={() => setDropoffPickerDate(new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth() - 1, dropoffPickerDate.getDate()))}
-                                  className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center transition-colors"
-                                >
-                                  <ChevronUp size={16} className="text-amber-600" />
-                                </button>
-                                <p className="font-bold text-stone-900 text-xs">
-                                  {dropoffPickerDate.toLocaleString('en-US', { month: 'short', year: 'numeric' })}
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={() => setDropoffPickerDate(new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth() + 1, dropoffPickerDate.getDate()))}
-                                  className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center transition-colors"
-                                >
-                                  <ChevronDown size={16} className="text-amber-600" />
-                                </button>
-                              </div>
-                              <div className="grid grid-cols-7 gap-0.5 text-center">
-                                {Array.from({ length: new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth() + 1, 0).getDate() }).map((_, dayIndex) => {
-                                  const day = dayIndex + 1
-                                  const firstDayOfMonth = new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth(), 1).getDay()
-                                  const isPast = new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth(), day) < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
-                                  const isToday = day === new Date().getDate() && dropoffPickerDate.getMonth() === new Date().getMonth() && dropoffPickerDate.getFullYear() === new Date().getFullYear()
-                                  const isSelected = dropoffPickerDate.getDate() === day && dropoffPickerDate.getMonth() === new Date().getMonth() && dropoffPickerDate.getFullYear() === new Date().getFullYear()
-                                  const isEmpty = dayIndex < firstDayOfMonth
-                                  return (
-                                    <button
-                                      key={day}
-                                      type="button"
-                                      onClick={() => {
-                                        if (isEmpty) return
-                                        const d = new Date(dropoffPickerDate.getFullYear(), dropoffPickerDate.getMonth(), day)
-                                        setDropoffPickerDate(d)
-                                        const formatted = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
-                                        setDropoffDate(formatted)
-                                      }}
-                                      disabled={isEmpty}
-                                      className={`h-8 w-8 rounded-full text-xs font-bold transition-all ${isEmpty ? 'invisible' : isToday ? 'bg-amber-600 text-white' : isSelected ? 'bg-amber-600 text-white' : isPast ? 'text-stone-300' : 'text-stone-700 hover:bg-amber-50'}`}
-                                    >
-                                      {day}
-                                    </button>
-                                  )
-                                })}
-                              </div>
-                              <div className="mt-3 flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setShowDropoffDatePicker(false)}
-                                  className="flex-1 py-2 rounded-xl border border-[#eae5dd] text-stone-600 text-xs font-semibold hover:bg-stone-50 transition-colors"
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => { setShowDropoffDatePicker(false); setDropoffPickerView('time') }}
-                                  className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
-                                >
-                                  Next: Time →
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="mt-3">
-                              <p className="text-xs font-bold text-stone-900 mb-3 text-center">Select Time</p>
-                              <div className="flex justify-center gap-3">
-                                <div className="w-24">
-                                  <p className="text-[10px] font-bold text-stone-400 mb-1.5 text-center">HOURS</p>
-                                  <div className="flex flex-col gap-1 max-h-32 overflow-y-auto rounded-xl border border-[#eae5dd] p-1">
-                                    {Array.from({ length: 12 }, (_, i) => {
-                                      const h = i + 1
-                                      return (
-                                        <button
-                                          key={h}
-                                          type="button"
-                                          onClick={() => setDropoffPickerHour(h)}
-                                          className={`w-full py-1 rounded-lg text-[11px] font-bold transition-all ${dropoffPickerHour === h ? 'bg-amber-600 text-white shadow-md' : 'text-stone-600 hover:bg-amber-50'}`}
-                                        >
-                                          {String(h).padStart(2,'0')}
-                                        </button>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-                                <div className="w-24">
-                                  <p className="text-[10px] font-bold text-stone-400 mb-1.5 text-center">MINUTES</p>
-                                  <div className="flex flex-col gap-1 max-h-32 overflow-y-auto rounded-xl border border-[#eae5dd] p-1">
-                                    {Array.from({ length: 60 }, (_, i) => (
-                                      <button
-                                        key={i}
-                                        type="button"
-                                        onClick={() => setDropoffPickerMinute(i)}
-                                        className={`w-full py-1 rounded-lg text-[11px] font-bold transition-all ${dropoffPickerMinute === i ? 'bg-amber-600 text-white shadow-md' : 'text-stone-600 hover:bg-amber-50'}`}
-                                      >
-                                        {String(i).padStart(2,'0')}
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                                <div className="flex flex-col gap-1 justify-center">
-                                  <button
-                                    type="button"
-                                    onClick={() => setDropoffPickerPeriod('AM')}
-                                    className={`w-12 h-8 rounded-lg text-[10px] font-bold transition-all ${dropoffPickerPeriod === 'AM' ? 'bg-amber-600 text-white shadow-md' : 'bg-stone-100 text-stone-600 hover:bg-amber-50'}`}
-                                  >
-                                    AM
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => setDropoffPickerPeriod('PM')}
-                                    className={`w-12 h-8 rounded-lg text-[10px] font-bold transition-all ${dropoffPickerPeriod === 'PM' ? 'bg-amber-600 text-white shadow-md' : 'bg-stone-100 text-stone-600 hover:bg-amber-50'}`}
-                                  >
-                                    PM
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="mt-3 flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setShowDropoffDatePicker(false)}
-                                  className="flex-1 py-2 rounded-xl border border-[#eae5dd] text-stone-600 text-xs font-semibold hover:bg-stone-50 transition-colors"
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={handleDropoffDateConfirm}
-                                  className="flex-1 py-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-700 text-white text-xs font-semibold hover:from-amber-700 hover:to-amber-800 transition-colors shadow-md"
-                                >
-                                  ✓ Confirm
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <label className="text-sm font-bold text-stone-800">
+                তারিখ ও সময় <span className="text-red-500">*</span>
+                <input type="datetime-local" min={getMinimumDateTime()} value={pickupDate} onChange={(event) => updateField('pickupDate', event.target.value)} className={inputClass('pickupDate')} />
+                {errors.pickupDate && <span className="mt-1 block text-xs font-medium text-red-600">{errors.pickupDate}</span>}
+              </label>
+
+              <label className="text-sm font-bold text-stone-800">
+                আপনার নাম <span className="text-red-500">*</span>
+                <input type="text" value={customerName} onChange={(event) => updateField('customerName', event.target.value)} placeholder="আপনার নাম লিখুন" className={inputClass('customerName')} />
+                {errors.customerName && <span className="mt-1 block text-xs font-medium text-red-600">{errors.customerName}</span>}
+              </label>
+
+              <label className="text-sm font-bold text-stone-800">
+                মোবাইল নম্বর <span className="text-red-500">*</span>
+                <input type="tel" inputMode="numeric" pattern="01[3-9][0-9]{8}" value={mobileNumber} onChange={(event) => updateField('mobileNumber', event.target.value)} placeholder="01XXXXXXXXX" className={inputClass('mobileNumber')} />
+                {errors.mobileNumber && <span className="mt-1 block text-xs font-medium text-red-600">{errors.mobileNumber}</span>}
+              </label>
             </div>
 
-            <div className="mt-7 grid gap-5 border-t border-[#eae5dd] pt-6 lg:grid-cols-[1fr_auto] lg:items-end">
-              <div>
-                <label className="flex items-center gap-2 text-base font-bold">
-                  <Phone size={18} /> Mobile Number <span className="text-[#b94a43]">*</span>
-                </label>
-                <input
-                  type="tel"
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  placeholder="+880 1XXXXXXXXX"
-                  className="mt-3 w-full rounded-xl border border-[#eae5dd] bg-white px-4 py-3 text-sm font-semibold outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
-                />
-              </div>
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between lg:justify-end">
-              <div className="flex flex-wrap gap-2">
-                {['One Way', 'Round Way', 'Hourly'].map((item) => (
-                  <button key={item} type="button" onClick={() => setTripType(item)} className={`rounded-lg px-4 py-3 text-sm font-bold cursor-pointer bg-stone-100 text-[#2c2a27] hover:bg-stone-200`}>
-                    <span className={`mr-2 inline-block size-5 align-[-5px] rounded-full ${tripType === item ? 'bg-amber-600' : 'bg-transparent border-[3px] border-[#dfe1e3]'}`} /> {item}
-                  </button>
-                ))}
-              </div>
-              <div className="text-center sm:text-right">
-                <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-xl bg-amber-600 px-8 py-4 text-base font-bold text-white transition hover:bg-amber-700 cursor-pointer shadow-lg hover:shadow-xl sm:w-auto">
-                  বুকিং রিকোয়েস্ট পাঠান <ChevronRight size={24} />
-                </button>
-                <p className="mt-2 text-xs font-medium text-[#766e64]">
-                  অগ্রিম পেমেন্ট লাগবে না — শুধু ফোন কলেই কনফার্ম
-                </p>
-              </div>
-              </div>
+            {isIntercity && (
+              <fieldset className="mt-6">
+                <legend className="text-sm font-bold text-stone-800">ট্রিপ টাইপ <span className="text-red-500">*</span></legend>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {(['One Way', 'Round Trip'] as const).map((type) => (
+                    <label key={type} className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold ${tripType === type ? 'border-brand-navy bg-blue-50 text-brand-navy' : 'border-[#eae5dd] text-brand-muted'}`}>
+                      <input type="radio" name="tripType" value={type} checked={tripType === type} onChange={() => setTripType(type)} className="accent-brand-navy" />
+                      {type === 'One Way' ? 'ওয়ান ওয়ে' : 'রাউন্ড ট্রিপ'}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+
+            <div className="mt-7 border-t border-[#eae5dd] pt-6">
+              <button type="submit" disabled={isSubmitting} className="flex min-h-13 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 text-base font-bold text-white shadow-lg shadow-amber-600/20 transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60 lg:mx-auto lg:w-72">
+                {isSubmitting ? <LoaderCircle className="animate-spin" size={21} /> : <CheckCircle2 size={21} />}
+                {isSubmitting ? 'পাঠানো হচ্ছে...' : 'বুকিং কনফার্ম করুন'}
+              </button>
+              <p className="mx-auto mt-3 max-w-xs rounded-lg bg-brand-surface px-3 py-2 text-center text-[13px] font-semibold leading-5 text-brand-navy sm:max-w-none sm:bg-transparent sm:px-0 sm:py-0">
+                অগ্রিম পেমেন্ট লাগবে না -{' '}
+                <strong className="whitespace-nowrap font-bold text-brand-navy">১০ মিনিটে</strong> কল ব্যাক
+              </p>
             </div>
           </form>
         </div>

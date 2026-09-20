@@ -472,6 +472,7 @@ function BookingTable({ bookings }: { bookings: Booking[] }) {
         <thead className="border-b border-[#e7e0d5] text-xs uppercase tracking-wider text-[#a49b8f]">
           <tr>
             <th className="p-5">Booking ID</th>
+            <th className="p-5">Customer</th>
             <th className="p-5">Car</th>
             <th className="p-5">Mobile</th>
             <th className="p-5">Pickup</th>
@@ -485,7 +486,7 @@ function BookingTable({ bookings }: { bookings: Booking[] }) {
         <tbody>
           {bookings.length === 0 ? (
             <tr>
-              <td colSpan={9} className="p-8 text-center text-[#8c8378]">
+              <td colSpan={10} className="p-8 text-center text-[#8c8378]">
                 No bookings yet.
               </td>
             </tr>
@@ -496,6 +497,10 @@ function BookingTable({ bookings }: { bookings: Booking[] }) {
                 className="border-b border-[#f0ebe3] last:border-0"
               >
                 <td className="p-5 font-bold">{booking.id}</td>
+                <td className="p-5">
+                  <p className="font-semibold">{booking.customerName || 'Not provided'}</p>
+                  <p className="text-xs text-[#8c8378]">{booking.carType || 'Car type not provided'}</p>
+                </td>
                 <td className="p-5">{booking.carName}</td>
                 <td className="p-5 font-bold text-[#292724]">
                   {booking.mobileNumber || 'Not provided'}
