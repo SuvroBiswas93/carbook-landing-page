@@ -19,10 +19,10 @@ export function FAQ() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            Frequently Asked Questions
+            সাধারণ প্রশ্নের উত্তর
           </h2>
           <p className="text-base sm:text-xl text-stone-600">
-            Everything you need to know about our rental service
+            বুকিংয়ের আগে যা জানা দরকার
           </p>
         </motion.div>
 
@@ -87,7 +87,7 @@ export function FAQ() {
             href="#contact"
             className="inline-block bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 px-8 rounded-lg transition-all"
           >
-            Contact Support
+            ফর্ম পূরণ করুন
           </a>
         </motion.div>
       </div>

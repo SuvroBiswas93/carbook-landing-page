@@ -36,15 +36,15 @@ export function Services() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            আমাদের সেবাসমূহ
+            কেন আমাদের বেছে নেবেন
           </h2>
           <p className="text-base sm:text-xl text-stone-600">
-            আপনার যাত্রাকে সহজ, নিরাপদ ও নিশ্চিন্ত করতে আমাদের সেবা
+            নিরাপদ ও নিশ্চিন্ত যাত্রার জন্য আমাদের প্রতিশ্রুতি
           </p>
         </motion.div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
           {servicesData.map((service, index) => (
             <motion.div
               key={service.id}
@@ -53,17 +53,17 @@ export function Services() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-              className="bg-white rounded-xl shadow-lg p-5 sm:p-8 cursor-pointer transition-all"
+              className="cursor-pointer rounded-xl bg-white p-4 shadow-lg transition-all sm:p-7"
               onClick={() => setSelectedService(service)}
             >
-              <div className="text-brand-navy mb-4">
+              <div className="mb-3 text-brand-navy sm:mb-4">
                 {iconMap[service.icon as keyof typeof iconMap]}
               </div>
-              <h3 className="text-xl font-bold text-stone-900 mb-3">
+              <h3 className="text-base font-bold leading-6 text-stone-900 sm:text-xl">
                 {service.title}
               </h3>
-              <p className="text-stone-600 mb-6">{service.description}</p>
-              <button className="cursor-pointer text-brand-navy font-semibold hover:text-brand-navy-soft transition-colors inline-flex items-center gap-2">
+              <p className="mb-4 mt-2 text-sm leading-6 text-stone-600 sm:mb-6 sm:text-base">{service.description}</p>
+              <button className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-brand-navy transition-colors hover:text-brand-navy-soft sm:text-base">
                 বিস্তারিত দেখুন →
               </button>
             </motion.div>
@@ -87,9 +87,15 @@ export function Services() {
                 onClick={() => setSelectedService(null)}
                 className="flex-1 cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-900 font-semibold py-3 rounded-lg transition-colors"
               >
-                Close
+                বন্ধ করুন
               </button>
-              <button className="flex-1 cursor-pointer bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all">
+              <button
+                onClick={() => {
+                  setSelectedService(null)
+                  document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="flex-1 cursor-pointer bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all"
+              >
                 বুকিং সম্পর্কে জানুন
               </button>
             </div>

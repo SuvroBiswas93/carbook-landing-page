@@ -165,7 +165,10 @@ export function CarSlider() {
                     </div>
 
                     <button
-                      onClick={() => setSelectedCar(car)}
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('car-booking:selected', { detail: car }))
+                        document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
+                      }}
                       className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all cursor-pointer"
                     >
                       বুক করুন

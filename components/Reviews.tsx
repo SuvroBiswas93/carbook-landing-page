@@ -86,13 +86,13 @@ export function Reviews() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-8 md:overflow-visible lg:grid-cols-3"
           >
             {reviews.map((review) => (
               <motion.div
                 key={review.id}
                 variants={item}
-                className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow"
+                className="min-w-[86%] snap-start rounded-xl bg-white p-6 shadow-lg transition-shadow hover:shadow-xl sm:min-w-[58%] md:min-w-0 md:p-8"
               >
                 {/* Stars */}
                 <div className="flex gap-1 mb-4">
