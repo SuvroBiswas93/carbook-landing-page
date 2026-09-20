@@ -16,32 +16,39 @@ export function Navbar() {
   const [activeHref, setActiveHref] = useState('#cars')
 
   useEffect(() => {
-    const sections = document.querySelectorAll<HTMLElement>('section[id]')
+    const updateActiveLink = () => {
+      const viewportCenter = window.innerHeight / 2
+      let nextActiveHref = '#cars'
+      let closestDistance = Number.POSITIVE_INFINITY
 
-    if (!sections.length) {
-      return
+      links.forEach((link) => {
+        const section = document.querySelector<HTMLElement>(link.href)
+
+        if (!section) {
+          return
+        }
+
+        const rect = section.getBoundingClientRect()
+        const sectionCenter = rect.top + rect.height / 2
+        const distance = Math.abs(sectionCenter - viewportCenter)
+
+        if (distance < closestDistance) {
+          closestDistance = distance
+          nextActiveHref = link.href
+        }
+      })
+
+      setActiveHref(nextActiveHref)
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+    updateActiveLink()
+    window.addEventListener('scroll', updateActiveLink, { passive: true })
+    window.addEventListener('resize', updateActiveLink)
 
-        if (visibleEntry) {
-          setActiveHref(`#${visibleEntry.target.id}`)
-        }
-      },
-      {
-        root: null,
-        threshold: [0.25, 0.5, 0.75],
-        rootMargin: '-20% 0px -45% 0px',
-      },
-    )
-
-    sections.forEach((section) => observer.observe(section))
-
-    return () => observer.disconnect()
+    return () => {
+      window.removeEventListener('scroll', updateActiveLink)
+      window.removeEventListener('resize', updateActiveLink)
+    }
   }, [])
 
   const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -94,11 +101,12 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
+              aria-current={activeHref === link.href ? 'page' : undefined}
               onClick={(event) => handleNavClick(event, link.href)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition md:max-lg:px-2 md:max-lg:py-1.5 md:max-lg:text-xs ${
                 activeHref === link.href
-                  ? 'bg-[#f6c05c] text-black shadow-[0_4px_16px_rgba(0,0,0,0.2)]'
-                  : 'text-white/80 hover:bg-white/10 hover:text-white'
+                  ? 'bg-[#16365C] text-white shadow-[0_4px_16px_rgba(0,0,0,0.2)]'
+                  : 'text-white/80 hover:text-white'
               }`}
             >
               {link.label}
@@ -136,11 +144,12 @@ export function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
+                aria-current={activeHref === link.href ? 'page' : undefined}
                 onClick={(event) => handleNavClick(event, link.href)}
                 className={`rounded-xl px-4 py-3 text-sm font-semibold transition ${
                   activeHref === link.href
                     ? 'bg-[#16365C] text-white'
-                    : 'text-white/80 hover:bg-white/10 hover:text-white'
+                    : 'text-white/80 hover:text-white'
                 }`}
               >
                 {link.label}
