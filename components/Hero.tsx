@@ -2,14 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, LoaderCircle, Search } from 'lucide-react'
+import { CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, LoaderCircle } from 'lucide-react'
 import { toast } from 'react-toastify'
-import locationsData from '@/data/locations.json'
 import type { Car } from '@/lib/store'
+import type { LocationResult } from '@/lib/location/types'
+import { PickupDropoff } from '@/components/car-rental/PickupDropoff'
+import type { BookingLocation } from '@/lib/store'
 
 type BookingTab = 'city' | 'hourly' | 'intercity' | 'airport'
 type TripType = 'One Way' | 'Round Trip'
-type PickerId = 'car' | 'pickup' | 'dropoff' | 'pickupDate' | 'returnDate' | null
+type PickerId = 'car' | 'pickupDate' | 'returnDate' | null
 
 const heroHeadline = 'চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে'
 const carTypes = ['Sedan', 'Noah-Hiace', 'Premio', 'Microbus', 'SUV']
@@ -17,7 +19,6 @@ const mobilePattern = /^01[3-9]\d{8}$/
 const banglaMonths = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর']
 const banglaWeekdays = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহস্পতি', 'শুক্র', 'শনি']
 const banglaDigits = (value: number | string) => String(value).replace(/\d/g, (digit) => '০১২৩৪৫৬৭৮৯'[Number(digit)])
-const locationNames: Record<string, string> = { Dhaka: 'ঢাকা', Chittagong: 'চট্টগ্রাম', Sylhet: 'সিলেট', Rajshahi: 'রাজশাহী', Khulna: 'খুলনা', Barisal: 'বরিশাল', Rangpur: 'রংপুর', Mymensingh: 'ময়মনসিংহ', Comilla: 'কুমিল্লা', "Cox's Bazar": 'কক্সবাজার', Jessore: 'যশোর', Dinajpur: 'দিনাজপুর', Noakhali: 'নোয়াখালী', Tangail: 'টাঙ্গাইল', Kushtia: 'কুষ্টিয়া' }
 
 const formatDateLabel = (value: string) => {
   if (!value) return ''
@@ -55,38 +56,6 @@ const getMinimumDateTime = () => {
   const now = new Date()
   const offset = now.getTimezoneOffset() * 60000
   return new Date(now.getTime() - offset).toISOString().slice(0, 16)
-}
-
-function LocationPicker({ label, value, onChange, error, open, onOpenChange }: { label: string; value: string; onChange: (value: string) => void; error?: string; open: boolean; onOpenChange: (open: boolean) => void }) {
-  const [query, setQuery] = useState('')
-  const filteredLocations = locationsData.filter((location) => `${location.name} ${location.address} ${locationNames[location.name] ?? ''}`.toLowerCase().includes(query.toLowerCase()))
-
-  return (
-    <div className="relative text-sm font-bold text-stone-800">
-      <span>{label} <span className="text-red-500">*</span></span>
-      <button type="button" onClick={() => onOpenChange(!open)} className={`mt-2 flex min-h-12 w-full cursor-pointer items-center justify-between rounded-2xl border bg-white px-4 text-left font-normal text-stone-500 shadow-[0_3px_8px_rgba(50,44,35,.06)] ${error ? 'border-red-400' : 'border-[#eae5dd]'}`}>
-        <span className={value ? 'font-semibold text-stone-800' : ''}>{value ? locationNames[value] ?? value : `সিলেক্ট ${label.toLowerCase()}`}</span>
-        <ChevronDown size={20} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && (
-        <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-[#eae5dd] bg-white shadow-[0_18px_35px_rgba(50,44,35,.18)]">
-          <div className="m-3 flex items-center gap-3 rounded-xl border border-[#eae5dd] px-3 py-2 text-stone-400">
-            <Search size={19} />
-            <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="লোকেশন খুঁজুন..." className="w-full bg-transparent text-sm font-normal text-stone-800 outline-none placeholder:text-stone-400" />
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {filteredLocations.map((location) => (
-              <button key={location.id} type="button" onClick={() => { onChange(location.name); onOpenChange(false); setQuery('') }} className="block w-full cursor-pointer border-t border-[#f0ece6] px-5 py-3 text-left transition hover:bg-amber-50">
-                <span className="block text-base font-bold text-stone-800">{locationNames[location.name] ?? location.name}</span>
-                <span className="block text-xs font-normal text-stone-400">{location.address.replace('Bangladesh', 'বাংলাদেশ')}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      {error && <span className="mt-1 block text-xs font-medium text-red-600">{error}</span>}
-    </div>
-  )
 }
 
 function CarPicker({ value, cars, onChange, error, open, onOpenChange }: { value: string; cars: Car[]; onChange: (value: string) => void; error?: string; open: boolean; onOpenChange: (open: boolean) => void }) {
@@ -166,8 +135,10 @@ export function Hero() {
   const [tripType, setTripType] = useState<TripType>('One Way')
   const [carType, setCarType] = useState('')
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
-  const [pickupLocation, setPickupLocation] = useState('')
-  const [dropoffLocation, setDropoffLocation] = useState('')
+  const [pickupLocation, setPickupLocation] = useState<LocationResult | null>(null)
+  const [dropoffLocation, setDropoffLocation] = useState<LocationResult | null>(null)
+  const [distanceKm, setDistanceKm] = useState(0)
+  const [durationMinutes, setDurationMinutes] = useState(0)
   const [pickupDate, setPickupDate] = useState('')
   const [returnDate, setReturnDate] = useState('')
   const [customerName, setCustomerName] = useState('')
@@ -213,8 +184,8 @@ export function Hero() {
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {}
     if (!carType) nextErrors.carType = 'গাড়ির ধরন নির্বাচন করুন'
-    if (!pickupLocation) nextErrors.pickupLocation = 'পিকআপ লোকেশন দিন'
-    if (!isHourly && !dropoffLocation) nextErrors.dropoffLocation = 'ড্রপ-অফ লোকেশন দিন'
+    if (!pickupLocation || !pickupLocation.latitude || !pickupLocation.longitude) nextErrors.pickupLocation = 'পিকআপ লোকেশন দিন'
+    if (!isHourly && (!dropoffLocation || !dropoffLocation.latitude || !dropoffLocation.longitude)) nextErrors.dropoffLocation = 'ড্রপ-অফ লোকেশন দিন'
     if (!pickupDate) nextErrors.pickupDate = 'তারিখ ও সময় নির্বাচন করুন'
     if (isRoundTrip && (!returnDate || new Date(returnDate).getTime() < new Date(pickupDate).getTime())) {
       nextErrors.returnDate = 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে'
@@ -233,8 +204,6 @@ export function Hero() {
       })
       setSelectedCar(matchingCar ?? cars[0] ?? null)
     }
-    if (field === 'pickupLocation') setPickupLocation(value)
-    if (field === 'dropoffLocation') setDropoffLocation(value)
     if (field === 'pickupDate') setPickupDate(value)
     if (field === 'returnDate') setReturnDate(value)
     if (field === 'customerName') setCustomerName(value)
@@ -249,7 +218,7 @@ export function Hero() {
           : field === 'dropoffLocation' && !value && !isHourly
             ? 'ড্রপ-অফ লোকেশন দিন'
             : field === 'pickupDate' && (!value || new Date(value).getTime() < Date.now())
-              ? 'বর্তমান বা ভবিষ্যতের তারিখ নির্বাচন করুন'
+              ? 'বর্তমান বা ভবিষ্টের তারিখ নির্বাচন করুন'
                 : field === 'returnDate' && isRoundTrip && (!value || new Date(value).getTime() < new Date(pickupDate).getTime())
                   ? 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে'
               : field === 'customerName' && !value.trim()
@@ -269,7 +238,7 @@ export function Hero() {
     setErrors({})
     if (tab !== 'intercity') setTripType('One Way')
     if (tab !== 'intercity') setReturnDate('')
-    if (tab === 'hourly') setDropoffLocation('')
+    if (tab === 'hourly') setDropoffLocation(null)
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -282,6 +251,13 @@ export function Hero() {
 
     setIsSubmitting(true)
     try {
+      const pickupBookingLocation: BookingLocation | string = pickupLocation
+        ? { name: pickupLocation.name, latitude: pickupLocation.latitude, longitude: pickupLocation.longitude }
+        : ''
+      const dropoffBookingLocation: BookingLocation | string = dropoffLocation
+        ? { name: dropoffLocation.name, latitude: dropoffLocation.latitude, longitude: dropoffLocation.longitude }
+        : ''
+
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -291,11 +267,13 @@ export function Hero() {
           carType,
           customerName: customerName.trim(),
           mobileNumber,
-          pickupLocation,
-          dropoffLocation: isHourly ? '' : dropoffLocation,
+          pickupLocation: pickupBookingLocation,
+          dropoffLocation: isHourly ? '' : dropoffBookingLocation,
           pickupDate,
           dropoffDate: isRoundTrip ? returnDate : '',
           tripType: isIntercity ? tripType : 'One Way',
+          distanceKm: distanceKm || undefined,
+          durationMinutes: durationMinutes || undefined,
         }),
       })
 
@@ -340,11 +318,19 @@ export function Hero() {
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               <CarPicker value={carType} cars={cars} onChange={(value) => updateField('carType', value)} error={errors.carType} open={openPicker === 'car'} onOpenChange={(open) => setOpenPicker(open ? 'car' : null)} />
 
-              <LocationPicker label="পিকআপ লোকেশন" value={pickupLocation} onChange={(value) => updateField('pickupLocation', value)} error={errors.pickupLocation} open={openPicker === 'pickup'} onOpenChange={(open) => setOpenPicker(open ? 'pickup' : null)} />
-
-              {!isHourly && (
-                <LocationPicker label={isAirport ? 'এয়ারপোর্টে ড্রপ-অফ' : 'ড্রপ-অফ লোকেশন'} value={dropoffLocation} onChange={(value) => updateField('dropoffLocation', value)} error={errors.dropoffLocation} open={openPicker === 'dropoff'} onOpenChange={(open) => setOpenPicker(open ? 'dropoff' : null)} />
-              )}
+              <div className="lg:col-span-2">
+                <PickupDropoff
+                  pickupLocation={pickupLocation}
+                  setPickupLocation={setPickupLocation}
+                  dropoffLocation={dropoffLocation}
+                  setDropoffLocation={setDropoffLocation}
+                  pickupError={errors.pickupLocation}
+                  dropoffError={errors.dropoffLocation}
+                  isHourly={isHourly}
+                  isAirport={isAirport}
+                  onRouteChange={(dk, dm) => { setDistanceKm(dk); setDurationMinutes(dm) }}
+                />
+              </div>
 
               <DateTimePicker label="তারিখ ও সময়" min={getMinimumDateTime()} value={pickupDate} onChange={(value) => updateField('pickupDate', value)} error={errors.pickupDate} open={openPicker === 'pickupDate'} onOpenChange={(open) => setOpenPicker(open ? 'pickupDate' : null)} />
 

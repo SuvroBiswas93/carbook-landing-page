@@ -29,6 +29,12 @@ export interface Review {
   createdAt: string
 }
 
+export interface BookingLocation {
+  name: string
+  latitude: number
+  longitude: number
+}
+
 export interface Booking {
   id: string
   carId: number
@@ -36,8 +42,8 @@ export interface Booking {
   customerName?: string
   carType?: string
   mobileNumber: string
-  pickupLocation: string
-  dropoffLocation: string
+  pickupLocation: string | BookingLocation
+  dropoffLocation: string | BookingLocation
   pickupDate: string
   tripType: string
   timestamp: string
@@ -46,6 +52,8 @@ export interface Booking {
   distanceFare?: number
   estimatedFare?: number
   dropoffDate?: string
+  distanceKm?: number
+  durationMinutes?: number
 }
 
 export interface Pricing {
@@ -128,8 +136,12 @@ export async function getBookings(): Promise<Booking[]> {
     customerName: booking.customerName ? String(booking.customerName) : undefined,
     carType: booking.carType ? String(booking.carType) : undefined,
     mobileNumber: String(booking.mobileNumber ?? ''),
-    pickupLocation: String(booking.pickupLocation ?? ''),
-    dropoffLocation: String(booking.dropoffLocation ?? ''),
+    pickupLocation: typeof booking.pickupLocation === 'object' && booking.pickupLocation !== null
+      ? `${booking.pickupLocation.name}`
+      : String(booking.pickupLocation ?? ''),
+    dropoffLocation: typeof booking.dropoffLocation === 'object' && booking.dropoffLocation !== null
+      ? `${booking.dropoffLocation.name}`
+      : String(booking.dropoffLocation ?? ''),
     pickupDate: String(booking.pickupDate ?? ''),
     dropoffDate: booking.dropoffDate ? String(booking.dropoffDate) : undefined,
     tripType: String(booking.tripType ?? 'One Way'),
@@ -140,6 +152,8 @@ export async function getBookings(): Promise<Booking[]> {
     distance: booking.distance !== undefined ? Number(booking.distance) : undefined,
     distanceFare: booking.distanceFare !== undefined ? Number(booking.distanceFare) : undefined,
     estimatedFare: booking.estimatedFare !== undefined ? Number(booking.estimatedFare) : undefined,
+    distanceKm: booking.distanceKm !== undefined ? Number(booking.distanceKm) : undefined,
+    durationMinutes: booking.durationMinutes !== undefined ? Number(booking.durationMinutes) : undefined,
   }))
 }
 

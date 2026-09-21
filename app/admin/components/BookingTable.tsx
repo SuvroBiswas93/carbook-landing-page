@@ -1,8 +1,14 @@
-import type { Booking, BookingStatus } from '@/lib/store'
+import type { Booking, BookingStatus, BookingLocation } from '@/lib/store'
 import { formatDateTime } from '@/lib/utils'
 import { ResponsiveTable } from './ResponsiveTable'
 import type { Column } from './ResponsiveTable'
 import { StatusBadge, StatusSelect } from './StatusSelect'
+
+function locationToString(loc: string | BookingLocation | undefined): string {
+  if (!loc) return 'Not provided'
+  if (typeof loc === 'object') return loc.name ?? 'Not provided'
+  return loc || 'Not provided'
+}
 
 const createColumns = (
   onStatusChange?: (id: string, status: BookingStatus) => void
@@ -45,14 +51,14 @@ const createColumns = (
     key: 'pickup',
     label: 'Pickup',
     render: (booking) => (
-      <span className="text-[#766e64]">{booking.pickupLocation}</span>
+      <span className="text-[#766e64]">{locationToString(booking.pickupLocation)}</span>
     ),
   },
   {
     key: 'dropoff',
     label: 'Drop-off',
     render: (booking) => (
-      <span className="text-[#766e64]">{booking.dropoffLocation}</span>
+      <span className="text-[#766e64]">{locationToString(booking.dropoffLocation)}</span>
     ),
     mobileHidden: true,
   },
