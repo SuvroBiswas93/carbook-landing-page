@@ -112,7 +112,7 @@ export function Navbar() {
             height={36}
             className="size-8 shrink-0 rounded-xl object-cover sm:size-9 sm:rounded-full"
           />
-<span className="max-w-[9rem] font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
+<span className="max-w-36 font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
               <span className="text-[#FFB020]">Traveling</span><span className="text-[#25D366]">Bangladesh</span>
            </span>
         </a>
