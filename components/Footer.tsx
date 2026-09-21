@@ -19,13 +19,13 @@ export function Footer({ onNavigate }: FooterProps) {
           <button type="button" onClick={() => onNavigate('hero')} className="flex cursor-pointer items-center gap-3 text-left ">
             <Image
               src="/logo.jpg"
-              alt="Traveling Bangladesh Rent A Car logo"
+              alt="Traveling Bangladesh logo"
               width={52}
               height={52}
               className="size-12 shrink-0 rounded-xl object-cover "
             />
             <span>
-              <span className="block max-w-xs font-serif text-xl font-bold leading-tight sm:text-2xl">Traveling Bangladesh Rent A Car</span>
+              <span className="block max-w-xs font-serif text-xl font-bold leading-tight sm:text-2xl"><span className="text-[#FFB020]">Traveling</span><span className="text-[#25D366]">Bangladesh</span></span>
               <span className="mt-1 block text-md text-white/65">চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে</span>
             </span>
           </button>

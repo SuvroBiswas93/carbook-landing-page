@@ -12,7 +12,7 @@ export default function ThankYouPage() {
         <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
           <CheckCircle2 size={36} />
         </span>
-        <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-amber-700">Traveling Bangladesh Rent A Car</p>
+        <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em]"><span className="text-[#FFB020]">Traveling</span><span className="text-[#25D366]">Bangladesh</span></p>
         <h1 className="mt-3 font-serif text-3xl font-bold text-stone-900 sm:text-4xl">বুকিং রিকোয়েস্ট পেয়েছি</h1>
         <p className="mt-4 leading-relaxed text-stone-600">ধন্যবাদ। আমাদের টিম ১০ মিনিটের মধ্যে আপনার নম্বরে কল করে বুকিং নিশ্চিত করবে।</p>
         <div className="mt-8 grid gap-3 sm:grid-cols-2">

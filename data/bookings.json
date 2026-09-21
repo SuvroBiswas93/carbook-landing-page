@@ -52,5 +52,20 @@
     "tripType": "One Way",
     "timestamp": "9/21/2026, 4:52:28 AM",
     "status": "New"
+  },
+  {
+    "id": "BD-145444",
+    "carId": 1,
+    "carName": "BMW 7 Series",
+    "customerName": "Suvro Biswas",
+    "carType": "luxury",
+    "mobileNumber": "01758197272",
+    "pickupLocation": "Dhaka",
+    "dropoffLocation": "Chittagong",
+    "pickupDate": "2026-09-22T06:00",
+    "dropoffDate": "2026-09-24T10:00",
+    "tripType": "Round Trip",
+    "timestamp": "9/21/2026, 4:05:45 PM",
+    "status": "New"
   }
 ]

@@ -92,18 +92,18 @@ export function Navbar() {
           href="#top"
           onClick={(event) => handleNavClick(event, '#top')}
           className="flex min-w-0 items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-2 py-1.5 transition hover:border-white/30 hover:bg-white/15 sm:gap-3 sm:rounded-full sm:px-3 sm:py-2"
-          aria-label="Traveling Bangladesh Rent A Car home"
+          aria-label="Traveling Bangladesh home"
         >
           <Image
             src="/logo.jpg"
-            alt="Traveling Bangladesh Rent A Car logo"
+            alt="Traveling Bangladesh logo"
             width={36}
             height={36}
             className="size-8 shrink-0 rounded-xl object-cover sm:size-9 sm:rounded-full"
           />
-          <span className="max-w-[9rem] font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
-            Traveling Bangladesh Rent A Car
-          </span>
+<span className="max-w-[9rem] font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
+              <span className="text-[#FFB020]">Traveling</span><span className="text-[#25D366]">Bangladesh</span>
+           </span>
         </a>
 
         <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 md:flex md:max-lg:gap-0 md:max-lg:p-0.5">
@@ -128,7 +128,7 @@ export function Navbar() {
           <a
             href={`tel:${config.company.phone}`}
             className="call-attention group relative inline-flex h-11 w-auto min-w-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-white/25 bg-brand-navy-soft px-2 text-[10px] font-black text-white shadow-[0_12px_34px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-[#214a78] hover:shadow-[0_14px_34px_rgba(22,54,92,0.5)] hover:ring-4 hover:ring-[#16365C]/30 sm:gap-2 sm:px-5 sm:py-3 sm:text-sm md:max-lg:px-2"
-            aria-label={`Call Traveling Bangladesh Rent A Car at ${config.company.phone}`}
+            aria-label={`Call Traveling Bangladesh at ${config.company.phone}`}
           >
             <span className="call-ring flex size-7 shrink-0 items-center justify-center rounded-full bg-white/15 text-white sm:size-8">
               <PhoneCall aria-hidden="true" className="size-4" />

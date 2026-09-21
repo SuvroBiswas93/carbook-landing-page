@@ -26,10 +26,10 @@ export function Contact() {
           viewport={{ once: true }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="mb-3 inline-block rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-amber-400 backdrop-blur-md">
-            Traveling Bangladesh Rent A Car
-          </span>
-          <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl">
+<span className="mb-3 inline-block rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-amber-400 backdrop-blur-md">
+              <span className="text-[#FFB020]">Traveling</span><span className="text-[#25D366]">Bangladesh</span>
+            </span>
+           <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl">
             যোগাযোগ করুন
           </h2>
           <p className="mt-4 text-base leading-relaxed text-gray-300 sm:text-xl">
