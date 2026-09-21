@@ -1,6 +1,6 @@
 import { PhotonResponse, LocationResult } from './types'
 
-const PHOTON_BASE = 'https://photon.komoot.io/api'
+const PHOTON_BASE = 'https://photon.komoot.io/api/'
 
 export async function searchLocations(
   query: string,
@@ -8,8 +8,10 @@ export async function searchLocations(
 ): Promise<LocationResult[]> {
   const url = new URL(PHOTON_BASE)
   url.searchParams.set('q', query)
-  url.searchParams.set('limit', '10')
-  url.searchParams.set('geojson', '1')
+  url.searchParams.set('limit', '20')
+  url.searchParams.set('geometry', 'geojson')
+  url.searchParams.set('countrycode', 'BD')
+  url.searchParams.set('lang', 'en')
 
   const response = await fetch(url.toString(), { signal })
 
@@ -21,18 +23,36 @@ export async function searchLocations(
 
   return data.features.map((feature) => {
     const [longitude, latitude] = feature.geometry.coordinates
+    const properties = feature.properties
+    const name = properties.name || properties.city || properties.district || properties.state || 'Bangladesh'
     const parts = [
-      feature.properties.name,
-      feature.properties.city,
-      feature.properties.state,
-      feature.properties.country === 'BD' ? 'Bangladesh' : feature.properties.country,
-    ].filter(Boolean)
+      name,
+      properties.street,
+      properties.housenumber,
+      properties.locality,
+      properties.neighbourhood,
+      properties.suburb,
+      properties.hamlet,
+      properties.village,
+      properties.union,
+      properties.upazila,
+      properties.town,
+      properties.municipality,
+      properties.city,
+      properties.district,
+      properties.county,
+      properties.state,
+      properties.postcode,
+      properties.countrycode === 'BD' || properties.country === 'Bangladesh' ? 'Bangladesh' : properties.country,
+    ].filter((part): part is string => Boolean(part))
+    const uniqueParts = parts.filter((part, index) => parts.indexOf(part) === index)
 
     return {
-      name: feature.properties.name,
+      name,
+      type: properties.type,
       latitude,
       longitude,
-      formattedAddress: parts.join(', '),
+      formattedAddress: uniqueParts.join(', '),
     }
   })
 }

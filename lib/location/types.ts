@@ -1,11 +1,23 @@
 export interface PhotonFeature {
   type: 'Feature'
   properties: {
-    name: string
-    country: string
-    countrycode: string
-    state: string
+    name?: string
+    country?: string
+    countrycode?: string
+    state?: string
     city?: string
+    town?: string
+    village?: string
+    hamlet?: string
+    municipality?: string
+    union?: string
+    upazila?: string
+    district?: string
+    county?: string
+    locality?: string
+    suburb?: string
+    neighbourhood?: string
+    postcode?: string
     type: string
     housenumber?: string | null
     street?: string | null
@@ -23,6 +35,7 @@ export interface PhotonResponse {
 
 export interface LocationResult {
   name: string
+  type?: string
   latitude: number
   longitude: number
   formattedAddress: string

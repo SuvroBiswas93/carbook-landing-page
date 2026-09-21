@@ -1,12 +1,9 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
-import dynamic from 'next/dynamic'
+import { useEffect, useRef, useState } from 'react'
 import { LocationResult } from '@/lib/location/types'
+import { formatDistance, getRoute } from '@/lib/location/osrm'
 import { LocationAutocomplete } from './LocationAutocomplete'
-import { formatDistance, formatDuration } from '@/lib/location/osrm'
-
-const LocationMap = dynamic(() => import('./LocationMap').then((mod) => mod.LocationMap), { ssr: false })
 
 interface PickupDropoffProps {
   pickupLocation: LocationResult | null
@@ -15,9 +12,7 @@ interface PickupDropoffProps {
   setDropoffLocation: (loc: LocationResult | null) => void
   pickupError: string | undefined
   dropoffError: string | undefined
-  isHourly: boolean
   isAirport: boolean
-  onRouteChange?: (distanceKm: number, durationMinutes: number) => void
 }
 
 export function PickupDropoff({
@@ -27,63 +22,98 @@ export function PickupDropoff({
   setDropoffLocation,
   pickupError,
   dropoffError,
-  isHourly,
   isAirport,
-  onRouteChange,
 }: PickupDropoffProps) {
-  const [distanceKm, setDistanceKm] = useState(0)
-  const [durationMinutes, setDurationMinutes] = useState(0)
+  const [openPickup, setOpenPickup] = useState(false)
+  const [openDropoff, setOpenDropoff] = useState(false)
+  const [routeDistance, setRouteDistance] = useState<number | null>(null)
+  const [isRouteLoading, setIsRouteLoading] = useState(false)
+  const [routeError, setRouteError] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const routeRequestRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
-    if (onRouteChange) onRouteChange(distanceKm, durationMinutes)
-  }, [distanceKm, durationMinutes, onRouteChange])
-
-  const onRoute = useCallback((distance: number, duration: number) => {
-    setDistanceKm(distance)
-    setDurationMinutes(duration)
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpenPickup(false)
+        setOpenDropoff(false)
+      }
+    }
+    document.addEventListener('pointerdown', handleClickOutside)
+    return () => document.removeEventListener('pointerdown', handleClickOutside)
   }, [])
 
-  const hasRoute = pickupLocation && dropoffLocation && distanceKm > 0
+  useEffect(() => {
+    routeRequestRef.current?.abort()
+    setRouteDistance(null)
+    setRouteError(false)
+
+    if (!pickupLocation || !dropoffLocation) {
+      setIsRouteLoading(false)
+      return
+    }
+
+    const controller = new AbortController()
+    routeRequestRef.current = controller
+    setIsRouteLoading(true)
+
+    getRoute(
+      pickupLocation.longitude,
+      pickupLocation.latitude,
+      dropoffLocation.longitude,
+      dropoffLocation.latitude,
+      controller.signal,
+    )
+      .then((data) => {
+        if (controller.signal.aborted) return
+        const route = data.routes[0]
+        if (!route) throw new Error('No driving route found')
+        setRouteDistance(route.distance)
+        setIsRouteLoading(false)
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return
+        setIsRouteLoading(false)
+        setRouteError(true)
+      })
+
+    return () => controller.abort()
+  }, [dropoffLocation, pickupLocation])
 
   return (
-    <div className="space-y-4">
-      <LocationAutocomplete
-        label="পিকআপ লোকেশন"
-        value={pickupLocation}
-        onChange={setPickupLocation}
-        error={pickupError}
-        open={false}
-        onOpenChange={() => {}}
-      />
+    <div ref={containerRef} className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        <LocationAutocomplete
+          label="পিকআপ লোকেশন"
+          value={pickupLocation}
+          onChange={setPickupLocation}
+          error={pickupError}
+          open={openPickup}
+          onOpenChange={setOpenPickup}
+        />
 
-      {!isHourly && (
         <LocationAutocomplete
           label={isAirport ? 'এয়ারপোর্টে ড্রপ-অফ' : 'ড্রপ-অফ লোকেশন'}
           value={dropoffLocation}
           onChange={setDropoffLocation}
           error={dropoffError}
-          open={false}
-          onOpenChange={() => {}}
+          open={openDropoff}
+          onOpenChange={setOpenDropoff}
         />
-      )}
+      </div>
 
-      {(pickupLocation || dropoffLocation) && (
-        <LocationMap
-          pickup={pickupLocation}
-          dropoff={dropoffLocation}
-          onRoute={onRoute}
-        />
-      )}
-
-      {hasRoute && (
-        <div className="flex justify-center">
-          <div className="rounded-xl bg-amber-50 px-6 py-3 text-center text-sm font-bold text-stone-800 shadow-sm">
-            <span>{formatDistance(distanceKm)}</span>
-            <span className="mx-2 text-stone-300">|</span>
-            <span>{formatDuration(durationMinutes)}</span>
-          </div>
+      {pickupLocation && dropoffLocation && (
+        <div className="border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-center text-sm text-stone-700 shadow-sm">
+          {isRouteLoading && <span className="font-semibold text-amber-800">সড়কপথের দূরত্ব হিসাব হচ্ছে...</span>}
+          {!isRouteLoading && routeDistance !== null && (
+            <span className="font-bold">সড়কপথের দূরত্ব: {formatDistance(routeDistance)}</span>
+          )}
+          {!isRouteLoading && routeError && (
+            <span className="font-medium text-red-600">এই দুই লোকেশনের সড়ক দূরত্ব এখন পাওয়া যাচ্ছে না</span>
+          )}
         </div>
       )}
+
     </div>
   )
 }

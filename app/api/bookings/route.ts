@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getBookings, saveBookings, type Booking, type BookingLocation } from '@/lib/store'
+import { getBookings, saveBookings, type Booking, type BookingLocation, normalizeBookingCategory } from '@/lib/store'
 
 function normalizeLocation(loc: unknown): string | BookingLocation {
   if (!loc) return ''
@@ -19,13 +19,6 @@ function locationHasCoordinates(loc: unknown): boolean {
   return false
 }
 
-function locationToString(loc: unknown): string {
-  if (typeof loc === 'object' && loc !== null && 'name' in loc) {
-    return String((loc as Record<string, unknown>).name)
-  }
-  return String(loc ?? '')
-}
-
 export async function GET() {
   return NextResponse.json(await getBookings())
 }
@@ -34,11 +27,12 @@ export async function POST(request: Request) {
   const body = (await request.json()) as Partial<Booking>
   const pickupLoc = normalizeLocation(body.pickupLocation)
   const dropoffLoc = normalizeLocation(body.dropoffLocation)
+  const category = normalizeBookingCategory(body.category, String(body.tripType ?? ''), Boolean(body.dropoffLocation))
   const booking: Booking = {
     id: `BD-${String(Date.now()).slice(-6)}`,
     carId: Number(body.carId ?? 0),
     carName: String(body.carName ?? 'Unselected car'),
-    category: normalizeBookingCategory(body.category, tripType, hasDropoff),
+    category,
     customerName: String(body.customerName ?? '').trim(),
     carType: String(body.carType ?? '').trim(),
     mobileNumber: String(body.mobileNumber ?? '').trim(),
@@ -46,7 +40,7 @@ export async function POST(request: Request) {
     dropoffLocation: dropoffLoc,
     pickupDate: String(body.pickupDate ?? '').trim(),
     dropoffDate: String(body.dropoffDate ?? '').trim(),
-    tripType,
+    tripType: String(body.tripType ?? 'One Way').trim(),
     timestamp: new Date().toLocaleString(),
     status: 'New',
     distance: Number.isFinite(Number(body.distance)) ? Number(body.distance) : undefined,

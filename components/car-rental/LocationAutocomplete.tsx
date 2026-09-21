@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Search, Loader2, X, MapPin } from 'lucide-react'
+import { Search, Loader2, X, MapPin, AlertCircle } from 'lucide-react'
 import { searchLocations } from '@/lib/location/photon'
 import type { LocationResult } from '@/lib/location/types'
 
@@ -28,6 +28,7 @@ export function LocationAutocomplete({
   const [results, setResults] = useState<LocationResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
+  const [apiError, setApiError] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -37,6 +38,7 @@ export function LocationAutocomplete({
     setResults([])
     setShowResults(false)
     setIsLoading(false)
+    setApiError(false)
     abortRef.current?.abort()
     if (debounceRef.current) clearTimeout(debounceRef.current)
   }, [])
@@ -57,6 +59,7 @@ export function LocationAutocomplete({
     if (query.length < 3) {
       setResults([])
       setShowResults(false)
+      setApiError(false)
       return
     }
 
@@ -67,6 +70,7 @@ export function LocationAutocomplete({
       abortRef.current = controller
 
       setIsLoading(true)
+      setApiError(false)
       try {
         const data = await searchLocations(query, controller.signal)
         if (!controller.signal.aborted) {
@@ -79,6 +83,7 @@ export function LocationAutocomplete({
           setResults([])
           setShowResults(false)
           setIsLoading(false)
+          setApiError(true)
         }
       }
     }, 300)
@@ -103,6 +108,7 @@ export function LocationAutocomplete({
     setQuery(location.name)
     setShowResults(false)
     setResults([])
+    setApiError(false)
     onOpenChange(false)
   }
 
@@ -111,6 +117,7 @@ export function LocationAutocomplete({
     setQuery('')
     setShowResults(false)
     setResults([])
+    setApiError(false)
     onOpenChange(false)
   }
 
@@ -123,17 +130,25 @@ export function LocationAutocomplete({
         disabled={disabled}
         className={`mt-2 flex min-h-12 w-full cursor-pointer items-center justify-between rounded-2xl border bg-white px-4 text-left font-normal text-stone-500 shadow-[0_3px_8px_rgba(50,44,35,.06)] ${error ? 'border-red-400' : 'border-[#eae5dd]'}`}
       >
-        <span className={value ? 'font-semibold text-stone-800' : ''}>
-          {value ? value.name : `সিলেক্ট ${label.toLowerCase()}`}
+        <span className={`min-w-0 ${value ? 'font-semibold text-stone-800' : ''}`}>
+          {value ? (
+            <span className="block min-w-0">
+              <span className="block break-words">{value.name}</span>
+              <span className="mt-0.5 block whitespace-normal break-words text-xs font-normal text-stone-500">{value.formattedAddress}</span>
+            </span>
+          ) : `সিলেক্ট ${label.toLowerCase()}`}
         </span>
         {value ? (
-          <button
-            type="button"
+          <span
+            role="button"
+            tabIndex={0}
             onClick={(e) => { e.stopPropagation(); handleRemove() }}
-            className="ml-2 text-stone-400 hover:text-red-500"
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); handleRemove() } }}
+            className="ml-2 shrink-0 cursor-pointer text-stone-400 hover:text-red-500"
+            aria-label="লোকেশন মুছে ফেলুন"
           >
             <X size={18} />
-          </button>
+          </span>
         ) : (
           <Search size={20} className="text-stone-400" />
         )}
@@ -156,7 +171,7 @@ export function LocationAutocomplete({
             {query.length >= 3 && !isLoading && (
               <button
                 type="button"
-                onClick={() => setQuery('')}
+                onClick={clearSearch}
                 className="text-stone-400 hover:text-stone-600"
               >
                 <X size={16} />
@@ -169,7 +184,13 @@ export function LocationAutocomplete({
                 <Loader2 className="animate-spin text-amber-600" size={24} />
               </div>
             )}
-            {!isLoading && showResults && results.length > 0 && (
+            {apiError && (
+              <div className="flex flex-col items-center justify-center py-8 text-stone-400">
+                <AlertCircle size={24} className="mb-2 opacity-50" />
+                <span className="text-sm font-medium">Unable to find this location. Please try another search.</span>
+              </div>
+            )}
+            {!isLoading && !apiError && showResults && results.length > 0 && (
               <>
                 <div className="border-b border-[#f0ece6] px-5 py-2 text-[11px] font-bold text-stone-400 uppercase tracking-wider">Search results</div>
                 {results.map((result) => (
@@ -180,12 +201,14 @@ export function LocationAutocomplete({
                     className="block w-full cursor-pointer border-t border-[#f0ece6] px-5 py-3 text-left transition hover:bg-amber-50"
                   >
                     <span className="block text-base font-bold text-stone-800">{result.name}</span>
-                    <span className="block text-xs font-normal text-stone-400">{result.formattedAddress}</span>
+                    <span className="block text-xs font-normal text-stone-400">
+                      {result.type ? `${result.type} · ` : ''}{result.formattedAddress}
+                    </span>
                   </button>
                 ))}
               </>
             )}
-            {!isLoading && query.length >= 3 && !showResults && results.length === 0 && (
+            {!isLoading && !apiError && query.length >= 3 && !showResults && results.length === 0 && (
               <div className="flex flex-col items-center justify-center py-8 text-stone-400">
                 <MapPin size={24} className="mb-2 opacity-50" />
                 <span className="text-sm font-medium">Unable to find this location. Please try another search.</span>

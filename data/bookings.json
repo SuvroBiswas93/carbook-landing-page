@@ -61,6 +61,7 @@
     "id": "BD-145444",
     "carId": 1,
     "carName": "BMW 7 Series",
+    "category": "intercity",
     "customerName": "Suvro Biswas",
     "carType": "luxury",
     "mobileNumber": "01758197272",

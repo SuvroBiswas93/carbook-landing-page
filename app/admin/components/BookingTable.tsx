@@ -40,11 +40,6 @@ const createColumns = (
     mobileHidden: true,
   },
   {
-    key: 'category',
-    label: 'Category',
-    render: (booking) => <CategoryBadge category={booking.category} />,
-  },
-  {
     key: 'mobile',
     label: 'Mobile',
     render: (booking) => (
@@ -72,13 +67,16 @@ const createColumns = (
     key: 'trip',
     label: 'Trip',
     render: (booking) =>
-      isRoundTrip(booking) ? (
-        <RoundTripBadge />
+      booking.tripType === 'Round Trip' ? (
+        <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+          {booking.tripType}
+        </span>
       ) : (
-        <span className="inline-flex whitespace-nowrap rounded-full bg-stone-100 px-3 py-1.5 text-xs font-bold text-stone-700">
+        <span className="inline-flex rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-700">
           {booking.tripType || 'One Way'}
         </span>
       ),
+    mobileHidden: true,
   },
   {
     key: 'schedule',
@@ -88,10 +86,10 @@ const createColumns = (
         <p className="text-sm font-semibold text-stone-900">
           {formatDateTime(booking.pickupDate)}
         </p>
-        {isRoundTrip(booking) && booking.dropoffDate && (
-          <div className="mt-1 rounded-lg border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 px-2.5 py-2">
+        {booking.tripType === 'Round Trip' && booking.dropoffDate && (
+          <div className="mt-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-2">
             <p className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-700">
-              <ArrowLeftRight size={11} /> Return
+              Return
             </p>
             <p className="text-sm font-semibold text-stone-900">
               {formatDateTime(booking.dropoffDate)}
@@ -131,30 +129,6 @@ const createColumns = (
       ) : (
         <StatusBadge status={booking.status} />
       ),
-  },
-  {
-    key: 'actions',
-    label: 'Actions',
-    render: (booking) =>
-      onDelete ? (
-        <button
-          type="button"
-          onClick={() => {
-            if (
-              window.confirm(
-                `Delete booking ${booking.id}? This cannot be undone.`
-              )
-            ) {
-              onDelete(booking.id)
-            }
-          }}
-          className="flex items-center gap-1.5 rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200"
-          aria-label={`Delete booking ${booking.id}`}
-        >
-          <Trash2 size={14} />
-          Delete
-        </button>
-      ) : null,
   },
 ]
 

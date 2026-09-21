@@ -137,8 +137,6 @@ export function Hero() {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
   const [pickupLocation, setPickupLocation] = useState<LocationResult | null>(null)
   const [dropoffLocation, setDropoffLocation] = useState<LocationResult | null>(null)
-  const [distanceKm, setDistanceKm] = useState(0)
-  const [durationMinutes, setDurationMinutes] = useState(0)
   const [pickupDate, setPickupDate] = useState('')
   const [returnDate, setReturnDate] = useState('')
   const [customerName, setCustomerName] = useState('')
@@ -185,7 +183,7 @@ export function Hero() {
     const nextErrors: FormErrors = {}
     if (!carType) nextErrors.carType = 'গাড়ির ধরন নির্বাচন করুন'
     if (!pickupLocation || !pickupLocation.latitude || !pickupLocation.longitude) nextErrors.pickupLocation = 'পিকআপ লোকেশন দিন'
-    if (!isHourly && (!dropoffLocation || !dropoffLocation.latitude || !dropoffLocation.longitude)) nextErrors.dropoffLocation = 'ড্রপ-অফ লোকেশন দিন'
+    if (!dropoffLocation || !dropoffLocation.latitude || !dropoffLocation.longitude) nextErrors.dropoffLocation = 'ড্রপ-অফ লোকেশন দিন'
     if (!pickupDate) nextErrors.pickupDate = 'তারিখ ও সময় নির্বাচন করুন'
     if (isRoundTrip && (!returnDate || new Date(returnDate).getTime() < new Date(pickupDate).getTime())) {
       nextErrors.returnDate = 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে'
@@ -215,7 +213,7 @@ export function Hero() {
         ? 'গাড়ির ধরন নির্বাচন করুন'
         : field === 'pickupLocation' && !value
           ? 'পিকআপ লোকেশন দিন'
-          : field === 'dropoffLocation' && !value && !isHourly
+          : field === 'dropoffLocation' && !value
             ? 'ড্রপ-অফ লোকেশন দিন'
             : field === 'pickupDate' && (!value || new Date(value).getTime() < Date.now())
               ? 'বর্তমান বা ভবিষ্টের তারিখ নির্বাচন করুন'
@@ -238,7 +236,6 @@ export function Hero() {
     setErrors({})
     if (tab !== 'intercity') setTripType('One Way')
     if (tab !== 'intercity') setReturnDate('')
-    if (tab === 'hourly') setDropoffLocation(null)
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -269,12 +266,10 @@ export function Hero() {
           customerName: customerName.trim(),
           mobileNumber,
           pickupLocation: pickupBookingLocation,
-          dropoffLocation: isHourly ? '' : dropoffBookingLocation,
+          dropoffLocation: dropoffBookingLocation,
           pickupDate,
           dropoffDate: isRoundTrip ? returnDate : '',
           tripType: isIntercity ? tripType : 'One Way',
-          distanceKm: distanceKm || undefined,
-          durationMinutes: durationMinutes || undefined,
         }),
       })
 
@@ -327,9 +322,7 @@ export function Hero() {
                   setDropoffLocation={setDropoffLocation}
                   pickupError={errors.pickupLocation}
                   dropoffError={errors.dropoffLocation}
-                  isHourly={isHourly}
                   isAirport={isAirport}
-                  onRouteChange={(dk, dm) => { setDistanceKm(dk); setDurationMinutes(dm) }}
                 />
               </div>
 
