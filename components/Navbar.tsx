@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Menu, PhoneCall, X } from 'lucide-react'
 import config from '@/data/config.json'
@@ -9,13 +9,14 @@ const links = [
   { label: 'গাড়ি', href: '#cars' },
   { label: 'ভাড়া', href: '#fare-calculator' },
   { label: 'মতামত', href: '#reviews' },
-  { label: 'সেবা', href: '#services' },
   { label: 'প্রশ্নোত্তর', href: '#faq' },
+  { label: 'যোগাযোগ', href: '#contact' },
 ]
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeHref, setActiveHref] = useState('#cars')
+  const manualNavigationRef = useRef<string | null>(null)
   const whatsappNumber = config.company.phone.replace(/\D/g, '')
   const whatsappMessage = encodeURIComponent(
     'Assalamu alaikum, I want to rent a car. Please share the available options and pricing.'
@@ -23,9 +24,21 @@ export function Navbar() {
 
   useEffect(() => {
     const updateActiveLink = () => {
-      const viewportCenter = window.innerHeight / 2
+      const navbarOffset = 88
+      const manualHref = manualNavigationRef.current
+
+      if (manualHref) {
+        const target = document.querySelector<HTMLElement>(manualHref)
+        const reachedBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
+
+        if (target && target.getBoundingClientRect().top > navbarOffset && !reachedBottom) {
+          return
+        }
+
+        manualNavigationRef.current = null
+      }
+
       let nextActiveHref = '#cars'
-      let closestDistance = Number.POSITIVE_INFINITY
 
       links.forEach((link) => {
         const section = document.querySelector<HTMLElement>(link.href)
@@ -35,11 +48,8 @@ export function Navbar() {
         }
 
         const rect = section.getBoundingClientRect()
-        const sectionCenter = rect.top + rect.height / 2
-        const distance = Math.abs(sectionCenter - viewportCenter)
 
-        if (distance < closestDistance) {
-          closestDistance = distance
+        if (rect.top <= navbarOffset) {
           nextActiveHref = link.href
         }
       })
@@ -76,6 +86,7 @@ export function Navbar() {
       return
     }
 
+    manualNavigationRef.current = href
     const navbarOffset = 88
     const targetTop = target.getBoundingClientRect().top + window.scrollY - navbarOffset
 
@@ -101,9 +112,9 @@ export function Navbar() {
             height={36}
             className="size-8 shrink-0 rounded-xl object-cover sm:size-9 sm:rounded-full"
           />
-          <span className="max-w-[9rem] font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
-Traveling Bangladesh
-          </span>
+<span className="max-w-36 font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
+              <span className="text-[#FFB020]">Traveling</span><span className="text-[#25D366]">Bangladesh</span>
+           </span>
         </a>
 
         <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 md:flex md:max-lg:gap-0 md:max-lg:p-0.5">
