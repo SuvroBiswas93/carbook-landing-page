@@ -277,10 +277,10 @@
    animation: gradient-shimmer 4s ease infinite;
  }
 
- @media (prefers-reduced-motion: reduce) {
-   .call-attention,
-   .call-ring,
-   .brand-gradient {
-     animation: none;
-   }
- }
+@media (prefers-reduced-motion: reduce) {
+    .call-attention,
+    .call-ring,
+    .brand-gradient {
+      animation: none;
+    }
+  }
