@@ -18,7 +18,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Traveling Bangladesh Rent A Car - Premium Car Rental Service',
+  title: 'Traveling Bangladesh - Premium Car Rental Service',
   description: 'Book luxury vehicles with ease. Premium car rental service with flexible options and exceptional service.',
   
   

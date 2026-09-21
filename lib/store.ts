@@ -1,7 +1,29 @@
 import { promises as fs } from 'fs'
 import path from 'path'
+import { DEFAULT_BASE_FARE, DEFAULT_FARE_PER_KM } from './pricing'
 
 export type BookingStatus = 'New' | 'Called' | 'Confirmed' | 'Cancelled'
+
+export type BookingCategory = 'city' | 'hourly' | 'intercity' | 'airport'
+
+const VALID_BOOKING_CATEGORIES: BookingCategory[] = ['city', 'hourly', 'intercity', 'airport']
+
+export function normalizeBookingCategory(
+  raw: unknown,
+  tripType = '',
+  hasDropoff = true
+): BookingCategory {
+  const rawValue = typeof raw === 'string' ? raw.trim().toLowerCase() : ''
+  const value: BookingCategory | null = (VALID_BOOKING_CATEGORIES as string[]).includes(rawValue)
+    ? (rawValue as BookingCategory)
+    : null
+  if (value) return value
+  const type = String(tripType ?? '').toLowerCase()
+  if (type.includes('hour')) return 'hourly'
+  if (type.includes('round')) return 'intercity'
+  if (!hasDropoff) return 'hourly'
+  return 'city'
+}
 
 export interface Car {
   id: number
@@ -33,6 +55,7 @@ export interface Booking {
   id: string
   carId: number
   carName: string
+  category: BookingCategory
   customerName?: string
   carType?: string
   mobileNumber: string
@@ -48,10 +71,15 @@ export interface Booking {
   dropoffDate?: string
 }
 
-export interface Pricing {
+export interface CarTypePricing {
+  carType: string
+  baseFare: number
   farePerKm: number
-  minimumFare: number
+}
+
+export interface Pricing {
   currency: string
+  carTypes: CarTypePricing[]
 }
 
 interface AppConfig {
@@ -125,6 +153,11 @@ export async function getBookings(): Promise<Booking[]> {
     id: String(booking.id ?? ''),
     carId: Number(booking.carId ?? 0),
     carName: String(booking.carName ?? 'Unselected car'),
+    category: normalizeBookingCategory(
+      booking.category,
+      String(booking.tripType ?? ''),
+      Boolean(booking.dropoffLocation)
+    ),
     customerName: booking.customerName ? String(booking.customerName) : undefined,
     carType: booking.carType ? String(booking.carType) : undefined,
     mobileNumber: String(booking.mobileNumber ?? ''),
@@ -147,20 +180,50 @@ export async function saveBookings(bookings: Booking[]): Promise<void> {
   await writeJson('bookings.json', bookings)
 }
 
+function normalizeCarTypePricing(value: unknown): CarTypePricing | null {
+  if (!value || typeof value !== 'object') return null
+  const item = value as Partial<CarTypePricing>
+  const carType = String(item.carType ?? '').trim()
+  const baseFare = Number(item.baseFare)
+  const farePerKm = Number(item.farePerKm)
+  if (!carType) return null
+  return {
+    carType,
+    baseFare:
+      Number.isFinite(baseFare) && baseFare >= 0 ? baseFare : DEFAULT_BASE_FARE,
+    farePerKm:
+      Number.isFinite(farePerKm) && farePerKm >= 0
+        ? farePerKm
+        : DEFAULT_FARE_PER_KM,
+  }
+}
+
 export async function getPricing(): Promise<Pricing> {
   const config = await readJson<Partial<AppConfig>>('config.json', {})
   const pricing = (config.pricing ?? {}) as Partial<Pricing>
 
+  const rawCarTypes = pricing.carTypes
+  const carTypes = Array.isArray(rawCarTypes)
+    ? rawCarTypes
+        .map(normalizeCarTypePricing)
+        .filter((item): item is CarTypePricing => item !== null)
+    : []
+
   return {
-    farePerKm: Number.isFinite(Number(pricing.farePerKm)) && Number(pricing.farePerKm) >= 0 ? Number(pricing.farePerKm) : 5,
-    minimumFare: Number.isFinite(Number(pricing.minimumFare)) && Number(pricing.minimumFare) >= 0 ? Number(pricing.minimumFare) : 25,
-    currency: String(pricing.currency ?? 'BDT'),
+    carTypes,
+    currency: String(pricing.currency ?? 'BDT') || 'BDT',
   }
 }
 
 export async function savePricing(pricing: Pricing): Promise<void> {
   const config = await readJson<Record<string, unknown>>('config.json', {})
-  await writeJson('config.json', { ...config, pricing })
+  const carTypes = (pricing.carTypes ?? [])
+    .map(normalizeCarTypePricing)
+    .filter((item): item is CarTypePricing => item !== null)
+  await writeJson('config.json', {
+    ...config,
+    pricing: { currency: String(pricing.currency ?? 'BDT') || 'BDT', carTypes },
+  })
 }
 
 export function nextNumericId(items: { id: number }[]): number {

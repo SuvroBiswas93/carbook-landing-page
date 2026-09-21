@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, LogOut, Menu, RefreshCw, X } from 'lucide-react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import type { ReactNode } from 'react'
 import { navItems } from './nav-items'
 import { useAdminData } from './useAdminData'
@@ -31,6 +33,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <Header onMenuOpen={() => setMobileOpen(true)} />
         <div className="p-4 sm:p-6 lg:p-8">{children}</div>
       </section>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
     </main>
   )
 }
@@ -47,7 +59,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className="p-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="font-serif text-2xl font-bold">
-            Luxe<span className="text-[#a8865f]">Drive</span>
+            Traveling <span className="text-[#a8865f]">Bangladesh</span>
           </Link>
           <button
             className="lg:hidden"

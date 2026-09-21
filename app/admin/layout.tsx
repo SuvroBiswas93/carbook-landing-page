@@ -4,8 +4,8 @@ import { AdminDataProvider } from './AdminDataProvider'
 import { AdminShell } from './AdminShell'
 
 export const metadata: Metadata = {
-  title: 'Admin | LuxeDrive',
-  description: 'LuxeDrive admin control center.',
+  title: 'Admin | Traveling Bangladesh',
+  description: 'Traveling Bangladesh admin control center.',
 }
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

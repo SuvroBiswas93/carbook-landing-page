@@ -1,14 +1,5 @@
 [
   {
-    "id": 6,
-    "name": "Suvro Biswas",
-    "rating": 5,
-    "text": "Khubi valo experience",
-    "location": "Magura sadar, Magura",
-    "hidden": false,
-    "createdAt": "2026-09-19T08:41:25.663Z"
-  },
-  {
     "id": 1,
     "name": "Sarah Mitchell",
     "rating": 5,

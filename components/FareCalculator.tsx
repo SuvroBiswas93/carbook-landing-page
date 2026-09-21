@@ -6,6 +6,7 @@ import { Calculator, ChevronDown, Search, X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import locationsData from '@/data/locations.json'
 import type { Car, Pricing } from '@/lib/store'
+import { DEFAULT_BASE_FARE, DEFAULT_FARE_PER_KM } from '@/lib/pricing'
 import { BookingModal, type BookingFormData } from './BookingModal'
 
 export function FareCalculator() {
@@ -53,7 +54,7 @@ export function FareCalculator() {
         return response.json()
       })
       .then((data: Pricing) => setPricing(data))
-      .catch(() => setPricing({ farePerKm: 5, minimumFare: 25, currency: 'BDT' }))
+      .catch(() => setPricing({ currency: 'BDT', carTypes: [] }))
   }, [])
 
   useEffect(() => {
@@ -137,8 +138,11 @@ export function FareCalculator() {
     }
 
     const distance = Math.max(15, Math.abs(dropoffLocation.id - pickupLocation.id) * 35)
-    const rate = Number(pricing.farePerKm)
-    const baseFare = Number(pricing.minimumFare)
+    const categoryPricing = pricing.carTypes?.find(
+      (entry) => entry.carType === car.category
+    )
+    const rate = Number(categoryPricing?.farePerKm ?? DEFAULT_FARE_PER_KM)
+    const baseFare = Number(categoryPricing?.baseFare ?? DEFAULT_BASE_FARE)
 
     if (!Number.isFinite(rate) || rate < 0 || !Number.isFinite(baseFare) || baseFare < 0) {
       toast.error('Pricing is temporarily unavailable')
@@ -194,6 +198,7 @@ export function FareCalculator() {
       body: JSON.stringify({
         carId: data.car.id,
         carName: `${data.car.brand} ${data.car.model}`,
+        category: data.tripType === 'Hourly' ? 'hourly' : 'intercity',
         mobileNumber: data.mobileNumber,
         pickupLocation: data.pickupLocation,
         dropoffLocation: data.dropoffLocation,
@@ -473,14 +478,14 @@ export function FareCalculator() {
                 <div>
                   <p className="text-sm text-stone-500 mb-2">বেস ভাড়া</p>
                   <p className="text-2xl font-bold text-stone-900">
-                      ৳{pricing?.minimumFare ?? 25}
-                    </p>
+                    ৳{DEFAULT_BASE_FARE}
+                  </p>
                 </div>
 
                 <div>
                   <p className="text-sm text-stone-500 mb-2">প্রতি কিলোমিটার ভাড়া</p>
                   <p className="text-2xl font-bold text-amber-700">
-                    ৳{pricing?.farePerKm ?? 5}/km
+                    ৳{DEFAULT_FARE_PER_KM}/km
                   </p>
                 </div>
 

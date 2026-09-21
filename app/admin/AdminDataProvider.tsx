@@ -9,10 +9,12 @@ import {
   useState,
 } from 'react'
 import type { ReactNode } from 'react'
+import { toast } from 'react-toastify'
 import type {
   Booking,
   BookingStatus,
   Car as FleetCar,
+  CarTypePricing,
   Pricing,
   Review,
 } from '@/lib/store'
@@ -40,7 +42,7 @@ const emptyReview: Omit<Review, 'id' | 'createdAt'> = {
   hidden: false,
 }
 
-const defaultPricing: Pricing = { farePerKm: 5, minimumFare: 25, currency: 'BDT' }
+const defaultPricing: Pricing = { currency: 'BDT', carTypes: [] }
 
 const POLL_INTERVAL = 15000
 
@@ -54,7 +56,7 @@ export interface AdminData {
   setCarForm: React.Dispatch<React.SetStateAction<Omit<FleetCar, 'id'>>>
   startEditCar: (car: FleetCar) => void
   resetCarForm: () => void
-  saveCar: () => Promise<void>
+  saveCar: () => Promise<boolean>
   deleteCar: (id: number) => Promise<void>
   toggleCar: (car: FleetCar) => Promise<void>
   editingReview: Review | null
@@ -69,6 +71,7 @@ export interface AdminData {
   setPricingForm: React.Dispatch<React.SetStateAction<Pricing>>
   savePricing: () => Promise<void>
   updateBookingStatus: (id: string, status: BookingStatus) => Promise<void>
+  deleteBooking: (id: string) => Promise<void>
   refresh: () => Promise<void>
   loading: boolean
 }
@@ -159,14 +162,32 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     setCarForm({ ...car })
   }
 
-  const saveCar = async () => {
-    await fetch(editingCar ? `/api/cars/${editingCar.id}` : '/api/cars', {
-      method: editingCar ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(carForm),
-    })
-    resetCarForm()
-    refresh()
+  const saveCar = async (): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        editingCar ? `/api/cars/${editingCar.id}` : '/api/cars',
+        {
+          method: editingCar ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(carForm),
+        }
+      )
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null
+        toast.error(data?.error ?? 'Car could not be saved. Please try again.')
+        return false
+      }
+      const wasEditing = Boolean(editingCar)
+      resetCarForm()
+      await refresh()
+      toast.success(wasEditing ? 'Car updated.' : 'Car added.')
+      return true
+    } catch {
+      toast.error('Network error. Car was not saved.')
+      return false
+    }
   }
 
   const deleteCar = async (id: number) => {
@@ -219,15 +240,32 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   }
 
   const savePricing = async () => {
-    const response = await fetch('/api/pricing', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pricingForm),
-    })
-    if (!response.ok) return
-    const savedPricing = (await response.json()) as Pricing
-    setPricing(savedPricing)
-    setPricingForm(savedPricing)
+    const carTypes: CarTypePricing[] = Array.from(
+      new Map(
+        pricingForm.carTypes
+          .map((item) => ({ ...item, carType: item.carType.trim() }))
+          .filter((item) => item.carType)
+          .map((item) => [item.carType, item] as const)
+      ).values()
+    )
+
+    try {
+      const response = await fetch('/api/pricing', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...pricingForm, carTypes }),
+      })
+      if (!response.ok) {
+        toast.error('Pricing could not be saved. Please try again.')
+        return
+      }
+      const savedPricing = (await response.json()) as Pricing
+      setPricing(savedPricing)
+      setPricingForm(savedPricing)
+      toast.success('Pricing saved successfully.')
+    } catch {
+      toast.error('Network error. Pricing was not saved.')
+    }
   }
 
   const updateBookingStatus = async (id: string, status: BookingStatus) => {
@@ -242,6 +280,18 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
+      if (!response.ok) refresh()
+    } catch {
+      refresh()
+    }
+  }
+
+  const deleteBooking = async (id: string) => {
+    setBookings((current) =>
+      current.filter((booking) => booking.id !== id)
+    )
+    try {
+      const response = await fetch(`/api/bookings/${id}`, { method: 'DELETE' })
       if (!response.ok) refresh()
     } catch {
       refresh()
@@ -273,6 +323,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     setPricingForm,
     savePricing,
     updateBookingStatus,
+    deleteBooking,
     refresh,
     loading,
   }

@@ -289,6 +289,7 @@ export function Hero() {
           carId: selectedCar?.id ?? 0,
           carName: selectedCar ? `${selectedCar.brand} ${selectedCar.model}` : carType,
           carType,
+          category: activeTab,
           customerName: customerName.trim(),
           mobileNumber,
           pickupLocation,

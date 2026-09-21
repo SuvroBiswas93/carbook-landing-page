@@ -1,11 +1,69 @@
-import type { Booking, BookingStatus } from '@/lib/store'
+import { ArrowLeftRight, Building2, Clock3, Plane, RefreshCw, Route, Trash2 } from 'lucide-react'
+import type { Booking, BookingCategory, BookingStatus } from '@/lib/store'
 import { formatDateTime } from '@/lib/utils'
 import { ResponsiveTable } from './ResponsiveTable'
 import type { Column } from './ResponsiveTable'
 import { StatusBadge, StatusSelect } from './StatusSelect'
 
+const categoryMeta: Record<
+  BookingCategory,
+  { label: string; bangla: string; badgeClass: string; icon: typeof Building2 }
+> = {
+  city: {
+    label: 'City',
+    bangla: 'সিটি',
+    badgeClass: 'bg-sky-100 text-sky-800 ring-sky-200',
+    icon: Building2,
+  },
+  hourly: {
+    label: 'Hourly',
+    bangla: 'আওয়ারলি',
+    badgeClass: 'bg-violet-100 text-violet-800 ring-violet-200',
+    icon: Clock3,
+  },
+  intercity: {
+    label: 'Intercity',
+    bangla: 'ইন্টারসিটি',
+    badgeClass: 'bg-emerald-100 text-emerald-800 ring-emerald-200',
+    icon: Route,
+  },
+  airport: {
+    label: 'Airport',
+    bangla: 'এয়ারপোর্ট',
+    badgeClass: 'bg-cyan-100 text-cyan-800 ring-cyan-200',
+    icon: Plane,
+  },
+}
+
+function CategoryBadge({ category }: { category?: BookingCategory }) {
+  const meta = (category && categoryMeta[category]) || categoryMeta.city
+  const Icon = meta.icon
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-inset ${meta.badgeClass}`}
+    >
+      <Icon size={13} />
+      <span>{meta.label}</span>
+      <span className="font-semibold opacity-75">· {meta.bangla}</span>
+    </span>
+  )
+}
+
+function RoundTripBadge() {
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-1.5 text-xs font-black text-white shadow-md shadow-amber-500/30">
+      <RefreshCw size={13} aria-hidden />
+      Round Trip
+    </span>
+  )
+}
+
+const isRoundTrip = (booking: Booking) =>
+  booking.tripType?.toLowerCase().includes('round') || Boolean(booking.dropoffDate)
+
 const createColumns = (
-  onStatusChange?: (id: string, status: BookingStatus) => void
+  onStatusChange?: (id: string, status: BookingStatus) => void,
+  onDelete?: (id: string) => void
 ): Column<Booking>[] => [
   {
     key: 'id',
@@ -33,6 +91,11 @@ const createColumns = (
     mobileHidden: true,
   },
   {
+    key: 'category',
+    label: 'Category',
+    render: (booking) => <CategoryBadge category={booking.category} />,
+  },
+  {
     key: 'mobile',
     label: 'Mobile',
     render: (booking) => (
@@ -52,7 +115,7 @@ const createColumns = (
     key: 'dropoff',
     label: 'Drop-off',
     render: (booking) => (
-      <span className="text-[#766e64]">{booking.dropoffLocation}</span>
+      <span className="text-[#766e64]">{booking.dropoffLocation || '—'}</span>
     ),
     mobileHidden: true,
   },
@@ -60,16 +123,13 @@ const createColumns = (
     key: 'trip',
     label: 'Trip',
     render: (booking) =>
-      booking.tripType === 'Round Way' ? (
-        <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
-          {booking.tripType}
-        </span>
+      isRoundTrip(booking) ? (
+        <RoundTripBadge />
       ) : (
-        <span className="inline-flex rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-700">
-          {booking.tripType}
+        <span className="inline-flex whitespace-nowrap rounded-full bg-stone-100 px-3 py-1.5 text-xs font-bold text-stone-700">
+          {booking.tripType || 'One Way'}
         </span>
       ),
-    mobileHidden: true,
   },
   {
     key: 'schedule',
@@ -79,10 +139,10 @@ const createColumns = (
         <p className="text-sm font-semibold text-stone-900">
           {formatDateTime(booking.pickupDate)}
         </p>
-        {booking.tripType === 'Round Way' && booking.dropoffDate && (
-          <div className="mt-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
-              Return
+        {isRoundTrip(booking) && booking.dropoffDate && (
+          <div className="mt-1 rounded-lg border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 px-2.5 py-2">
+            <p className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-700">
+              <ArrowLeftRight size={11} /> Return
             </p>
             <p className="text-sm font-semibold text-stone-900">
               {formatDateTime(booking.dropoffDate)}
@@ -123,20 +183,45 @@ const createColumns = (
         <StatusBadge status={booking.status} />
       ),
   },
+  {
+    key: 'actions',
+    label: 'Actions',
+    render: (booking) =>
+      onDelete ? (
+        <button
+          type="button"
+          onClick={() => {
+            if (
+              window.confirm(
+                `Delete booking ${booking.id}? This cannot be undone.`
+              )
+            ) {
+              onDelete(booking.id)
+            }
+          }}
+          className="flex items-center gap-1.5 rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200"
+          aria-label={`Delete booking ${booking.id}`}
+        >
+          <Trash2 size={14} />
+          Delete
+        </button>
+      ) : null,
+  },
 ]
 
 interface BookingTableProps {
   bookings: Booking[]
   onStatusChange?: (id: string, status: BookingStatus) => void
+  onDelete?: (id: string) => void
 }
 
-export function BookingTable({ bookings, onStatusChange }: BookingTableProps) {
+export function BookingTable({ bookings, onStatusChange, onDelete }: BookingTableProps) {
   return (
     <ResponsiveTable
       data={bookings}
-      columns={createColumns(onStatusChange)}
+      columns={createColumns(onStatusChange, onDelete)}
       idKey="id"
-      minWidth="min-w-[940px]"
+      minWidth="min-w-[1000px]"
       emptyMessage="No bookings yet."
     />
   )

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Car as FleetCar } from '@/lib/store'
 
 interface CarFormProps {
@@ -5,6 +6,55 @@ interface CarFormProps {
   setForm: (form: Omit<FleetCar, 'id'>) => void
   onSave: () => void
   editing: boolean
+}
+
+const inputClass = 'rounded-xl border border-[#e7e0d5] px-4 py-3'
+
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string
+  hint?: string
+  children: ReactNode
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-sm font-bold text-[#292724]">{label}</span>
+      {children}
+      {hint && <span className="text-xs leading-snug text-[#8c8378]">{hint}</span>}
+    </label>
+  )
+}
+
+function CheckField({
+  label,
+  hint,
+  checked,
+  text,
+  onChange,
+}: {
+  label: string
+  hint: string
+  checked: boolean
+  text: string
+  onChange: (checked: boolean) => void
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-sm font-bold text-[#292724]">{label}</span>
+      <label className="flex items-center gap-3 rounded-xl border border-[#e7e0d5] px-4 py-3 text-sm font-bold">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        {text}
+      </label>
+      <span className="text-xs leading-snug text-[#8c8378]">{hint}</span>
+    </div>
+  )
 }
 
 export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
@@ -18,87 +68,142 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
       <h3 className="font-serif text-xl font-bold">
         {editing ? 'Edit Car' : 'Add Car'}
       </h3>
+      <p className="mt-1 text-sm text-[#8c8378]">
+        Fill in the details exactly as they should appear on the home page car
+        card.
+      </p>
+
       <div className="mt-4 grid gap-4 md:grid-cols-3">
-        <input
-          value={form.brand}
-          onChange={(e) => update('brand', e.target.value)}
-          placeholder="Brand"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <input
-          value={form.model}
-          onChange={(e) => update('model', e.target.value)}
-          placeholder="Model"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <input
-          value={form.category}
-          onChange={(e) => update('category', e.target.value)}
-          placeholder="Category"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <input
-          type="number"
-          value={form.seats}
-          onChange={(e) => update('seats', Number(e.target.value))}
-          placeholder="Seats"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <label className="flex items-center gap-3 rounded-xl border border-[#e7e0d5] px-4 py-3 text-sm font-bold">
+        <Field
+          label="Brand"
+          hint="Shown as the first part of the car card title."
+        >
           <input
-            type="checkbox"
-            checked={form.hasAc}
-            onChange={(e) => update('hasAc', e.target.checked)}
+            value={form.brand}
+            onChange={(e) => update('brand', e.target.value)}
+            placeholder="e.g. Toyota"
+            className={inputClass}
           />
-          AC available
-        </label>
-        <input
-          value={form.transmission}
-          onChange={(e) => update('transmission', e.target.value)}
-          placeholder="Transmission"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <input
-          value={form.fuel}
-          onChange={(e) => update('fuel', e.target.value)}
-          placeholder="Fuel"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <input
-          type="number"
-          value={form.pricePerDay}
-          onChange={(e) => update('pricePerDay', Number(e.target.value))}
-          placeholder="Price per day"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <input
-          type="number"
-          value={form.pricePerKm}
-          onChange={(e) => update('pricePerKm', Number(e.target.value))}
-          placeholder="Price per km"
-          className="rounded-xl border border-[#e7e0d5] px-4 py-3"
-        />
-        <label className="flex items-center gap-3 rounded-xl border border-[#e7e0d5] px-4 py-3 text-sm font-bold">
+        </Field>
+
+        <Field
+          label="Model"
+          hint="Shown after the brand in the car card title."
+        >
           <input
-            type="checkbox"
-            checked={form.published}
-            onChange={(e) => update('published', e.target.checked)}
+            value={form.model}
+            onChange={(e) => update('model', e.target.value)}
+            placeholder="e.g. Camry"
+            className={inputClass}
           />
-          Publish on website
-        </label>
+        </Field>
+
+        <Field
+          label="Category"
+          hint="Small text under the title, e.g. sedan, luxury, mpv, suv."
+        >
+          <input
+            value={form.category}
+            onChange={(e) => update('category', e.target.value)}
+            placeholder="e.g. sedan"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field
+          label="Seats"
+          hint="Passenger count shown with the seat icon."
+        >
+          <input
+            type="number"
+            value={form.seats}
+            onChange={(e) => update('seats', Number(e.target.value))}
+            placeholder="e.g. 5"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field
+          label="Fuel"
+          hint="Shown with the fuel icon, e.g. petrol, diesel, hybrid."
+        >
+          <input
+            value={form.fuel}
+            onChange={(e) => update('fuel', e.target.value)}
+            placeholder="e.g. petrol"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field
+          label="Transmission"
+          hint="Gearbox shown as Trans, e.g. automatic, manual."
+        >
+          <input
+            value={form.transmission}
+            onChange={(e) => update('transmission', e.target.value)}
+            placeholder="e.g. automatic"
+            className={inputClass}
+          />
+        </Field>
+
+        <CheckField
+          label="Air conditioning"
+          text="AC available"
+          checked={form.hasAc}
+          onChange={(checked) => update('hasAc', checked)}
+          hint="Shown as আছে / নেই on the car card."
+        />
+
+        <Field
+          label="Price per day"
+          hint="Card shows “From ৳… শুরু” using this value."
+        >
+          <input
+            type="number"
+            value={form.pricePerDay}
+            onChange={(e) => update('pricePerDay', Number(e.target.value))}
+            placeholder="e.g. 4500"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field
+          label="Price per km"
+          hint="Shown as ৳…/কিমি under the daily price."
+        >
+          <input
+            type="number"
+            value={form.pricePerKm}
+            onChange={(e) => update('pricePerKm', Number(e.target.value))}
+            placeholder="e.g. 45"
+            className={inputClass}
+          />
+        </Field>
+
+        <CheckField
+          label="Visibility"
+          text="Publish on website"
+          checked={form.published}
+          onChange={(checked) => update('published', checked)}
+          hint="Only published cars appear on the home page slider."
+        />
       </div>
-      <input
-        value={form.image}
-        onChange={(e) => update('image', e.target.value)}
-        placeholder="Image URL"
-        className="mt-4 w-full rounded-xl border border-[#e7e0d5] px-4 py-3"
-      />
-      <textarea
-        value={form.description}
-        onChange={(e) => update('description', e.target.value)}
-        placeholder="Description"
-        className="mt-4 min-h-24 w-full rounded-xl border border-[#e7e0d5] px-4 py-3"
-      />
+
+      <div className="mt-4 flex flex-col gap-4">
+        <Field
+          label="Image URL"
+          hint="Photo shown at the top of the car card."
+        >
+          <input
+            value={form.image}
+            onChange={(e) => update('image', e.target.value)}
+            placeholder="https://example.com/car-photo.jpg"
+            className={inputClass}
+          />
+        </Field>
+      </div>
+
       <button
         onClick={onSave}
         className="mt-4 rounded-xl bg-[#292724] px-5 py-3 text-sm font-bold text-white"

@@ -6,6 +6,7 @@ interface ModuleProps {
   description: string
   action?: string
   onAction?: () => void
+  actionIcon?: ReactNode
   children: ReactNode
 }
 
@@ -14,6 +15,7 @@ export function Module({
   description,
   action,
   onAction,
+  actionIcon = <Plus size={17} />,
   children,
 }: ModuleProps) {
   return (
@@ -28,7 +30,7 @@ export function Module({
             onClick={onAction}
             className="flex items-center gap-2 rounded-xl bg-[#292724] px-4 py-3 text-sm font-bold text-white"
           >
-            <Plus size={17} />
+            {actionIcon}
             {action}
           </button>
         )}
