@@ -14,9 +14,29 @@
     }
   },
   "pricing": {
-    "farePerKm": 5,
-    "minimumFare": 25,
-    "currency": "BDT"
+    "currency": "BDT",
+    "carTypes": [
+      {
+        "carType": "luxury",
+        "baseFare": 25,
+        "farePerKm": 5
+      },
+      {
+        "carType": "sedan",
+        "baseFare": 25,
+        "farePerKm": 5
+      },
+      {
+        "carType": "mpv",
+        "baseFare": 30.01,
+        "farePerKm": 5.5
+      },
+      {
+        "carType": "suv",
+        "baseFare": 40,
+        "farePerKm": 9
+      }
+    ]
   },
   "routes": [
     {

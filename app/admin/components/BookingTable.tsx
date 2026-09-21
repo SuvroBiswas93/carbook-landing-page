@@ -11,7 +11,8 @@ function locationToString(loc: string | BookingLocation | undefined): string {
 }
 
 const createColumns = (
-  onStatusChange?: (id: string, status: BookingStatus) => void
+  onStatusChange?: (id: string, status: BookingStatus) => void,
+  onDelete?: (id: string) => void
 ): Column<Booking>[] => [
   {
     key: 'id',
@@ -37,6 +38,11 @@ const createColumns = (
     label: 'Car',
     render: (booking) => booking.carName,
     mobileHidden: true,
+  },
+  {
+    key: 'category',
+    label: 'Category',
+    render: (booking) => <CategoryBadge category={booking.category} />,
   },
   {
     key: 'mobile',
@@ -66,16 +72,13 @@ const createColumns = (
     key: 'trip',
     label: 'Trip',
     render: (booking) =>
-      booking.tripType === 'Round Way' ? (
-        <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
-          {booking.tripType}
-        </span>
+      isRoundTrip(booking) ? (
+        <RoundTripBadge />
       ) : (
-        <span className="inline-flex rounded-full bg-stone-100 px-3 py-1 text-xs font-bold text-stone-700">
-          {booking.tripType}
+        <span className="inline-flex whitespace-nowrap rounded-full bg-stone-100 px-3 py-1.5 text-xs font-bold text-stone-700">
+          {booking.tripType || 'One Way'}
         </span>
       ),
-    mobileHidden: true,
   },
   {
     key: 'schedule',
@@ -85,10 +88,10 @@ const createColumns = (
         <p className="text-sm font-semibold text-stone-900">
           {formatDateTime(booking.pickupDate)}
         </p>
-        {booking.tripType === 'Round Way' && booking.dropoffDate && (
-          <div className="mt-1 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
-              Return
+        {isRoundTrip(booking) && booking.dropoffDate && (
+          <div className="mt-1 rounded-lg border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 px-2.5 py-2">
+            <p className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-700">
+              <ArrowLeftRight size={11} /> Return
             </p>
             <p className="text-sm font-semibold text-stone-900">
               {formatDateTime(booking.dropoffDate)}
@@ -129,20 +132,45 @@ const createColumns = (
         <StatusBadge status={booking.status} />
       ),
   },
+  {
+    key: 'actions',
+    label: 'Actions',
+    render: (booking) =>
+      onDelete ? (
+        <button
+          type="button"
+          onClick={() => {
+            if (
+              window.confirm(
+                `Delete booking ${booking.id}? This cannot be undone.`
+              )
+            ) {
+              onDelete(booking.id)
+            }
+          }}
+          className="flex items-center gap-1.5 rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200"
+          aria-label={`Delete booking ${booking.id}`}
+        >
+          <Trash2 size={14} />
+          Delete
+        </button>
+      ) : null,
+  },
 ]
 
 interface BookingTableProps {
   bookings: Booking[]
   onStatusChange?: (id: string, status: BookingStatus) => void
+  onDelete?: (id: string) => void
 }
 
-export function BookingTable({ bookings, onStatusChange }: BookingTableProps) {
+export function BookingTable({ bookings, onStatusChange, onDelete }: BookingTableProps) {
   return (
     <ResponsiveTable
       data={bookings}
-      columns={createColumns(onStatusChange)}
+      columns={createColumns(onStatusChange, onDelete)}
       idKey="id"
-      minWidth="min-w-[940px]"
+      minWidth="min-w-[1000px]"
       emptyMessage="No bookings yet."
     />
   )

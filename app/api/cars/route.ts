@@ -29,8 +29,8 @@ export async function POST(request: Request) {
   const cars = await getCars(true)
   const car = carFromBody(body, nextNumericId(cars))
 
-  if (!car.brand || !car.model || !car.category || !car.image || !car.description) {
-    return NextResponse.json({ error: 'Brand, model, category, image, and description are required.' }, { status: 400 })
+  if (!car.brand || !car.model || !car.category || !car.image) {
+    return NextResponse.json({ error: 'Brand, model, category, and image are required.' }, { status: 400 })
   }
 
   cars.push(car)

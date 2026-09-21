@@ -3,15 +3,19 @@ import { Module } from '../Module'
 import { PricingForm } from '../PricingForm'
 
 export function PricingSection({ admin }: { admin: AdminData }) {
+  const categories = Array.from(
+    new Set(admin.cars.map((car) => car.category.trim()).filter(Boolean))
+  )
+
   return (
     <Module
       title="Pricing"
-      description="Control the rates used by the fare calculator."
+      description="Set the base fare and per-kilometer rate for each car type."
     >
       <PricingForm
         form={admin.pricingForm}
         setForm={admin.setPricingForm}
-        savedPricing={admin.pricing}
+        categories={categories}
         onSave={admin.savePricing}
       />
     </Module>

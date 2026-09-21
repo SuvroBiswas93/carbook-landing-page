@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
-import { getPricing, savePricing, type Pricing } from '@/lib/store'
+import {
+  getPricing,
+  savePricing,
+  type CarTypePricing,
+  type Pricing,
+} from '@/lib/store'
 
 function numberOrNull(value: unknown): number | null {
   const number = typeof value === 'number' ? value : Number(value)
@@ -12,19 +17,30 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   const body = (await request.json()) as Partial<Pricing>
-  const farePerKm = numberOrNull(body.farePerKm)
-  const minimumFare = numberOrNull(body.minimumFare)
+  const rawCarTypes = Array.isArray(body.carTypes) ? body.carTypes : []
 
-  if (farePerKm === null || minimumFare === null) {
-    return NextResponse.json(
-      { error: 'Per-kilometer rate and minimum fare must be valid non-negative numbers.' },
-      { status: 400 },
-    )
+  const carTypes: CarTypePricing[] = []
+  for (const raw of rawCarTypes) {
+    const item = (raw ?? {}) as Partial<CarTypePricing>
+    const carType = String(item.carType ?? '').trim()
+    const baseFare = numberOrNull(item.baseFare)
+    const farePerKm = numberOrNull(item.farePerKm)
+
+    if (!carType || baseFare === null || farePerKm === null) {
+      return NextResponse.json(
+        {
+          error:
+            'Each car type needs a valid name, base fare, and per-kilometer rate.',
+        },
+        { status: 400 },
+      )
+    }
+
+    carTypes.push({ carType, baseFare, farePerKm })
   }
 
   const pricing: Pricing = {
-    farePerKm,
-    minimumFare,
+    carTypes,
     currency: String(body.currency ?? 'BDT').trim() || 'BDT',
   }
 

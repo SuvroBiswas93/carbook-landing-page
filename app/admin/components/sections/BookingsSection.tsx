@@ -23,6 +23,7 @@ export function BookingsSection({ admin }: { admin: AdminData }) {
           <BookingTable
           bookings={pageBookings}
           onStatusChange={admin.updateBookingStatus}
+          onDelete={admin.deleteBooking}
         />
         </div>
         {bookings.length > 0 && (

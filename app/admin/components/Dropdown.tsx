@@ -20,6 +20,7 @@ interface DropdownProps<T extends string> {
   menuClassName?: string
   menuWidth?: number
   ariaLabel?: string
+  placeholder?: string
 }
 
 export function Dropdown<T extends string>({
@@ -30,6 +31,7 @@ export function Dropdown<T extends string>({
   menuClassName = '',
   menuWidth = 176,
   ariaLabel,
+  placeholder,
 }: DropdownProps<T>) {
   const [open, setOpen] = useState(false)
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null)
@@ -107,7 +109,7 @@ export function Dropdown<T extends string>({
         {current?.dotClass && (
           <span className={`h-2 w-2 shrink-0 rounded-full ${current.dotClass}`} />
         )}
-        <span className="truncate">{current?.label ?? value}</span>
+        <span className="truncate">{current?.label ?? placeholder ?? value}</span>
         <ChevronDown
           size={14}
           className={`shrink-0 transition-transform duration-200 ${
