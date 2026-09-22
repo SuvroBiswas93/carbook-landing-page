@@ -74,9 +74,11 @@ model Booking {
   carType       String?
   mobileNumber  String
   pickupName    String
+  pickupAddress String?
   pickupLat     Float?
   pickupLng     Float?
   dropoffName   String?
+  dropoffAddress String?
   dropoffLat    Float?
   dropoffLng    Float?
   pickupDate    String

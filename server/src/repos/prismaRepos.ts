@@ -53,20 +53,20 @@ function reviewFromRow(row: { id: number; name: string; rating: number; text: st
   }
 }
 
-function locationParts(value: string | BookingLocation): { name: string; latitude: number | null; longitude: number | null } {
-  if (typeof value === 'string') return { name: value, latitude: null, longitude: null }
-  return { name: value.name, latitude: value.latitude, longitude: value.longitude }
+function locationParts(value: string | BookingLocation): { name: string; address: string | null; latitude: number | null; longitude: number | null } {
+  if (typeof value === 'string') return { name: value, address: null, latitude: null, longitude: null }
+  return { name: value.name, address: value.formattedAddress ?? null, latitude: value.latitude, longitude: value.longitude }
 }
 
-function locationFromParts(name: string | null, latitude: number | null, longitude: number | null): string | BookingLocation {
+function locationFromParts(name: string | null, address: string | null, latitude: number | null, longitude: number | null): string | BookingLocation {
   if (name === null) return ''
-  if (latitude !== null && longitude !== null) return { name, latitude, longitude }
+  if (latitude !== null && longitude !== null) return { name, formattedAddress: address ?? undefined, latitude, longitude }
   return name
 }
 
 function bookingFromRow(row: {
   id: string; carId: number; carName: string; category: DomainBookingCategory; customerName: string | null; carType: string | null
-  mobileNumber: string; pickupName: string; pickupLat: number | null; pickupLng: number | null; dropoffName: string | null
+  mobileNumber: string; pickupName: string; pickupAddress: string | null; pickupLat: number | null; pickupLng: number | null; dropoffName: string | null; dropoffAddress: string | null
   dropoffLat: number | null; dropoffLng: number | null; pickupDate: string; dropoffDate: string | null; tripType: string
   timestamp: string; status: BookingStatus; distance: number | null; distanceFare: number | null; estimatedFare: number | null
   distanceKm: number | null; durationMinutes: number | null
@@ -79,8 +79,8 @@ function bookingFromRow(row: {
     customerName: row.customerName ?? undefined,
     carType: row.carType ?? undefined,
     mobileNumber: row.mobileNumber,
-    pickupLocation: locationFromParts(row.pickupName, row.pickupLat, row.pickupLng),
-    dropoffLocation: locationFromParts(row.dropoffName, row.dropoffLat, row.dropoffLng),
+    pickupLocation: locationFromParts(row.pickupName, row.pickupAddress, row.pickupLat, row.pickupLng),
+    dropoffLocation: locationFromParts(row.dropoffName, row.dropoffAddress, row.dropoffLat, row.dropoffLng),
     pickupDate: row.pickupDate,
     dropoffDate: row.dropoffDate ?? undefined,
     tripType: row.tripType,
@@ -165,8 +165,8 @@ export const prismaBookingsRepo: BookingsRepo = {
     const row = await prisma.booking.create({ data: {
       id: booking.id, carId: booking.carId, carName: booking.carName, category: booking.category as BookingCategory,
       customerName: booking.customerName ?? null, carType: booking.carType ?? null, mobileNumber: booking.mobileNumber,
-      pickupName: pickup.name, pickupLat: pickup.latitude, pickupLng: pickup.longitude,
-      dropoffName: dropoff.name || null, dropoffLat: dropoff.latitude, dropoffLng: dropoff.longitude,
+      pickupName: pickup.name, pickupAddress: pickup.address, pickupLat: pickup.latitude, pickupLng: pickup.longitude,
+      dropoffName: dropoff.name || null, dropoffAddress: dropoff.address, dropoffLat: dropoff.latitude, dropoffLng: dropoff.longitude,
       pickupDate: booking.pickupDate, dropoffDate: booking.dropoffDate ?? null, tripType: booking.tripType,
       timestamp: booking.timestamp, status: booking.status as PrismaBookingStatus,
       distance: booking.distance ?? null, distanceFare: booking.distanceFare ?? null, estimatedFare: booking.estimatedFare ?? null,

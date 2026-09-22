@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 const bookingLocationSchema = z.object({
   name: z.string().trim().min(1),
+  formattedAddress: z.string().trim().optional(),
   latitude: z.coerce.number().finite(),
   longitude: z.coerce.number().finite(),
 })
