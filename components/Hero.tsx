@@ -180,8 +180,26 @@ export function Hero() {
       setValue('carName', `${car.brand} ${car.model}`, { shouldValidate: true })
     }
 
+    const handlePrefill = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        car: Car
+        pickupLocation: LocationResult | null
+        dropoffLocation: LocationResult | null
+      }>).detail
+      if (!detail?.car) return
+      setSelectedCar(detail.car)
+      setValue('carName', `${detail.car.brand} ${detail.car.model}`, { shouldValidate: true })
+      if (detail.pickupLocation) setPickupLocation(detail.pickupLocation)
+      if (detail.dropoffLocation) setDropoffLocation(detail.dropoffLocation)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
     window.addEventListener('car-booking:selected', handleCarBooking)
-    return () => window.removeEventListener('car-booking:selected', handleCarBooking)
+    window.addEventListener('hero-booking:prefill', handlePrefill)
+    return () => {
+      window.removeEventListener('car-booking:selected', handleCarBooking)
+      window.removeEventListener('hero-booking:prefill', handlePrefill)
+    }
   }, [])
 
   const isHourly = activeTab === 'hourly'
@@ -219,10 +237,10 @@ export function Hero() {
     }
     try {
       const pickupBookingLocation: BookingLocation | string = pickupLocation
-        ? { name: pickupLocation.name, latitude: pickupLocation.latitude, longitude: pickupLocation.longitude }
+        ? { name: pickupLocation.name, latitude: pickupLocation.latitude, longitude: pickupLocation.longitude, formattedAddress: pickupLocation.formattedAddress }
         : ''
       const dropoffBookingLocation: BookingLocation | string = dropoffLocation
-        ? { name: dropoffLocation.name, latitude: dropoffLocation.latitude, longitude: dropoffLocation.longitude }
+        ? { name: dropoffLocation.name, latitude: dropoffLocation.latitude, longitude: dropoffLocation.longitude, formattedAddress: dropoffLocation.formattedAddress }
         : ''
 
       const response = await fetch('/api/bookings', {

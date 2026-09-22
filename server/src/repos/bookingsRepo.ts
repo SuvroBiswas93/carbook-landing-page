@@ -39,6 +39,7 @@ function normalizeStoredLocation(raw: unknown): string | BookingLocation {
       name: String(location.name ?? ''),
       latitude: Number(location.latitude),
       longitude: Number(location.longitude),
+      formattedAddress: location.formattedAddress ? String(location.formattedAddress) : undefined,
     }
   }
   return String(raw ?? '')

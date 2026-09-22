@@ -55,6 +55,7 @@ export interface BookingLocation {
   name: string
   latitude: number
   longitude: number
+  formattedAddress?: string
 }
 
 export interface Booking {
@@ -170,10 +171,10 @@ export async function getBookings(): Promise<Booking[]> {
     carType: booking.carType ? String(booking.carType) : undefined,
     mobileNumber: String(booking.mobileNumber ?? ''),
     pickupLocation: typeof booking.pickupLocation === 'object' && booking.pickupLocation !== null
-      ? `${booking.pickupLocation.name}`
+      ? `${booking.pickupLocation.formattedAddress || booking.pickupLocation.name}`
       : String(booking.pickupLocation ?? ''),
     dropoffLocation: typeof booking.dropoffLocation === 'object' && booking.dropoffLocation !== null
-      ? `${booking.dropoffLocation.name}`
+      ? `${booking.dropoffLocation.formattedAddress || booking.dropoffLocation.name}`
       : String(booking.dropoffLocation ?? ''),
     pickupDate: String(booking.pickupDate ?? ''),
     dropoffDate: booking.dropoffDate ? String(booking.dropoffDate) : undefined,

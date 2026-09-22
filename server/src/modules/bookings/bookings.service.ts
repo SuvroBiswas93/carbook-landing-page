@@ -19,8 +19,13 @@ function normalizeLocation(loc: unknown): string | BookingLocation {
     'latitude' in loc &&
     'longitude' in loc
   ) {
-    const { name, latitude, longitude } = loc as Record<string, unknown>
-    return { name: String(name), latitude: Number(latitude), longitude: Number(longitude) }
+    const { name, latitude, longitude, formattedAddress } = loc as Record<string, unknown>
+    return {
+      name: String(name),
+      latitude: Number(latitude),
+      longitude: Number(longitude),
+      formattedAddress: formattedAddress ? String(formattedAddress) : undefined,
+    }
   }
   return String(loc).trim()
 }

@@ -2,43 +2,39 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calculator, ChevronDown, Search, X } from 'lucide-react'
+import { Calculator, ChevronDown } from 'lucide-react'
 import { toast } from 'react-toastify'
-import locationsData from '@/data/locations.json'
-import type { Car, Pricing } from '@/lib/store'
+import type { Car } from '@/lib/store'
 import { DEFAULT_BASE_FARE, DEFAULT_FARE_PER_KM } from '@/lib/pricing'
-import { BookingModal, type BookingFormData } from './BookingModal'
+import type { LocationResult } from '@/lib/location/types'
+import { formatDistance, getRoute } from '@/lib/location/osrm'
+import { LocationAutocomplete } from './car-rental/LocationAutocomplete'
 
 export function FareCalculator() {
   const [formData, setFormData] = useState({
     carId: '',
-    pickupLocationId: '',
-    dropoffLocationId: '',
   })
+  const [pickupLocation, setPickupLocation] = useState<LocationResult | null>(null)
+  const [dropoffLocation, setDropoffLocation] = useState<LocationResult | null>(null)
+  const [routeDistanceMeters, setRouteDistanceMeters] = useState<number | null>(null)
+  const [isRouteLoading, setIsRouteLoading] = useState(false)
+  const [routeError, setRouteError] = useState(false)
+  const routeRequestRef = useRef<AbortController | null>(null)
   const [result, setResult] = useState<{
     baseFare: number
     distanceFare: number
     totalFare: number
-    distance: number
-    carId: number
-    pickupLocation: string
-    dropoffLocation: string
+    distanceKm: number
+    car: Car
   } | null>(null)
   const [cars, setCars] = useState<Car[]>([])
-  const [pricing, setPricing] = useState<Pricing | null>(null)
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
-  const [bookingData, setBookingData] = useState<BookingFormData | null>(null)
 
   const [showCarDropdown, setShowCarDropdown] = useState(false)
-  const [showPickupDropdown, setShowPickupDropdown] = useState(false)
-  const [showDropoffDropdown, setShowDropoffDropdown] = useState(false)
-  const [carSearch, setCarSearch] = useState('')
-  const [pickupSearch, setPickupSearch] = useState('')
-  const [dropoffSearch, setDropoffSearch] = useState('')
+  const [openPickup, setOpenPickup] = useState(false)
+  const [openDropoff, setOpenDropoff] = useState(false)
 
   const carDropdownRef = useRef<HTMLDivElement>(null)
-  const pickupDropdownRef = useRef<HTMLDivElement>(null)
-  const dropoffDropdownRef = useRef<HTMLDivElement>(null)
+  const locationContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetch('/api/cars')
@@ -48,108 +44,112 @@ export function FareCalculator() {
   }, [])
 
   useEffect(() => {
-    fetch('/api/pricing')
-      .then((response) => {
-        if (!response.ok) throw new Error('Unable to load pricing')
-        return response.json()
-      })
-      .then((data: Pricing) => setPricing(data))
-      .catch(() => setPricing({ currency: 'BDT', carTypes: [] }))
-  }, [])
-
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
-      const isInsideCar = carDropdownRef.current?.contains(target)
-      const isInsidePickup = pickupDropdownRef.current?.contains(target)
-      const isInsideDropoff = dropoffDropdownRef.current?.contains(target)
-      if (!isInsideCar && !isInsidePickup && !isInsideDropoff) {
+      if (!carDropdownRef.current?.contains(target)) {
         setShowCarDropdown(false)
-        setShowPickupDropdown(false)
-        setShowDropoffDropdown(false)
+      }
+      if (!locationContainerRef.current?.contains(target)) {
+        setOpenPickup(false)
+        setOpenDropoff(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const filteredCars = cars.filter(
-    (car) =>
-      car.brand.toLowerCase().includes(carSearch.toLowerCase()) ||
-      car.model.toLowerCase().includes(carSearch.toLowerCase())
-  )
-  const filteredPickup = locationsData.filter(
-    (loc) =>
-      loc.name.toLowerCase().includes(pickupSearch.toLowerCase()) ||
-      loc.zone.toLowerCase().includes(pickupSearch.toLowerCase())
-  )
-  const filteredDropoff = locationsData.filter(
-    (loc) =>
-      loc.name.toLowerCase().includes(dropoffSearch.toLowerCase()) ||
-      loc.zone.toLowerCase().includes(dropoffSearch.toLowerCase())
-  )
+  useEffect(() => {
+    routeRequestRef.current?.abort()
+    setRouteDistanceMeters(null)
+    setRouteError(false)
+    setResult(null)
+
+    if (!pickupLocation || !dropoffLocation) {
+      setIsRouteLoading(false)
+      return
+    }
+
+    const controller = new AbortController()
+    routeRequestRef.current = controller
+    setIsRouteLoading(true)
+
+    getRoute(
+      pickupLocation.longitude,
+      pickupLocation.latitude,
+      dropoffLocation.longitude,
+      dropoffLocation.latitude,
+      controller.signal,
+    )
+      .then((data) => {
+        if (controller.signal.aborted) return
+        const route = data.routes[0]
+        if (!route) throw new Error('No driving route found')
+        setRouteDistanceMeters(route.distance)
+        setIsRouteLoading(false)
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return
+        setIsRouteLoading(false)
+        setRouteError(true)
+      })
+
+    return () => controller.abort()
+  }, [dropoffLocation, pickupLocation])
 
   const selectedCar = cars.find((c) => c.id === Number(formData.carId))
-  const selectedPickup = locationsData.find((l) => l.id === Number(formData.pickupLocationId))
-  const selectedDropoff = locationsData.find((l) => l.id === Number(formData.dropoffLocationId))
+  const displayBaseFare = selectedCar?.pricePerDay ?? DEFAULT_BASE_FARE
+  const displayRate = selectedCar?.pricePerKm ?? DEFAULT_FARE_PER_KM
+  const distanceKm =
+    routeDistanceMeters === null
+      ? undefined
+      : Math.round((routeDistanceMeters / 1000) * 10) / 10
 
   const handleCarSelect = (car: Car) => {
     setFormData({ ...formData, carId: String(car.id) })
+    setResult(null)
     setShowCarDropdown(false)
-    setCarSearch('')
   }
 
-  const handlePickupSelect = (loc: typeof locationsData[0]) => {
-    setFormData({ ...formData, pickupLocationId: String(loc.id) })
-    setShowPickupDropdown(false)
-    setPickupSearch('')
+  const updatePickup = (loc: LocationResult | null) => {
+    setPickupLocation(loc)
+    setResult(null)
   }
 
-  const handleDropoffSelect = (loc: typeof locationsData[0]) => {
-    setFormData({ ...formData, dropoffLocationId: String(loc.id) })
-    setShowDropoffDropdown(false)
-    setDropoffSearch('')
+  const updateDropoff = (loc: LocationResult | null) => {
+    setDropoffLocation(loc)
+    setResult(null)
   }
 
   const handleCalculate = () => {
-    if (
-      !formData.carId ||
-      !formData.pickupLocationId ||
-      !formData.dropoffLocationId
-    ) {
+    if (!formData.carId || !pickupLocation || !dropoffLocation) {
       toast.error('Please select all options')
       return
     }
 
-    const carId = Number(formData.carId)
-    const pickupLocationId = Number(formData.pickupLocationId)
-    const dropoffLocationId = Number(formData.dropoffLocationId)
-    const car = Number.isInteger(carId) ? cars.find((c) => c.id === carId) : undefined
-    const pickupLocation = locationsData.find(
-      (l) => l.id === pickupLocationId
-    )
-    const dropoffLocation = locationsData.find(
-      (l) => l.id === dropoffLocationId
-    )
+    if (routeDistanceMeters === null || distanceKm === undefined) {
+      toast.error(
+        routeError
+          ? 'Route distance could not be calculated. Please try another location pair.'
+          : 'Route distance is still being calculated. Please wait.'
+      )
+      return
+    }
 
-    if (!car || !pickupLocation || !dropoffLocation || !pricing) {
+    const car = selectedCar
+    if (!car) {
       toast.error('Invalid selection')
       return
     }
 
-    const distance = Math.max(15, Math.abs(dropoffLocation.id - pickupLocation.id) * 35)
-    const categoryPricing = pricing.carTypes?.find(
-      (entry) => entry.carType === car.category
-    )
-    const rate = Number(categoryPricing?.farePerKm ?? DEFAULT_FARE_PER_KM)
-    const baseFare = Number(categoryPricing?.baseFare ?? DEFAULT_BASE_FARE)
+    const rate = Number(car.pricePerKm ?? DEFAULT_FARE_PER_KM)
+    const baseFare = Number(car.pricePerDay ?? DEFAULT_BASE_FARE)
 
     if (!Number.isFinite(rate) || rate < 0 || !Number.isFinite(baseFare) || baseFare < 0) {
       toast.error('Pricing is temporarily unavailable')
       return
     }
 
-    const distanceFare = distance * rate
+    const distanceFare = distanceKm * rate
 
     const totalFare = Math.max(baseFare, distanceFare)
 
@@ -157,67 +157,21 @@ export function FareCalculator() {
       baseFare,
       distanceFare,
       totalFare,
-      distance,
-      carId: car.id,
-      pickupLocation: pickupLocation.name,
-      dropoffLocation: dropoffLocation.name,
+      distanceKm,
+      car,
     })
 
     toast.success('Fare calculated successfully!')
   }
 
-  const handleOpenBooking = () => {
+  const handleBookNow = () => {
     if (!result) return
 
-    const car = cars.find((item) => item.id === result.carId)
-    if (!car) {
-      toast.error('This vehicle is no longer available')
-      return
-    }
-
-    setBookingData({
-      car,
-      pickupLocation: result.pickupLocation,
-      dropoffLocation: result.dropoffLocation,
-      pickupDate: '',
-      mobileNumber: '',
-      tripType: 'One Way',
-      distance: result.distance,
-      distanceFare: result.distanceFare,
-      estimatedFare: result.totalFare,
-    })
-    setIsBookingModalOpen(true)
-  }
-
-  const handleBookConfirm = async (data: BookingFormData): Promise<boolean> => {
-    if (!data.car) return false
-
-    const response = await fetch('/api/bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        carId: data.car.id,
-        carName: `${data.car.brand} ${data.car.model}`,
-        category: data.tripType === 'Hourly' ? 'hourly' : 'intercity',
-        mobileNumber: data.mobileNumber,
-        pickupLocation: data.pickupLocation,
-        dropoffLocation: data.dropoffLocation,
-        pickupDate: data.pickupDate,
-        tripType: data.tripType,
-        distance: data.distance,
-        distanceFare: data.distanceFare,
-        estimatedFare: data.estimatedFare,
-      }),
-    })
-
-    if (!response.ok) {
-      toast.error('Could not send booking request')
-      return false
-    }
-
-    setIsBookingModalOpen(false)
-    setBookingData(null)
-    return true
+    window.dispatchEvent(
+      new CustomEvent('hero-booking:prefill', {
+        detail: { car: result.car, pickupLocation, dropoffLocation },
+      })
+    )
   }
 
   return (
@@ -257,7 +211,7 @@ export function FareCalculator() {
               </label>
               <button
                 type="button"
-                onClick={() => { setShowCarDropdown(!showCarDropdown); setShowPickupDropdown(false); setShowDropoffDropdown(false) }}
+                onClick={() => { setShowCarDropdown(!showCarDropdown) }}
                 className="mt-4 flex w-full items-center justify-between text-left rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
               >
                 <span>
@@ -277,10 +231,10 @@ export function FareCalculator() {
               </button>
               {showCarDropdown && (
                 <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-[#eae5dd] bg-white shadow-xl max-h-64 overflow-y-auto">
-                  {filteredCars.length === 0 && (
+                  {cars.length === 0 && (
                     <p className="px-4 py-3 text-sm text-[#aaa59e]">No vehicles available.</p>
                   )}
-                  {filteredCars.map((car) => (
+                  {cars.map((car) => (
                     <button
                       key={car.id}
                       type="button"
@@ -298,114 +252,35 @@ export function FareCalculator() {
               )}
             </div>
 
-            {/* Pickup Location Dropdown */}
-            <div className="relative" ref={pickupDropdownRef}>
-              <label className="block text-sm font-medium text-stone-700 mb-3">
-                Pickup Location
-              </label>
-              <div className="mt-4 relative">
-                <button
-                  type="button"
-                  onClick={() => { setShowPickupDropdown(!showPickupDropdown); setShowCarDropdown(false); setShowDropoffDropdown(false) }}
-                  className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
-                >
-                  <span className={selectedPickup ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
-                    {selectedPickup ? selectedPickup.name : 'Select pickup location'}
-                  </span>
-                  <ChevronDown size={20} className="text-[#aaa59e]" />
-                </button>
-                {showPickupDropdown && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-[#eae5dd] bg-white shadow-xl overflow-hidden">
-                    <div className="relative p-2 border-b border-[#eae5dd]">
-                      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa59e]" />
-                      <input
-                        type="text"
-                        placeholder="Search location..."
-                        value={pickupSearch}
-                        onChange={(e) => setPickupSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 rounded-lg border border-[#eae5dd] text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
-                      />
-                      {pickupSearch && (
-                        <button
-                          type="button"
-                          onClick={() => setPickupSearch('')}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aaa59e] hover:text-stone-600"
-                        >
-                          <X size={16} />
-                        </button>
-                      )}
-                    </div>
-                    <div className="max-h-48 overflow-y-auto">
-                      {filteredPickup.map((loc) => (
-                        <button
-                          key={loc.id}
-                          type="button"
-                          onClick={() => handlePickupSelect(loc)}
-                          className={`w-full cursor-pointer px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${selectedPickup?.id === loc.id ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
-                        >
-                          <p className="font-semibold text-sm text-stone-900">{loc.name}</p>
-                          <p className="text-xs text-[#aaa59e]">{loc.address}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Pickup / Drop-off Location (Photon autocomplete) */}
+            <div ref={locationContainerRef} className="space-y-4">
+              <LocationAutocomplete
+                label="পিকআপ লোকেশন"
+                value={pickupLocation}
+                onChange={updatePickup}
+                open={openPickup}
+                onOpenChange={setOpenPickup}
+              />
 
-            {/* Drop-off Location Dropdown */}
-            <div className="relative" ref={dropoffDropdownRef}>
-              <label className="block text-sm font-medium text-stone-700 mb-3">
-                Drop-off Location
-              </label>
-              <div className="mt-4 relative">
-                <button
-                  type="button"
-                  onClick={() => { setShowDropoffDropdown(!showDropoffDropdown); setShowCarDropdown(false); setShowPickupDropdown(false) }}
-                  className="flex w-full items-center justify-between rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow text-sm"
-                >
-                  <span className={selectedDropoff ? 'text-stone-900 font-semibold' : 'text-[#aaa59e]'}>
-                    {selectedDropoff ? selectedDropoff.name : 'Select drop-off location'}
-                  </span>
-                  <ChevronDown size={20} className="text-[#aaa59e]" />
-                </button>
-                {showDropoffDropdown && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-[#eae5dd] bg-white shadow-xl overflow-hidden">
-                    <div className="relative p-2 border-b border-[#eae5dd]">
-                      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa59e]" />
-                      <input
-                        type="text"
-                        placeholder="Search location..."
-                        value={dropoffSearch}
-                        onChange={(e) => setDropoffSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 rounded-lg border border-[#eae5dd] text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
-                      />
-                      {dropoffSearch && (
-                        <button
-                          type="button"
-                          onClick={() => setDropoffSearch('')}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aaa59e] hover:text-stone-600"
-                        >
-                          <X size={16} />
-                        </button>
-                      )}
-                    </div>
-                    <div className="max-h-48 overflow-y-auto">
-                      {filteredDropoff.map((loc) => (
-                        <button
-                          key={loc.id}
-                          type="button"
-                          onClick={() => handleDropoffSelect(loc)}
-                          className={`w-full cursor-pointer px-4 py-3 text-left hover:bg-amber-50 transition-colors border-b border-[#f5f0eb] ${selectedDropoff?.id === loc.id ? 'bg-amber-50 border-l-4 border-amber-500' : ''}`}
-                        >
-                          <p className="font-semibold text-sm text-stone-900">{loc.name}</p>
-                          <p className="text-xs text-[#aaa59e]">{loc.address}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <LocationAutocomplete
+                label="ড্রপ-অফ লোকেশন"
+                value={dropoffLocation}
+                onChange={updateDropoff}
+                open={openDropoff}
+                onOpenChange={setOpenDropoff}
+              />
+
+              {pickupLocation && dropoffLocation && (
+                <div className="border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-center text-sm text-stone-700 shadow-sm">
+                  {isRouteLoading && <span className="font-semibold text-amber-800">সড়কপথের দূরত্ব হিসাব হচ্ছে...</span>}
+                  {!isRouteLoading && routeDistanceMeters !== null && (
+                    <span className="font-bold">সড়কপথের দূরত্ব: {formatDistance(routeDistanceMeters)}</span>
+                  )}
+                  {!isRouteLoading && routeError && (
+                    <span className="font-medium text-red-600">এই দুই লোকেশনের সড়ক দূরত্ব এখন পাওয়া যাচ্ছে না</span>
+                  )}
+                </div>
+              )}
             </div>
 
             <motion.button
@@ -434,7 +309,7 @@ export function FareCalculator() {
                 <div className="bg-white rounded-lg p-6">
                   <p className="text-sm text-stone-500 mb-2">Distance</p>
                   <p className="text-3xl font-bold text-stone-900">
-                    {result.distance} km
+                    {formatDistance(result.distanceKm * 1000)}
                   </p>
                 </div>
 
@@ -455,8 +330,8 @@ export function FareCalculator() {
                   </p>
                 </div>
 
-                <button onClick={handleOpenBooking} className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-4 rounded-lg transition-all cursor-pointer">
-                  Proceed to Booking
+                <button onClick={handleBookNow} className="w-full bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-4 rounded-lg transition-all cursor-pointer">
+                  Book Now
                 </button>
               </div>
             </motion.div>
@@ -473,19 +348,24 @@ export function FareCalculator() {
               <h3 className="text-2xl font-bold text-stone-900 mb-8">
                 আমরা যেভাবে ভাড়া হিসাব করি
               </h3>
+              {selectedCar && (
+                <p className="-mt-5 mb-6 text-sm font-semibold text-brand-navy">
+                  {selectedCar.brand} {selectedCar.model} ({selectedCar.category})
+                </p>
+              )}
 
               <div className="space-y-6">
                 <div>
                   <p className="text-sm text-stone-500 mb-2">বেস ভাড়া</p>
                   <p className="text-2xl font-bold text-stone-900">
-                    ৳{DEFAULT_BASE_FARE}
+                    ৳{displayBaseFare}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-sm text-stone-500 mb-2">প্রতি কিলোমিটার ভাড়া</p>
                   <p className="text-2xl font-bold text-amber-700">
-                    ৳{DEFAULT_FARE_PER_KM}/km
+                    ৳{displayRate}/km
                   </p>
                 </div>
 
@@ -502,16 +382,6 @@ export function FareCalculator() {
         </div>
       </div>
     </section>
-
-    <BookingModal
-      isOpen={isBookingModalOpen}
-      onClose={() => {
-        setIsBookingModalOpen(false)
-        setBookingData(null)
-      }}
-      bookingData={bookingData}
-      onBookConfirm={handleBookConfirm}
-    />
     </>
   )
 }

@@ -34,7 +34,7 @@ export function Overview({ admin }: { admin: AdminData }) {
         <h2 className="font-serif text-xl font-bold">All Bookings</h2>
         <div className="mt-4 rounded-2xl border border-[#e7e0d5] bg-[#fffdf9]">
           <div className="overflow-x-auto">
-            <BookingTable bookings={pageBookings} />
+            <BookingTable bookings={pageBookings} onDelete={admin.deleteBooking} />
           </div>
           {bookings.length > 0 && (
             <Pagination

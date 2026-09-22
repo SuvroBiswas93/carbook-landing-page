@@ -37,6 +37,7 @@ export interface BookingLocation {
   name: string
   latitude: number
   longitude: number
+  formattedAddress?: string
 }
 
 export interface Booking {

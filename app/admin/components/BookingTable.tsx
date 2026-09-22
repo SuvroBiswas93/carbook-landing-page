@@ -1,3 +1,7 @@
+'use client'
+
+import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
 import type { Booking, BookingStatus, BookingLocation } from '@/lib/store'
 import { formatDateTime } from '@/lib/utils'
 import { ResponsiveTable } from './ResponsiveTable'
@@ -6,7 +10,10 @@ import { StatusBadge, StatusSelect } from './StatusSelect'
 
 function locationToString(loc: string | BookingLocation | undefined): string {
   if (!loc) return 'Not provided'
-  if (typeof loc === 'object') return loc.name ?? 'Not provided'
+  if (typeof loc === 'object') {
+    if (loc.formattedAddress) return loc.formattedAddress
+    return loc.name ?? 'Not provided'
+  }
   return loc || 'Not provided'
 }
 
@@ -34,7 +41,8 @@ function estimatedDistanceKm(booking: Booking): number | undefined {
 
 const createColumns = (
   onStatusChange?: (id: string, status: BookingStatus) => void,
-  onDelete?: (id: string) => void
+  onDelete?: (id: string) => void,
+  onRequestDelete?: (booking: Booking) => void
 ): Column<Booking>[] => [
   {
     key: 'id',
@@ -156,6 +164,24 @@ const createColumns = (
         <StatusBadge status={booking.status} />
       ),
   },
+  ...(onDelete && onRequestDelete
+    ? [
+        {
+          key: 'actions',
+          label: '',
+          render: (booking: Booking) => (
+            <button
+              type="button"
+              onClick={() => onRequestDelete(booking)}
+              aria-label={`Delete booking ${booking.id}`}
+              className="rounded-lg bg-red-50 p-2 text-red-600 transition-colors hover:bg-red-100 hover:text-red-700"
+            >
+              <Trash2 size={16} />
+            </button>
+          ),
+        } as Column<Booking>,
+      ]
+    : []),
 ]
 
 interface BookingTableProps {
@@ -165,13 +191,61 @@ interface BookingTableProps {
 }
 
 export function BookingTable({ bookings, onStatusChange, onDelete }: BookingTableProps) {
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null)
+
+  const handleDelete = () => {
+    if (!bookingToDelete) return
+    setBookingToDelete(null)
+    onDelete?.(bookingToDelete.id)
+  }
+
   return (
-    <ResponsiveTable
-      data={bookings}
-      columns={createColumns(onStatusChange, onDelete)}
-      idKey="id"
-      minWidth="min-w-[1000px]"
-      emptyMessage="No bookings yet."
-    />
+    <>
+      <ResponsiveTable
+        data={bookings}
+        columns={createColumns(onStatusChange, onDelete, setBookingToDelete)}
+        idKey="id"
+        minWidth="min-w-[1000px]"
+        emptyMessage="No bookings yet."
+      />
+
+      {bookingToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setBookingToDelete(null)}
+          />
+          <div className="relative w-full max-w-md rounded-2xl border border-[#e7e0d5] bg-[#fffdf9] p-6 shadow-2xl">
+            <h3 className="font-serif text-xl font-bold text-[#292724]">
+              Delete booking?
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-[#766e64]">
+              This will permanently remove booking{' '}
+              <span className="font-bold text-[#292724]">{bookingToDelete.id}</span>
+              {bookingToDelete.customerName
+                ? ` for ${bookingToDelete.customerName}`
+                : ''}.
+              This action cannot be undone.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setBookingToDelete(null)}
+                className="flex-1 rounded-xl border border-[#e7e0d5] bg-white px-4 py-2.5 text-sm font-bold text-[#292724] transition-colors hover:bg-[#f7f3ec]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
