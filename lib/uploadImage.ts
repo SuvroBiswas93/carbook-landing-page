@@ -13,21 +13,15 @@ const EXT_BY_TYPE: Record<string, string> = {
 }
 
 export async function uploadCarImage(file: File): Promise<string> {
-  const fallbackName = `car-${Date.now()}.${EXT_BY_TYPE[file.type] ?? 'jpg'}`
-  const fileName = file.name?.trim() ? file.name : fallbackName
+  const formData = new FormData()
+  formData.append('file', file, file.name || `car-${Date.now()}.${EXT_BY_TYPE[file.type] ?? 'jpg'}`)
 
-  const response = await apiFetch('/api/uploads/presign', {
+  const response = await apiFetch('/api/uploads/image', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      fileName,
-      contentType: file.type,
-      size: file.size,
-    }),
+    body: formData,
   })
 
   const data = (await response.json().catch(() => null)) as {
-    uploadUrl?: string
     publicUrl?: string
     cacheControl?: string
     error?: string
@@ -36,21 +30,8 @@ export async function uploadCarImage(file: File): Promise<string> {
   if (!response.ok) {
     throw new Error(data?.error ?? 'Could not start the upload.')
   }
-  if (!data?.uploadUrl || !data.publicUrl) {
+  if (!data?.publicUrl) {
     throw new Error('Upload response was incomplete.')
-  }
-
-  const put = await fetch(data.uploadUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': file.type,
-      'Cache-Control': data.cacheControl ?? R2_CACHE_CONTROL,
-    },
-    body: file,
-  })
-
-  if (!put.ok) {
-    throw new Error(`Upload failed with status ${put.status}.`)
   }
 
   return data.publicUrl

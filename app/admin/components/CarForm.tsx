@@ -175,14 +175,6 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
           />
         </Field>
 
-        <CheckField
-          label="Air conditioning"
-          text="AC available"
-          checked={form.hasAc}
-          onChange={(checked) => update('hasAc', checked)}
-          hint="Shown as আছে / নেই on the car card."
-        />
-
         <Field
           label="Price per day"
           hint="Card shows “From ৳… শুরু” using this value."
@@ -218,54 +210,52 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
         />
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <div className="mt-4">
         <Field
-          label="Image URL"
-          hint="Photo shown at the top of the car card. Filled in automatically when you upload."
+          label="Description"
+          hint="Short description shown for the car."
         >
-          <input
-            value={form.image}
-            onChange={(e) => update('image', e.target.value)}
-            placeholder="https://cdn.example.com/fleet/car-photo.jpg"
+          <textarea
+            value={form.description}
+            onChange={(e) => update('description', e.target.value)}
+            placeholder="e.g. Premium luxury sedan with adaptive suspension."
+            rows={3}
             className={inputClass}
           />
         </Field>
+      </div>
 
-        <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-bold text-[#292724]">
-            Upload from device
-          </span>
-          <div className="flex items-center gap-3">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-              onChange={handleFileChange}
-              className="hidden"
+      <div className="mt-4 flex flex-col gap-1.5">
+        <span className="text-sm font-bold text-[#292724]">Upload image</span>
+        <div className="flex items-center gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="rounded-xl bg-[#a8865f] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#97744e] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {uploading ? 'Uploading…' : 'Choose image'}
+          </button>
+          {form.image ? (
+            <img
+              src={form.image}
+              alt="Car preview"
+              className="h-12 w-16 rounded-lg border border-[#e7e0d5] object-cover"
             />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="rounded-xl bg-[#a8865f] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#97744e] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {uploading ? 'Uploading…' : 'Choose image'}
-            </button>
-            {form.image ? (
-              <img
-                src={form.image}
-                alt="Car preview"
-                className="h-12 w-16 rounded-lg border border-[#e7e0d5] object-cover"
-              />
-            ) : (
-              <span className="text-xs text-[#8c8378]">No image yet</span>
-            )}
-          </div>
-          <span className="text-xs leading-snug text-[#8c8378]">
-            JPG, PNG, WebP, AVIF or GIF up to 5 MB. You can type a public URL
-            in the field above instead.
-          </span>
+          ) : (
+            <span className="text-xs text-[#8c8378]">No image yet</span>
+          )}
         </div>
+        <span className="text-xs leading-snug text-[#8c8378]">
+          JPG, PNG, WebP, AVIF or GIF up to 5 MB.
+        </span>
       </div>
 
       <button

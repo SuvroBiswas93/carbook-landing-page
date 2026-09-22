@@ -11,6 +11,14 @@ import { jsonReviewsRepo } from './reviewsRepo'
 import { jsonPricingRepo } from './pricingRepo'
 import { jsonAdminsRepo } from './adminsRepo'
 import { jsonSessionsRepo } from './sessionsRepo'
+import {
+  prismaAdminsRepo,
+  prismaBookingsRepo,
+  prismaCarsRepo,
+  prismaPricingRepo,
+  prismaReviewsRepo,
+  prismaSessionsRepo,
+} from './prismaRepos'
 
 export interface Repos {
   cars: CarsRepo
@@ -23,9 +31,14 @@ export interface Repos {
 
 export function createRepos(source: 'json' | 'prisma' = env.DATA_SOURCE): Repos {
   if (source === 'prisma') {
-    throw new Error(
-      'Prisma data source is not active yet. Keep DATA_SOURCE=json until Prisma + MySQL are wired up.'
-    )
+    return {
+      cars: prismaCarsRepo,
+      bookings: prismaBookingsRepo,
+      reviews: prismaReviewsRepo,
+      pricing: prismaPricingRepo,
+      admins: prismaAdminsRepo,
+      sessions: prismaSessionsRepo,
+    }
   }
   return {
     cars: jsonCarsRepo,

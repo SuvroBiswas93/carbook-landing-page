@@ -9,7 +9,8 @@ export const r2Enabled =
   Boolean(env.R2_ACCOUNT_ID) &&
   Boolean(env.R2_ACCESS_KEY_ID) &&
   Boolean(env.R2_SECRET_ACCESS_KEY) &&
-  Boolean(env.R2_BUCKET_NAME)
+  Boolean(env.R2_BUCKET_NAME) &&
+  Boolean(env.R2_PUBLIC_URL.trim())
 
 export const r2Client: S3Client | null = r2Enabled
   ? new S3Client({

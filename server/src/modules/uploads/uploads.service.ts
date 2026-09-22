@@ -107,7 +107,32 @@ export function createUploadsService() {
     return { ok: true }
   }
 
-  return { presign, remove }
+  async function uploadImage(params: { originalName: string; contentType: string; size: number; body: Buffer }): Promise<{ publicUrl: string; cacheControl: string }> {
+    const client = await requireR2()
+    const ext = params.originalName.split('.').pop()?.toLowerCase() ?? ''
+    const expectedType = ALLOWED_TYPES[ext]
+    if (!expectedType || expectedType !== params.contentType) {
+      throw BadRequest('Unsupported file type. Allowed: jpg, png, webp, avif, gif.')
+    }
+    if (!Number.isInteger(params.size) || params.size <= 0 || params.size > env.R2_MAX_FILE_SIZE_BYTES) {
+      throw BadRequest(`File size must be at least 1 byte and no larger than ${Math.floor(env.R2_MAX_FILE_SIZE_BYTES / 1024 / 1024)}MB.`)
+    }
+
+    const key = `fleet/${Date.now()}-${randomBytes(8).toString('hex')}.${ext}`
+    await client.send(new PutObjectCommand({
+      Bucket: env.R2_BUCKET_NAME,
+      Key: key,
+      Body: params.body,
+      ContentType: expectedType,
+      CacheControl: R2_CACHE_CONTROL,
+      ContentLength: params.size,
+    }))
+
+    const publicBase = env.R2_PUBLIC_URL.trim().replace(/\/+$/, '')
+    return { publicUrl: `${publicBase}/${key}`, cacheControl: R2_CACHE_CONTROL }
+  }
+
+  return { presign, remove, uploadImage }
 }
 
 export type UploadsService = ReturnType<typeof createUploadsService>

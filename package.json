@@ -11,6 +11,7 @@
     "start": "next start",
     "start:server": "tsx server/src/index.ts",
     "seed:admin": "tsx server/scripts/seed-admin.ts",
+    "configure:r2-cors": "tsx server/scripts/configure-r2-cors.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p server/tsconfig.json"
   },
   "dependencies": {
@@ -18,6 +19,7 @@
     "@aws-sdk/s3-request-presigner": "^3.758.0",
     "@base-ui/react": "^1.5.0",
     "@hookform/resolvers": "^5.9.1",
+    "@prisma/client": "^6.19.0",
     "@vercel/analytics": "1.6.1",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
@@ -33,6 +35,7 @@
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.16.0",
+    "multer": "^2.4.0",
     "next": "16.3.3",
     "react": "^19",
     "react-dom": "^19",
@@ -54,11 +57,13 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/leaflet": "^1.9.22",
+    "@types/multer": "^2.2.0",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^9.1.2",
     "postcss": "^8.5",
+    "prisma": "6.19.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.19.3",
     "typescript": "5.7.3"
