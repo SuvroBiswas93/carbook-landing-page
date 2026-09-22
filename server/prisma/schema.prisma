@@ -1,0 +1,118 @@
+// Prisma + MySQL reference schema (NOT activated yet).
+// This mirrors the repository abstractions under server/src/repos so that
+// switching DATA_SOURCE=json -> prisma is a drop-in change at the repo layer.
+// DATABASE_URL is expected to be provided in .env when wiring this up.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  New
+  Called
+  Confirmed
+  Cancelled
+}
+
+enum BookingCategory {
+  city
+  hourly
+  intercity
+  airport
+}
+
+model Admin {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String
+  role         String         @default("admin")
+  createdAt    DateTime       @default(now())
+  sessions     RefreshToken[]
+}
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  adminId    String
+  tokenHash  String    @unique
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  lastUsedAt DateTime  @default(now())
+  revokedAt  DateTime?
+  admin      Admin     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([expiresAt])
+}
+
+model Car {
+  id          Int     @id @default(autoincrement())
+  brand       String
+  model       String
+  category    String
+  seats       Int     @default(4)
+  hasAc       Boolean @default(true)
+  transmission String @default("automatic")
+  fuel        String  @default("petrol")
+  pricePerDay Int     @default(0)
+  pricePerKm  Int     @default(0)
+  description String  @default("")
+  image       String  @default("/placeholder.jpg")
+  published   Boolean @default(true)
+}
+
+model Booking {
+  id            String          @id
+  carId         Int             @default(0)
+  carName       String          @default("Unselected car")
+  category      BookingCategory @default(city)
+  customerName  String?
+  carType       String?
+  mobileNumber  String
+  pickupName    String
+  pickupLat     Float?
+  pickupLng     Float?
+  dropoffName   String?
+  dropoffLat    Float?
+  dropoffLng    Float?
+  pickupDate    String
+  dropoffDate   String?
+  tripType      String          @default("One Way")
+  timestamp     String
+  status        BookingStatus   @default(New)
+  distance      Float?
+  distanceFare  Float?
+  estimatedFare Float?
+  distanceKm    Float?
+  durationMinutes Float?
+  createdAt     DateTime        @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  name      String
+  rating    Int
+  text      String
+  location  String
+  hidden    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PricingTier {
+  id       Int    @id @default(autoincrement())
+  carType  String @unique
+  baseFare Float
+  farePerKm Float
+}
+
+model Setting {
+  id       Int    @id @default(1)
+  currency String @default("BDT")
+}

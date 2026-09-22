@@ -1,5 +1,10 @@
+'use client'
+
+import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { toast } from 'react-toastify'
 import type { Car as FleetCar } from '@/lib/store'
+import { uploadCarImage } from '@/lib/uploadImage'
 
 interface CarFormProps {
   form: Omit<FleetCar, 'id'>
@@ -58,10 +63,33 @@ function CheckField({
 }
 
 export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+
   const update = (
     key: keyof Omit<FleetCar, 'id'>,
     value: string | number | boolean
   ) => setForm({ ...form, [key]: value })
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await uploadCarImage(file)
+      update('image', url)
+      toast.success('Image uploaded. Save the car to keep the change.')
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Image upload failed.'
+      )
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   return (
     <div className="mb-8 rounded-2xl border border-[#e7e0d5] bg-[#fffdf9] p-5">
@@ -190,18 +218,54 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
         />
       </div>
 
-      <div className="mt-4 flex flex-col gap-4">
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Field
           label="Image URL"
-          hint="Photo shown at the top of the car card."
+          hint="Photo shown at the top of the car card. Filled in automatically when you upload."
         >
           <input
             value={form.image}
             onChange={(e) => update('image', e.target.value)}
-            placeholder="https://example.com/car-photo.jpg"
+            placeholder="https://cdn.example.com/fleet/car-photo.jpg"
             className={inputClass}
           />
         </Field>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-bold text-[#292724]">
+            Upload from device
+          </span>
+          <div className="flex items-center gap-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="rounded-xl bg-[#a8865f] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#97744e] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {uploading ? 'Uploading…' : 'Choose image'}
+            </button>
+            {form.image ? (
+              <img
+                src={form.image}
+                alt="Car preview"
+                className="h-12 w-16 rounded-lg border border-[#e7e0d5] object-cover"
+              />
+            ) : (
+              <span className="text-xs text-[#8c8378]">No image yet</span>
+            )}
+          </div>
+          <span className="text-xs leading-snug text-[#8c8378]">
+            JPG, PNG, WebP, AVIF or GIF up to 5 MB. You can type a public URL
+            in the field above instead.
+          </span>
+        </div>
       </div>
 
       <button

@@ -3,3 +3,13 @@ pmOnFail: ignore
 minimumReleaseAgeExclude:
   - '@next/*'
   - next
+
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - prisma
+
+neverBuiltDependencies:
+  - esbuild
+
+allowBuilds:
+  esbuild: true

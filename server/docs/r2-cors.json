@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/cors.json",
+  "CORSRules": [
+    {
+      "AllowedOrigins": [
+        "http://localhost:3000",
+        "https://your-production-origin.com"
+      ],
+      "AllowedMethods": ["PUT", "GET", "HEAD"],
+      "AllowedHeaders": ["Content-Type", "Cache-Control", "x-amz-*"],
+      "ExposeHeaders": ["ETag", "X-Request-Id"],
+      "MaxAgeSeconds": 3600
+    }
+  ]
+}

@@ -2,20 +2,39 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Home, LogOut, Menu, RefreshCw, X } from 'lucide-react'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import type { ReactNode } from 'react'
 import { navItems } from './nav-items'
 import { useAdminData } from './useAdminData'
+import { setAccessToken } from '@/lib/apiClient'
 
 function getActiveLabel(pathname: string) {
   return navItems.find((item) => pathname === item.href)?.label ?? 'Overview'
 }
 
 export function AdminShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  if (pathname.startsWith('/admin/login')) {
+    return (
+      <main className="min-h-screen overflow-x-clip bg-[#f7f4ef] text-[#282622]">
+        {children}
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="light"
+        />
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen overflow-x-clip bg-[#f7f4ef] text-[#282622]">
@@ -49,6 +68,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+      })
+    } catch {
+      // Clear the local session regardless of network state.
+    }
+    setAccessToken(null)
+    onClose()
+    router.replace('/admin/login')
+  }
 
   return (
     <aside
@@ -96,21 +130,44 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
         </nav>
       </div>
 
-      <Link
-        href="/"
-        className="absolute bottom-6 left-6 flex items-center gap-3 text-sm font-semibold text-[#766e64] transition-colors hover:text-[#282622]"
-      >
-        <LogOut size={18} />
-        Back to website
-      </Link>
+      <div className="absolute bottom-6 left-6 grid gap-2">
+        <button
+          onClick={handleSignOut}
+          className="flex items-center gap-3 text-sm font-semibold text-[#766e64] transition-colors hover:text-[#282622]"
+        >
+          <LogOut size={18} />
+          Sign out
+        </button>
+        <Link
+          href="/"
+          className="flex items-center gap-3 text-sm font-semibold text-[#766e64] transition-colors hover:text-[#282622]"
+        >
+          <Home size={18} />
+          Back to website
+        </Link>
+      </div>
     </aside>
   )
 }
 
 function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
   const activeLabel = getActiveLabel(pathname)
   const { refresh, loading } = useAdminData()
+
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+      })
+    } catch {
+      // Clear the local session regardless of network state.
+    }
+    setAccessToken(null)
+    router.replace('/admin/login')
+  }
 
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-[#e7e0d5] bg-[#fffdf9] px-4 sm:h-20 sm:px-8">
@@ -136,6 +193,14 @@ function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
           className="flex h-9 w-9 items-center justify-center rounded-xl text-[#766e64] transition-colors hover:bg-[#f0ebe3] hover:text-[#282622] disabled:cursor-not-allowed"
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+        </button>
+        <button
+          onClick={handleSignOut}
+          aria-label="Sign out"
+          title="Sign out"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-[#766e64] transition-colors hover:bg-[#f0ebe3] hover:text-[#282622]"
+        >
+          <LogOut size={16} />
         </button>
         <Link
           href="/"

@@ -10,6 +10,7 @@ import {
 } from 'react'
 import type { ReactNode } from 'react'
 import { toast } from 'react-toastify'
+import { apiFetch, redirectToLogin } from '@/lib/apiClient'
 import type {
   Booking,
   BookingStatus,
@@ -100,12 +101,34 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (refreshingRef.current) return
     refreshingRef.current = true
     try {
-      const [bookingRes, carRes, reviewRes, pricingRes] = await Promise.all([
-        fetch('/api/bookings'),
-        fetch('/api/cars?admin=1'),
-        fetch('/api/reviews?admin=1'),
-        fetch('/api/pricing'),
+      if (
+        typeof window !== 'undefined' &&
+        window.location.pathname.startsWith('/admin/login')
+      ) {
+        return
+      }
+      const responses = await Promise.all([
+        apiFetch('/api/bookings'),
+        apiFetch('/api/cars?admin=1'),
+        apiFetch('/api/reviews?admin=1'),
+        apiFetch('/api/pricing'),
       ])
+      const [bookingRes, carRes, reviewRes, pricingRes] = responses
+
+      if (responses.some((response) => response.status === 401)) {
+        if (
+          typeof window !== 'undefined' &&
+          !window.location.pathname.startsWith('/admin/login')
+        ) {
+          redirectToLogin()
+        }
+        return
+      }
+
+      if (!responses.every((response) => response.ok)) {
+        // Keep existing data on failure so routes never appear to hang.
+        return
+      }
 
       const [bookingData, carData, reviewData, pricingData] = await Promise.all([
         bookingRes.json(),
@@ -114,16 +137,18 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         pricingRes.json(),
       ])
 
-      setBookings(bookingData)
-      setCars(carData)
-      setReviews(reviewData)
+      if (Array.isArray(bookingData)) setBookings(bookingData)
+      if (Array.isArray(carData)) setCars(carData)
+      if (Array.isArray(reviewData)) setReviews(reviewData)
 
       const currentPricing = pricingData as Pricing
-      setPricing(currentPricing)
+      if (currentPricing && typeof currentPricing === 'object') {
+        setPricing(currentPricing)
 
-      if (!pricingFormInitialized.current) {
-        setPricingForm(currentPricing)
-        pricingFormInitialized.current = true
+        if (!pricingFormInitialized.current) {
+          setPricingForm(currentPricing)
+          pricingFormInitialized.current = true
+        }
       }
     } catch {
       // Keep existing data on failure so routes never appear to hang.
@@ -164,7 +189,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
 
   const saveCar = async (): Promise<boolean> => {
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         editingCar ? `/api/cars/${editingCar.id}` : '/api/cars',
         {
           method: editingCar ? 'PUT' : 'POST',
@@ -191,12 +216,12 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   }
 
   const deleteCar = async (id: number) => {
-    await fetch(`/api/cars/${id}`, { method: 'DELETE' })
+    await apiFetch(`/api/cars/${id}`, { method: 'DELETE' })
     refresh()
   }
 
   const toggleCar = async (car: FleetCar) => {
-    await fetch(`/api/cars/${car.id}`, {
+    await apiFetch(`/api/cars/${car.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...car, published: !car.published }),
@@ -216,7 +241,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
 
   const saveReview = async () => {
     if (!editingReview) return
-    await fetch(`/api/reviews/${editingReview.id}`, {
+    await apiFetch(`/api/reviews/${editingReview.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reviewForm),
@@ -226,12 +251,12 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   }
 
   const deleteReview = async (id: number) => {
-    await fetch(`/api/reviews/${id}`, { method: 'DELETE' })
+    await apiFetch(`/api/reviews/${id}`, { method: 'DELETE' })
     refresh()
   }
 
   const toggleReview = async (review: Review) => {
-    await fetch(`/api/reviews/${review.id}`, {
+    await apiFetch(`/api/reviews/${review.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...review, hidden: !review.hidden }),
@@ -250,7 +275,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     )
 
     try {
-      const response = await fetch('/api/pricing', {
+      const response = await apiFetch('/api/pricing', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...pricingForm, carTypes }),
@@ -275,7 +300,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       )
     )
     try {
-      const response = await fetch(`/api/bookings/${id}`, {
+      const response = await apiFetch(`/api/bookings/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -291,7 +316,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       current.filter((booking) => booking.id !== id)
     )
     try {
-      const response = await fetch(`/api/bookings/${id}`, { method: 'DELETE' })
+      const response = await apiFetch(`/api/bookings/${id}`, { method: 'DELETE' })
       if (!response.ok) refresh()
     } catch {
       refresh()
