@@ -9,16 +9,17 @@ async function readJson<T>(fileName: string): Promise<T> {
   return JSON.parse(await fs.readFile(path.join(dataDir, fileName), 'utf8')) as T
 }
 
-function locationParts(value: unknown): { name: string; latitude: number | null; longitude: number | null } {
+function locationParts(value: unknown): { name: string; address: string | null; latitude: number | null; longitude: number | null } {
   if (typeof value === 'object' && value !== null && 'name' in value) {
-    const location = value as { name?: unknown; latitude?: unknown; longitude?: unknown }
+    const location = value as { name?: unknown; formattedAddress?: unknown; latitude?: unknown; longitude?: unknown }
     return {
       name: String(location.name ?? ''),
+      address: location.formattedAddress ? String(location.formattedAddress) : null,
       latitude: Number.isFinite(Number(location.latitude)) ? Number(location.latitude) : null,
       longitude: Number.isFinite(Number(location.longitude)) ? Number(location.longitude) : null,
     }
   }
-  return { name: String(value ?? ''), latitude: null, longitude: null }
+  return { name: String(value ?? ''), address: null, latitude: null, longitude: null }
 }
 
 function bookingCategory(value: unknown, tripType: unknown, hasDropoff: boolean): BookingCategory {
@@ -126,9 +127,11 @@ async function migrateBookings() {
       carType: booking.carType ? String(booking.carType) : null,
       mobileNumber: String(booking.mobileNumber ?? ''),
       pickupName: pickup.name,
+      pickupAddress: pickup.address,
       pickupLat: pickup.latitude,
       pickupLng: pickup.longitude,
       dropoffName: dropoff.name || null,
+      dropoffAddress: dropoff.address,
       dropoffLat: dropoff.latitude,
       dropoffLng: dropoff.longitude,
       pickupDate: String(booking.pickupDate ?? ''),
