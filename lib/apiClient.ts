@@ -50,7 +50,7 @@ export async function apiFetch(
 
   const response = await run()
 
-  if (response.status === 401 && accessToken) {
+  if (response.status === 401) {
     refreshing = refreshing ?? attemptRefresh().finally(() => (refreshing = null))
     const refreshed = await refreshing
     if (refreshed) {

@@ -10,6 +10,28 @@ function locationToString(loc: string | BookingLocation | undefined): string {
   return loc || 'Not provided'
 }
 
+function estimatedDistanceKm(booking: Booking): number | undefined {
+  const storedDistance = booking.distanceKm ?? booking.distance
+  if (storedDistance !== undefined) return storedDistance
+
+  if (typeof booking.pickupLocation !== 'object' || typeof booking.dropoffLocation !== 'object') {
+    return undefined
+  }
+
+  const toRadians = (value: number) => (value * Math.PI) / 180
+  const latitudeDelta = toRadians(booking.dropoffLocation.latitude - booking.pickupLocation.latitude)
+  const longitudeDelta = toRadians(booking.dropoffLocation.longitude - booking.pickupLocation.longitude)
+  const latitude = toRadians((booking.pickupLocation.latitude + booking.dropoffLocation.latitude) / 2)
+  const straightLineKm = 2 * 6371 * Math.asin(
+    Math.sqrt(
+      Math.sin(latitudeDelta / 2) ** 2 +
+        Math.cos(latitude) * Math.cos(latitude) * Math.sin(longitudeDelta / 2) ** 2,
+    ),
+  )
+
+  return Math.round(straightLineKm * 1.2 * 10) / 10
+}
+
 const createColumns = (
   onStatusChange?: (id: string, status: BookingStatus) => void,
   onDelete?: (id: string) => void
@@ -102,20 +124,24 @@ const createColumns = (
   {
     key: 'estimate',
     label: 'Estimate',
-    render: (booking) => (
-      <>
-        <span className="font-bold text-[#a36d16]">
-          {booking.estimatedFare !== undefined
-            ? `৳${booking.estimatedFare.toFixed(2)}`
-            : 'N/A'}
-        </span>
-        {booking.distance !== undefined && (
-          <span className="block text-xs font-normal text-[#8c8378]">
-            {booking.distance} km
+    render: (booking) => {
+      const estimatedKm = estimatedDistanceKm(booking)
+
+      return (
+        <>
+          <span className="font-bold text-[#a36d16]">
+            {booking.estimatedFare !== undefined
+              ? `৳${booking.estimatedFare.toFixed(2)}`
+              : ''}
           </span>
-        )}
-      </>
-    ),
+          {estimatedKm !== undefined && (
+            <span className="block text-xs font-normal text-[#8c8378]">
+              {estimatedKm} km
+            </span>
+          )}
+        </>
+      )
+    },
   },
   {
     key: 'status',

@@ -13,6 +13,7 @@ interface PickupDropoffProps {
   pickupError: string | undefined
   dropoffError: string | undefined
   isAirport: boolean
+  onDistanceChange?: (distanceMeters: number | null) => void
 }
 
 export function PickupDropoff({
@@ -23,6 +24,7 @@ export function PickupDropoff({
   pickupError,
   dropoffError,
   isAirport,
+  onDistanceChange,
 }: PickupDropoffProps) {
   const [openPickup, setOpenPickup] = useState(false)
   const [openDropoff, setOpenDropoff] = useState(false)
@@ -46,6 +48,7 @@ export function PickupDropoff({
   useEffect(() => {
     routeRequestRef.current?.abort()
     setRouteDistance(null)
+    onDistanceChange?.(null)
     setRouteError(false)
 
     if (!pickupLocation || !dropoffLocation) {
@@ -69,6 +72,7 @@ export function PickupDropoff({
         const route = data.routes[0]
         if (!route) throw new Error('No driving route found')
         setRouteDistance(route.distance)
+        onDistanceChange?.(route.distance)
         setIsRouteLoading(false)
       })
       .catch(() => {
@@ -78,7 +82,7 @@ export function PickupDropoff({
       })
 
     return () => controller.abort()
-  }, [dropoffLocation, pickupLocation])
+  }, [dropoffLocation, onDistanceChange, pickupLocation])
 
   return (
     <div ref={containerRef} className="space-y-4">

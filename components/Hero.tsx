@@ -138,6 +138,7 @@ export function Hero() {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
   const [pickupLocation, setPickupLocation] = useState<LocationResult | null>(null)
   const [dropoffLocation, setDropoffLocation] = useState<LocationResult | null>(null)
+  const [routeDistanceMeters, setRouteDistanceMeters] = useState<number | null>(null)
   const [cars, setCars] = useState<Car[]>([])
   const [openPicker, setOpenPicker] = useState<PickerId>(null)
   const heroCardRef = useRef<HTMLDivElement>(null)
@@ -239,6 +240,7 @@ export function Hero() {
           pickupDate: values.pickupDate,
           dropoffDate: isRoundTrip ? values.returnDate : '',
           tripType: isIntercity ? tripType : 'One Way',
+          distanceKm: routeDistanceMeters === null ? undefined : routeDistanceMeters / 1000,
         }),
       })
 
@@ -290,6 +292,7 @@ export function Hero() {
                   pickupError={errors.root?.message}
                   dropoffError={errors.root?.message}
                   isAirport={isAirport}
+                  onDistanceChange={setRouteDistanceMeters}
                 />
               </div>
 

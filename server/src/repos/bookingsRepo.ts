@@ -32,6 +32,18 @@ export function normalizeBookingCategory(
   return 'city'
 }
 
+function normalizeStoredLocation(raw: unknown): string | BookingLocation {
+  if (typeof raw === 'object' && raw !== null && 'name' in raw && 'latitude' in raw && 'longitude' in raw) {
+    const location = raw as Partial<BookingLocation>
+    return {
+      name: String(location.name ?? ''),
+      latitude: Number(location.latitude),
+      longitude: Number(location.longitude),
+    }
+  }
+  return String(raw ?? '')
+}
+
 export function normalizeBooking(raw: Partial<Booking>): Booking {
   return {
     id: String(raw.id ?? ''),
@@ -45,14 +57,8 @@ export function normalizeBooking(raw: Partial<Booking>): Booking {
     customerName: raw.customerName ? String(raw.customerName) : undefined,
     carType: raw.carType ? String(raw.carType) : undefined,
     mobileNumber: String(raw.mobileNumber ?? ''),
-    pickupLocation:
-      typeof raw.pickupLocation === 'object' && raw.pickupLocation !== null
-        ? String((raw.pickupLocation as BookingLocation).name)
-        : String(raw.pickupLocation ?? ''),
-    dropoffLocation:
-      typeof raw.dropoffLocation === 'object' && raw.dropoffLocation !== null
-        ? String((raw.dropoffLocation as BookingLocation).name)
-        : String(raw.dropoffLocation ?? ''),
+    pickupLocation: normalizeStoredLocation(raw.pickupLocation),
+    dropoffLocation: normalizeStoredLocation(raw.dropoffLocation),
     pickupDate: String(raw.pickupDate ?? ''),
     dropoffDate: raw.dropoffDate ? String(raw.dropoffDate) : undefined,
     tripType: String(raw.tripType ?? 'One Way'),
@@ -71,7 +77,7 @@ export function normalizeBooking(raw: Partial<Booking>): Booking {
 export const jsonBookingsRepo: BookingsRepo = {
   async list() {
     const bookings = await readJson<Partial<Booking>[]>('bookings.json', [])
-    return bookings.map(normalizeBooking)
+    return bookings.map(normalizeBooking).reverse()
   },
 
   async create(booking) {
