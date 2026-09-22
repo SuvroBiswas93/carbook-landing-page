@@ -1,76 +1,65 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
-import {
-  DEFAULT_BASE_FARE,
-  DEFAULT_FARE_PER_KM,
-} from '@/lib/pricing'
-import type { CarTypePricing, Pricing } from '@/lib/store'
-import { Dropdown } from './Dropdown'
+import type { Car } from '@/lib/store'
 
-interface PricingFormProps {
-  form: Pricing
-  setForm: (form: Pricing) => void
-  categories: string[]
-  onSave: () => void | Promise<void>
+export interface CarPricingUpdate {
+  id: number
+  pricePerDay: number
+  pricePerKm: number
 }
 
-export function PricingForm({
-  form,
-  setForm,
-  categories,
-  onSave,
-}: PricingFormProps) {
+interface PricingFormProps {
+  cars: Car[]
+  onSave: (updates: CarPricingUpdate[]) => Promise<boolean>
+}
+
+export function PricingForm({ cars, onSave }: PricingFormProps) {
+  const [edits, setEdits] = useState<Record<number, { pricePerDay: number; pricePerKm: number }>>({})
   const [saving, setSaving] = useState(false)
+
+  const getEdits = (car: Car) => ({
+    pricePerDay: edits[car.id]?.pricePerDay ?? car.pricePerDay,
+    pricePerKm: edits[car.id]?.pricePerKm ?? car.pricePerKm,
+  })
+
+  const setValue = (
+    id: number,
+    key: 'pricePerDay' | 'pricePerKm',
+    value: number
+  ) => {
+    setEdits((current) => ({
+      ...current,
+      [id]: { ...current[id], [key]: value },
+    }))
+  }
 
   const handleSave = async () => {
     if (saving) return
     setSaving(true)
     try {
-      await onSave()
+      const updates: CarPricingUpdate[] = cars.map((car) => {
+        const current = getEdits(car)
+        return {
+          id: car.id,
+          pricePerDay: current.pricePerDay,
+          pricePerKm: current.pricePerKm,
+        }
+      })
+      await onSave(updates)
     } finally {
       setSaving(false)
     }
   }
 
-  const carTypes = form.carTypes
-  const usedTypes = carTypes.map((item) => item.carType).filter(Boolean)
-  const availableTypes = categories.filter((type) => !usedTypes.includes(type))
-  const hasPendingEntry = carTypes.some((item) => !item.carType)
-
-  const updateEntry = (
-    index: number,
-    patch: Partial<Pick<CarTypePricing, 'carType' | 'baseFare' | 'farePerKm'>>
-  ) => {
-    setForm({
-      ...form,
-      carTypes: carTypes.map((item, i) =>
-        i === index ? { ...item, ...patch } : item
-      ),
-    })
-  }
-
-  const removeEntry = (index: number) => {
-    setForm({
-      ...form,
-      carTypes: carTypes.filter((_, i) => i !== index),
-    })
-  }
-
-  const addEntry = () => {
-    if (availableTypes.length === 0 || hasPendingEntry) return
-    setForm({
-      ...form,
-      carTypes: [
-        ...carTypes,
-        {
-          carType: '',
-          baseFare: DEFAULT_BASE_FARE,
-          farePerKm: DEFAULT_FARE_PER_KM,
-        },
-      ],
-    })
+  if (cars.length === 0) {
+    return (
+      <div className="max-w-3xl rounded-2xl border border-[#e7e0d5] bg-[#fffdf9] p-5">
+        <p className="text-sm text-[#766e64]">
+          No cars yet. Add cars in the Fleet section first.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -79,51 +68,35 @@ export function PricingForm({
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-[#e7e0d5] bg-[#f5f1ea]">
-              <th className="px-4 py-3 font-bold">Car type</th>
+              <th className="px-4 py-3 font-bold">Car</th>
               <th className="px-4 py-3 font-bold">Base fare</th>
               <th className="px-4 py-3 font-bold">Per kilometer</th>
-              <th className="px-4 py-3 text-right font-bold">Action</th>
             </tr>
           </thead>
           <tbody>
-            {carTypes.map((entry, index) => {
-              const options = categories
-                .filter(
-                  (type) =>
-                    !carTypes.some(
-                      (item, i) => i !== index && item.carType === type
-                    )
-                )
-                .map((type) => ({ value: type, label: type }))
-
+            {cars.map((car, index) => {
+              const current = getEdits(car)
               return (
                 <tr
-                  key={index}
+                  key={car.id}
                   className={index % 2 ? 'bg-[#faf7f2]' : 'bg-white'}
                 >
                   <td className="px-4 py-3">
-                    {entry.carType ? (
-                      <span className="font-semibold capitalize">
-                        {entry.carType}
-                      </span>
-                    ) : options.length > 0 ? (
-                      <Dropdown
-                        value=""
-                        options={options}
-                        onChange={(value) =>
-                          updateEntry(index, { carType: value })
-                        }
-                        ariaLabel="Select car type"
-                        placeholder="Select car type"
-                        triggerClassName="h-9 min-w-36 bg-white text-sm text-[#766e64] ring-[#e7e0d5] hover:ring-[#c9bda9]"
-                        menuClassName="capitalize"
-                        menuWidth={192}
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={car.image}
+                        alt={`${car.brand} ${car.model}`}
+                        className="h-12 w-16 rounded-lg border border-[#e7e0d5] object-cover"
                       />
-                    ) : (
-                      <span className="text-sm text-[#766e64]">
-                        No car types left
-                      </span>
-                    )}
+                      <div className="min-w-0">
+                        <p className="font-semibold text-[#292724]">
+                          {car.brand} {car.model}
+                        </p>
+                        <p className="text-xs capitalize text-[#8c8378]">
+                          {car.category}
+                        </p>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -132,11 +105,9 @@ export function PricingForm({
                         type="number"
                         min="0"
                         step="0.01"
-                        value={entry.baseFare}
+                        value={current.pricePerDay}
                         onChange={(e) =>
-                          updateEntry(index, {
-                            baseFare: Number(e.target.value),
-                          })
+                          setValue(car.id, 'pricePerDay', Number(e.target.value))
                         }
                         className="w-28 rounded-lg border border-[#e7e0d5] bg-white px-3 py-2"
                       />
@@ -149,29 +120,14 @@ export function PricingForm({
                         type="number"
                         min="0"
                         step="0.01"
-                        value={entry.farePerKm}
+                        value={current.pricePerKm}
                         onChange={(e) =>
-                          updateEntry(index, {
-                            farePerKm: Number(e.target.value),
-                          })
+                          setValue(car.id, 'pricePerKm', Number(e.target.value))
                         }
                         className="w-28 rounded-lg border border-[#e7e0d5] bg-white px-3 py-2"
                       />
                       <span className="text-sm text-[#766e64]">/km</span>
                     </div>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => removeEntry(index)}
-                      aria-label={`Delete ${
-                        entry.carType || 'car type'
-                      } pricing`}
-                      title="Delete"
-                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-[#f0d9d9] bg-white text-[#c0392b] transition-colors hover:bg-[#fdeceb]"
-                    >
-                      <Trash2 size={16} />
-                    </button>
                   </td>
                 </tr>
               )
@@ -180,39 +136,9 @@ export function PricingForm({
         </table>
       </div>
 
-      {carTypes.length === 0 && (
-        <p className="mt-4 text-sm text-[#766e64]">
-          No car types yet. Add one below.
-        </p>
-      )}
-
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={addEntry}
-          disabled={availableTypes.length === 0 || hasPendingEntry}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#e7e0d5] bg-white px-4 py-2.5 text-sm font-bold text-[#292724] transition-colors hover:bg-[#f5f1ea] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus size={16} />
-          Add car type
-        </button>
-        {categories.length === 0 && (
-          <span className="text-sm text-[#766e64]">
-            Add car categories in the Fleet section first.
-          </span>
-        )}
-        {categories.length > 0 && availableTypes.length === 0 && (
-          <span className="text-sm text-[#766e64]">
-            Every fleet car type is already priced.
-          </span>
-        )}
-      </div>
-
       <p className="mt-4 text-sm text-[#766e64]">
-        Car types come from the Fleet section. Pick one only while adding a new
-        entry, set its base fare and per-kilometer rate, and remove any entry
-        you no longer need. Changes apply to the website fare calculator after
-        saving.
+        Edit the base fare and per-kilometer rate for each car. Changes apply to
+        the website fare calculator and booking flow after saving.
       </p>
       <button
         onClick={handleSave}

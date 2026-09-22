@@ -15,8 +15,6 @@ import type {
   Booking,
   BookingStatus,
   Car as FleetCar,
-  CarTypePricing,
-  Pricing,
   Review,
 } from '@/lib/store'
 
@@ -43,15 +41,12 @@ const emptyReview: Omit<Review, 'id' | 'createdAt'> = {
   hidden: false,
 }
 
-const defaultPricing: Pricing = { currency: 'BDT', carTypes: [] }
-
 const POLL_INTERVAL = 15000
 
 export interface AdminData {
   bookings: Booking[]
   cars: FleetCar[]
   reviews: Review[]
-  pricing: Pricing
   editingCar: FleetCar | null
   carForm: Omit<FleetCar, 'id'>
   setCarForm: React.Dispatch<React.SetStateAction<Omit<FleetCar, 'id'>>>
@@ -68,9 +63,9 @@ export interface AdminData {
   saveReview: () => Promise<void>
   deleteReview: (id: number) => Promise<void>
   toggleReview: (review: Review) => Promise<void>
-  pricingForm: Pricing
-  setPricingForm: React.Dispatch<React.SetStateAction<Pricing>>
-  savePricing: () => Promise<void>
+  saveCarPricing: (
+    updates: Array<{ id: number; pricePerDay: number; pricePerKm: number }>
+  ) => Promise<boolean>
   updateBookingStatus: (id: string, status: BookingStatus) => Promise<void>
   deleteBooking: (id: string) => Promise<void>
   refresh: () => Promise<void>
@@ -83,7 +78,6 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [cars, setCars] = useState<FleetCar[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
-  const [pricing, setPricing] = useState<Pricing>(defaultPricing)
   const [loading, setLoading] = useState(true)
 
   const [editingCar, setEditingCar] = useState<FleetCar | null>(null)
@@ -92,9 +86,6 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [editingReview, setEditingReview] = useState<Review | null>(null)
   const [reviewForm, setReviewForm] = useState(emptyReview)
 
-  const [pricingForm, setPricingForm] = useState<Pricing>(defaultPricing)
-
-  const pricingFormInitialized = useRef(false)
   const refreshingRef = useRef(false)
 
   const refresh = useCallback(async () => {
@@ -111,9 +102,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         apiFetch('/api/bookings'),
         apiFetch('/api/cars?admin=1'),
         apiFetch('/api/reviews?admin=1'),
-        apiFetch('/api/pricing'),
       ])
-      const [bookingRes, carRes, reviewRes, pricingRes] = responses
+      const [bookingRes, carRes, reviewRes] = responses
 
       if (responses.some((response) => response.status === 401)) {
         if (
@@ -130,26 +120,15 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      const [bookingData, carData, reviewData, pricingData] = await Promise.all([
+      const [bookingData, carData, reviewData] = await Promise.all([
         bookingRes.json(),
         carRes.json(),
         reviewRes.json(),
-        pricingRes.json(),
       ])
 
       if (Array.isArray(bookingData)) setBookings(bookingData)
       if (Array.isArray(carData)) setCars(carData)
       if (Array.isArray(reviewData)) setReviews(reviewData)
-
-      const currentPricing = pricingData as Pricing
-      if (currentPricing && typeof currentPricing === 'object') {
-        setPricing(currentPricing)
-
-        if (!pricingFormInitialized.current) {
-          setPricingForm(currentPricing)
-          pricingFormInitialized.current = true
-        }
-      }
     } catch {
       // Keep existing data on failure so routes never appear to hang.
     } finally {
@@ -264,32 +243,30 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     refresh()
   }
 
-  const savePricing = async () => {
-    const carTypes: CarTypePricing[] = Array.from(
-      new Map(
-        pricingForm.carTypes
-          .map((item) => ({ ...item, carType: item.carType.trim() }))
-          .filter((item) => item.carType)
-          .map((item) => [item.carType, item] as const)
-      ).values()
-    )
-
+  const saveCarPricing = async (
+    updates: Array<{ id: number; pricePerDay: number; pricePerKm: number }>
+  ): Promise<boolean> => {
     try {
-      const response = await apiFetch('/api/pricing', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...pricingForm, carTypes }),
-      })
-      if (!response.ok) {
-        toast.error('Pricing could not be saved. Please try again.')
-        return
+      for (const update of updates) {
+        const response = await apiFetch(`/api/cars/${update.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pricePerDay: update.pricePerDay,
+            pricePerKm: update.pricePerKm,
+          }),
+        })
+        if (!response.ok) {
+          toast.error(`Pricing for car #${update.id} could not be saved.`)
+          return false
+        }
       }
-      const savedPricing = (await response.json()) as Pricing
-      setPricing(savedPricing)
-      setPricingForm(savedPricing)
       toast.success('Pricing saved successfully.')
+      await refresh()
+      return true
     } catch {
       toast.error('Network error. Pricing was not saved.')
+      return false
     }
   }
 
@@ -327,7 +304,6 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     bookings,
     cars,
     reviews,
-    pricing,
     editingCar,
     carForm,
     setCarForm,
@@ -344,9 +320,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     saveReview,
     deleteReview,
     toggleReview,
-    pricingForm,
-    setPricingForm,
-    savePricing,
+    saveCarPricing,
     updateBookingStatus,
     deleteBooking,
     refresh,
