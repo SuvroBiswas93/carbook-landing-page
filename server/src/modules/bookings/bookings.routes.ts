@@ -3,7 +3,9 @@ import type { Repos } from '../../repos'
 import { asyncHandler } from '../../lib/asyncHandler'
 import { requireAuth } from '../../middlewares/auth'
 import { adminLimiter, adminWriteLimiter, publicBookingLimiter } from '../../middlewares/rateLimiter'
+import { validate } from '../../middlewares/validate'
 import { createBookingsService } from './bookings.service'
+import { createBookingSchema } from './bookings.validation'
 
 export function createBookingsRouter(repos: Repos): Router {
   const service = createBookingsService(repos)
@@ -21,6 +23,7 @@ export function createBookingsRouter(repos: Repos): Router {
   router.post(
     '/',
     publicBookingLimiter,
+    validate(createBookingSchema),
     asyncHandler(async (req, res) => {
       res.status(201).json(await service.create(req.body))
     })

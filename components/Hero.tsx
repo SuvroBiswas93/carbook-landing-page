@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, LoaderCircle } from 'lucide-react'
 import { toast } from 'react-toastify'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import type { Car } from '@/lib/store'
 import type { LocationResult } from '@/lib/location/types'
 import { PickupDropoff } from '@/components/car-rental/PickupDropoff'
@@ -14,7 +17,6 @@ type TripType = 'One Way' | 'Round Trip'
 type PickerId = 'car' | 'pickupDate' | 'returnDate' | null
 
 const heroHeadline = 'চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে'
-const carTypes = ['Sedan', 'Noah-Hiace', 'Premio', 'Microbus', 'SUV']
 const mobilePattern = /^01[3-9]\d{8}$/
 const banglaMonths = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর']
 const banglaWeekdays = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহস্পতি', 'শুক্র', 'শনি']
@@ -42,15 +44,15 @@ const toDateTimeValue = (date: Date, hour: number, minute: number, period: 'AM' 
   return new Date(next.getTime() - offset).toISOString().slice(0, 16)
 }
 
-interface FormErrors {
-  carType?: string
-  pickupLocation?: string
-  dropoffLocation?: string
-  pickupDate?: string
-  returnDate?: string
-  customerName?: string
-  mobileNumber?: string
-}
+const bookingFormSchema = z.object({
+  carName: z.string().min(1, 'গাড়ির ধরন নির্বাচন করুন'),
+  pickupDate: z.string().min(1, 'তারিখ ও সময় নির্বাচন করুন'),
+  returnDate: z.string(),
+  customerName: z.string().trim().min(1, 'আপনার নাম লিখুন'),
+  mobileNumber: z.string().regex(mobilePattern, 'সঠিক ১১ সংখ্যার বাংলাদেশি নম্বর দিন'),
+})
+
+type BookingFormValues = z.infer<typeof bookingFormSchema>
 
 const getMinimumDateTime = () => {
   const now = new Date()
@@ -71,11 +73,11 @@ function CarPicker({ value, cars, onChange, error, open, onOpenChange }: { value
       {open && (
         <div className="absolute inset-x-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-[#eae5dd] bg-white p-2 shadow-[0_18px_35px_rgba(50,44,35,.18)]">
           {availableCars.length > 0 ? availableCars.map((car) => (
-            <button key={car.id} type="button" onClick={() => { onChange(car.category); onOpenChange(false) }} className="flex w-full cursor-pointer items-center gap-3 rounded-xl p-2 text-left transition hover:bg-amber-50">
+            <button key={car.id} type="button" onClick={() => { onChange(`${car.brand} ${car.model}`); onOpenChange(false) }} className="flex w-full cursor-pointer items-center gap-3 rounded-xl p-2 text-left transition hover:bg-amber-50">
               <img src={car.image} alt={`${car.brand} ${car.model}`} className="size-14 rounded-lg bg-stone-100 object-cover" />
               <span className="min-w-0"><span className="block truncate font-bold text-stone-800">{car.brand} {car.model}</span><span className="block text-xs font-normal text-stone-500">{car.category} · {banglaDigits(car.seats)} সিট · {car.hasAc ? 'এসি' : 'নন-এসি'}</span></span>
             </button>
-          )) : carTypes.map((type) => <button key={type} type="button" onClick={() => { onChange(type); onOpenChange(false) }} className="block w-full cursor-pointer rounded-xl px-3 py-3 text-left font-bold text-stone-800 hover:bg-amber-50">{type}</button>)}
+          )) : <span className="block px-3 py-3 text-sm font-normal text-stone-500">গাড়ির তালিকা পাওয়া যায়নি</span>}
         </div>
       )}
       {error && <span className="mt-1 block text-xs font-medium text-red-600">{error}</span>}
@@ -133,19 +135,26 @@ export function Hero() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<BookingTab>('city')
   const [tripType, setTripType] = useState<TripType>('One Way')
-  const [carType, setCarType] = useState('')
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
   const [pickupLocation, setPickupLocation] = useState<LocationResult | null>(null)
   const [dropoffLocation, setDropoffLocation] = useState<LocationResult | null>(null)
-  const [pickupDate, setPickupDate] = useState('')
-  const [returnDate, setReturnDate] = useState('')
-  const [customerName, setCustomerName] = useState('')
-  const [mobileNumber, setMobileNumber] = useState('')
   const [cars, setCars] = useState<Car[]>([])
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [openPicker, setOpenPicker] = useState<PickerId>(null)
   const heroCardRef = useRef<HTMLDivElement>(null)
+  const {
+    register,
+    handleSubmit: submitForm,
+    setValue,
+    setError,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<BookingFormValues>({
+    defaultValues: { carName: '', pickupDate: '', returnDate: '', customerName: '', mobileNumber: '' },
+    resolver: zodResolver(bookingFormSchema),
+  })
+  const carName = watch('carName')
+  const pickupDate = watch('pickupDate')
+  const returnDate = watch('returnDate')
 
   useEffect(() => {
     fetch('/api/cars')
@@ -167,7 +176,7 @@ export function Hero() {
       const car = (event as CustomEvent<Car>).detail
       if (!car) return
       setSelectedCar(car)
-      setCarType(carTypes.find((type) => `${car.brand} ${car.model}`.toLowerCase().includes(type.toLowerCase())) ?? 'Sedan')
+      setValue('carName', `${car.brand} ${car.model}`, { shouldValidate: true })
     }
 
     window.addEventListener('car-booking:selected', handleCarBooking)
@@ -179,74 +188,34 @@ export function Hero() {
   const isAirport = activeTab === 'airport'
   const isRoundTrip = isIntercity && tripType === 'Round Trip'
 
-  const validate = (): FormErrors => {
-    const nextErrors: FormErrors = {}
-    if (!carType) nextErrors.carType = 'গাড়ির ধরন নির্বাচন করুন'
-    if (!pickupLocation || !pickupLocation.latitude || !pickupLocation.longitude) nextErrors.pickupLocation = 'পিকআপ লোকেশন দিন'
-    if (!dropoffLocation || !dropoffLocation.latitude || !dropoffLocation.longitude) nextErrors.dropoffLocation = 'ড্রপ-অফ লোকেশন দিন'
-    if (!pickupDate) nextErrors.pickupDate = 'তারিখ ও সময় নির্বাচন করুন'
-    if (isRoundTrip && (!returnDate || new Date(returnDate).getTime() < new Date(pickupDate).getTime())) {
-      nextErrors.returnDate = 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে'
+  const updateField = (field: keyof BookingFormValues, value: string) => {
+    const nextValue = field === 'mobileNumber' ? value.replace(/\D/g, '').slice(0, 11) : value
+    setValue(field, nextValue, { shouldDirty: true, shouldValidate: true })
+    if (field === 'carName') {
+      setSelectedCar(cars.find((car) => `${car.brand} ${car.model}` === value) ?? null)
     }
-    if (!customerName.trim()) nextErrors.customerName = 'আপনার নাম লিখুন'
-    if (!mobilePattern.test(mobileNumber)) nextErrors.mobileNumber = 'সঠিক ১১ সংখ্যার বাংলাদেশি নম্বর দিন'
-    return nextErrors
-  }
-
-  const updateField = <K extends keyof FormErrors>(field: K, value: string) => {
-    if (field === 'carType') {
-      setCarType(value)
-      const matchingCar = cars.find((car) => {
-        const label = `${car.brand} ${car.model}`.toLowerCase()
-        return label.includes(value.toLowerCase()) || car.category.toLowerCase() === value.toLowerCase()
-      })
-      setSelectedCar(matchingCar ?? cars[0] ?? null)
-    }
-    if (field === 'pickupDate') setPickupDate(value)
-    if (field === 'returnDate') setReturnDate(value)
-    if (field === 'customerName') setCustomerName(value)
-    if (field === 'mobileNumber') setMobileNumber(value.replace(/\D/g, '').slice(0, 11))
-
-    const nextErrors = { ...errors }
-    const fieldError =
-      field === 'carType' && !value
-        ? 'গাড়ির ধরন নির্বাচন করুন'
-        : field === 'pickupLocation' && !value
-          ? 'পিকআপ লোকেশন দিন'
-          : field === 'dropoffLocation' && !value
-            ? 'ড্রপ-অফ লোকেশন দিন'
-            : field === 'pickupDate' && (!value || new Date(value).getTime() < Date.now())
-              ? 'বর্তমান বা ভবিষ্টের তারিখ নির্বাচন করুন'
-                : field === 'returnDate' && isRoundTrip && (!value || new Date(value).getTime() < new Date(pickupDate).getTime())
-                  ? 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে'
-              : field === 'customerName' && !value.trim()
-                ? 'আপনার নাম লিখুন'
-                : field === 'mobileNumber' && !mobilePattern.test(value.replace(/\D/g, ''))
-                  ? 'সঠিক ১১ সংখ্যার বাংলাদেশি নম্বর দিন'
-                  : undefined
-
-    if (fieldError) nextErrors[field] = fieldError
-    else delete nextErrors[field]
-    setErrors(nextErrors)
   }
 
   const handleTabChange = (tab: BookingTab) => {
     setOpenPicker(null)
     setActiveTab(tab)
-    setErrors({})
     if (tab !== 'intercity') setTripType('One Way')
-    if (tab !== 'intercity') setReturnDate('')
+    if (tab !== 'intercity') updateField('returnDate', '')
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (isSubmitting) return
-
-    const nextErrors = validate()
-    setErrors(nextErrors)
-    if (Object.keys(nextErrors).length > 0) return
-
-    setIsSubmitting(true)
+  const handleSubmit = async (values: BookingFormValues) => {
+    if (!pickupLocation || !pickupLocation.latitude || !pickupLocation.longitude) {
+      setError('root', { message: 'পিকআপ লোকেশন দিন' })
+      return
+    }
+    if (!dropoffLocation || !dropoffLocation.latitude || !dropoffLocation.longitude) {
+      setError('root', { message: 'ড্রপ-অফ লোকেশন দিন' })
+      return
+    }
+    if (isRoundTrip && (!values.returnDate || new Date(values.returnDate).getTime() < new Date(values.pickupDate).getTime())) {
+      setError('returnDate', { message: 'ফেরার সময় পিকআপের সময়ের পরে হতে হবে' })
+      return
+    }
     try {
       const pickupBookingLocation: BookingLocation | string = pickupLocation
         ? { name: pickupLocation.name, latitude: pickupLocation.latitude, longitude: pickupLocation.longitude }
@@ -260,15 +229,15 @@ export function Hero() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           carId: selectedCar?.id ?? 0,
-          carName: selectedCar ? `${selectedCar.brand} ${selectedCar.model}` : carType,
-          carType,
+          carName: values.carName,
+          carType: selectedCar?.category ?? '',
           category: activeTab,
-          customerName: customerName.trim(),
-          mobileNumber,
+          customerName: values.customerName.trim(),
+          mobileNumber: values.mobileNumber,
           pickupLocation: pickupBookingLocation,
           dropoffLocation: dropoffBookingLocation,
-          pickupDate,
-          dropoffDate: isRoundTrip ? returnDate : '',
+          pickupDate: values.pickupDate,
+          dropoffDate: isRoundTrip ? values.returnDate : '',
           tripType: isIntercity ? tripType : 'One Way',
         }),
       })
@@ -282,12 +251,10 @@ export function Hero() {
       router.push('/thank-you')
     } catch {
       toast.error('ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন')
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
-  const inputClass = (field: keyof FormErrors) => `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100 ${errors[field] ? 'border-red-400 ring-2 ring-red-100' : 'border-[#eae5dd]'}`
+  const inputClass = (field: keyof BookingFormValues) => `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100 ${errors[field] ? 'border-red-400 ring-2 ring-red-100' : 'border-[#eae5dd]'}`
 
   return (
     <section id="hero" className="relative z-20 bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32">
@@ -310,9 +277,9 @@ export function Hero() {
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} noValidate className="relative z-10 p-4 sm:p-7 lg:p-8">
+          <form onSubmit={submitForm(handleSubmit)} noValidate className="relative z-10 p-4 sm:p-7 lg:p-8">
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              <CarPicker value={carType} cars={cars} onChange={(value) => updateField('carType', value)} error={errors.carType} open={openPicker === 'car'} onOpenChange={(open) => setOpenPicker(open ? 'car' : null)} />
+              <CarPicker value={carName} cars={cars} onChange={(value) => updateField('carName', value)} error={errors.carName?.message} open={openPicker === 'car'} onOpenChange={(open) => setOpenPicker(open ? 'car' : null)} />
 
               <div className="lg:col-span-2">
                 <PickupDropoff
@@ -320,28 +287,28 @@ export function Hero() {
                   setPickupLocation={setPickupLocation}
                   dropoffLocation={dropoffLocation}
                   setDropoffLocation={setDropoffLocation}
-                  pickupError={errors.pickupLocation}
-                  dropoffError={errors.dropoffLocation}
+                  pickupError={errors.root?.message}
+                  dropoffError={errors.root?.message}
                   isAirport={isAirport}
                 />
               </div>
 
-              <DateTimePicker label="তারিখ ও সময়" min={getMinimumDateTime()} value={pickupDate} onChange={(value) => updateField('pickupDate', value)} error={errors.pickupDate} open={openPicker === 'pickupDate'} onOpenChange={(open) => setOpenPicker(open ? 'pickupDate' : null)} />
+              <DateTimePicker label="তারিখ ও সময়" min={getMinimumDateTime()} value={pickupDate} onChange={(value) => updateField('pickupDate', value)} error={errors.pickupDate?.message} open={openPicker === 'pickupDate'} onOpenChange={(open) => setOpenPicker(open ? 'pickupDate' : null)} />
 
               {isRoundTrip && (
-                <DateTimePicker label="ফেরার তারিখ ও সময়" min={pickupDate || getMinimumDateTime()} value={returnDate} onChange={(value) => updateField('returnDate', value)} error={errors.returnDate} open={openPicker === 'returnDate'} onOpenChange={(open) => setOpenPicker(open ? 'returnDate' : null)} />
+                <DateTimePicker label="ফেরার তারিখ ও সময়" min={pickupDate || getMinimumDateTime()} value={returnDate} onChange={(value) => updateField('returnDate', value)} error={errors.returnDate?.message} open={openPicker === 'returnDate'} onOpenChange={(open) => setOpenPicker(open ? 'returnDate' : null)} />
               )}
 
               <label className="text-sm font-bold text-stone-800">
                 আপনার নাম <span className="text-red-500">*</span>
-                <input type="text" value={customerName} onChange={(event) => updateField('customerName', event.target.value)} placeholder="আপনার নাম লিখুন" className={inputClass('customerName')} />
-                {errors.customerName && <span className="mt-1 block text-xs font-medium text-red-600">{errors.customerName}</span>}
+                <input type="text" {...register('customerName')} placeholder="আপনার নাম লিখুন" className={inputClass('customerName')} />
+                {errors.customerName && <span className="mt-1 block text-xs font-medium text-red-600">{errors.customerName.message}</span>}
               </label>
 
               <label className="text-sm font-bold text-stone-800">
                 মোবাইল নম্বর <span className="text-red-500">*</span>
-                <input type="tel" inputMode="numeric" pattern="01[3-9][0-9]{8}" value={mobileNumber} onChange={(event) => updateField('mobileNumber', event.target.value)} placeholder="01XXXXXXXXX" className={inputClass('mobileNumber')} />
-                {errors.mobileNumber && <span className="mt-1 block text-xs font-medium text-red-600">{errors.mobileNumber}</span>}
+                <input type="tel" inputMode="numeric" pattern="01[3-9][0-9]{8}" {...register('mobileNumber', { setValueAs: (value: string) => value.replace(/\D/g, '').slice(0, 11) })} placeholder="01XXXXXXXXX" className={inputClass('mobileNumber')} />
+                {errors.mobileNumber && <span className="mt-1 block text-xs font-medium text-red-600">{errors.mobileNumber.message}</span>}
               </label>
             </div>
 
@@ -360,9 +327,9 @@ export function Hero() {
             )}
 
             <div className="mt-7 border-t border-[#eae5dd] pt-6">
-              <button type="submit" disabled={isSubmitting} className="flex min-h-13 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 text-base font-bold text-white shadow-lg shadow-amber-600/20 transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60 lg:mx-auto lg:w-72">
-                {isSubmitting ? <LoaderCircle className="animate-spin" size={21} /> : <CheckCircle2 size={21} />}
-                {isSubmitting ? 'পাঠানো হচ্ছে...' : 'বুকিং কনফার্ম করুন'}
+              <button type="submit" disabled={isSubmitting} aria-busy={isSubmitting} className="flex min-h-13 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 text-base font-bold text-white shadow-lg shadow-amber-600/20 transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60 lg:mx-auto lg:w-72">
+                {isSubmitting ? <LoaderCircle aria-hidden="true" className="animate-spin" size={21} /> : <CheckCircle2 aria-hidden="true" size={21} />}
+                <span aria-live="polite">{isSubmitting ? 'পাঠানো হচ্ছে...' : 'বুকিং কনফার্ম করুন'}</span>
               </button>
               <p className="mx-auto mt-3 max-w-xs rounded-lg bg-brand-surface px-3 py-2 text-center text-[13px] font-semibold leading-5 text-brand-navy sm:max-w-none sm:bg-transparent sm:px-0 sm:py-0">
                 অগ্রিম পেমেন্ট লাগবে না -{' '}
