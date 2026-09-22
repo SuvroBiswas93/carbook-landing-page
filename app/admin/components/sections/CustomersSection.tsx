@@ -1,6 +1,6 @@
 'use client'
 
-import type { Review } from '@/lib/store'
+import type { Review } from '@/lib/types'
 import type { AdminData } from '../../useAdminData'
 import { PAGE_SIZE_OPTIONS, usePagination } from '../../usePagination'
 import { CustomerTable } from '../CustomerTable'

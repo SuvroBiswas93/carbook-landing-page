@@ -1,4 +1,4 @@
-import type { Review } from '@/lib/store'
+import type { Review } from '@/lib/types'
 
 interface ReviewFormProps {
   form: Omit<Review, 'id' | 'createdAt'>

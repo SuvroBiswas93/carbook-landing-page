@@ -1,7 +1,7 @@
 'use client'
 
 import { X } from 'lucide-react'
-import type { Review } from '@/lib/store'
+import type { Review } from '@/lib/types'
 import type { AdminData } from '../../useAdminData'
 import { PAGE_SIZE_OPTIONS, usePagination } from '../../usePagination'
 import { Module } from '../Module'

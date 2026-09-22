@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { Booking } from '@/lib/store'
+import type { Booking } from '@/lib/types'
 import { ChartCard } from './ChartCard'
 
 const BAR_RADIUS: [number, number, number, number] = [0, 3, 3, 0]

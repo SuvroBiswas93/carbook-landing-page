@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
-import type { Booking, BookingStatus, BookingLocation } from '@/lib/store'
+import type { Booking, BookingStatus, BookingLocation } from '@/lib/types'
 import { formatDateTime } from '@/lib/utils'
 import { ResponsiveTable } from './ResponsiveTable'
 import type { Column } from './ResponsiveTable'

@@ -1,6 +1,6 @@
 'use client'
 
-import type { Booking } from '@/lib/store'
+import type { Booking } from '@/lib/types'
 import type { AdminData } from '../../useAdminData'
 import { PAGE_SIZE_OPTIONS, usePagination } from '../../usePagination'
 import { BookingTable } from '../BookingTable'

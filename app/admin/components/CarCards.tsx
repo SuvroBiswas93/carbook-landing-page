@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react'
-import type { Car as FleetCar } from '@/lib/store'
+import type { Car as FleetCar } from '@/lib/types'
 
 interface CarCardsProps {
   cars: FleetCar[]

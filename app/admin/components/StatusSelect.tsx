@@ -1,6 +1,6 @@
 'use client'
 
-import type { BookingStatus } from '@/lib/store'
+import type { BookingStatus } from '@/lib/types'
 import { Dropdown } from './Dropdown'
 
 export const bookingStatuses: readonly BookingStatus[] = [

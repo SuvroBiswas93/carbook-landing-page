@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Pencil, Star, Trash2 } from 'lucide-react'
-import type { Review } from '@/lib/store'
+import type { Review } from '@/lib/types'
 
 interface ReviewListProps {
   reviews: Review[]

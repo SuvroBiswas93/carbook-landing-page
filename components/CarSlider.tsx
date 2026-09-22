@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Users, Fuel, Zap, Snowflake } from 'lucide-react'
 import { Modal } from './Modal'
-import type { Car } from '@/lib/store'
+import type { Car } from '@/lib/types'
 
 export function CarSlider() {
   const [currentIndex, setCurrentIndex] = useState(0)

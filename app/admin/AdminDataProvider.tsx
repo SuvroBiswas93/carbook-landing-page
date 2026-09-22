@@ -16,7 +16,7 @@ import type {
   BookingStatus,
   Car as FleetCar,
   Review,
-} from '@/lib/store'
+} from '@/lib/types'
 
 const emptyCar: Omit<FleetCar, 'id'> = {
   brand: '',

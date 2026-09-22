@@ -1,7 +1,7 @@
 'use client'
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
-import type { Booking, BookingStatus } from '@/lib/store'
+import type { Booking, BookingStatus } from '@/lib/types'
 import { ChartCard } from './ChartCard'
 
 const statusMeta: Record<BookingStatus, string> = {

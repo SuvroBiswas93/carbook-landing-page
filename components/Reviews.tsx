@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Edit3 } from 'lucide-react'
 import { toast } from 'react-toastify'
-import type { Review } from '@/lib/store'
+import type { Review } from '@/lib/types'
 import { Modal } from './Modal'
 
 export function Reviews() {

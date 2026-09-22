@@ -1,4 +1,4 @@
-import type { Review } from '@/lib/store'
+import type { Review } from '@/lib/types'
 import { ResponsiveTable } from './ResponsiveTable'
 import type { Column } from './ResponsiveTable'
 

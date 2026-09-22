@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { Car } from '@/lib/store'
+import type { Car } from '@/lib/types'
 
 export interface CarPricingUpdate {
   id: number

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { Car as FleetCar } from '@/lib/store'
+import type { Car as FleetCar } from '@/lib/types'
 import type { AdminData } from '../../useAdminData'
 import { PAGE_SIZE_OPTIONS, usePagination } from '../../usePagination'
 import { CarCards } from '../CarCards'

@@ -12,3 +12,9 @@ server/dist
 .next
 .kilo
 node_modules/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Stale npm lockfile (project uses pnpm)
+package-lock.json

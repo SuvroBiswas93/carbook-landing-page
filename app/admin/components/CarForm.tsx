@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { toast } from 'react-toastify'
-import type { Car as FleetCar } from '@/lib/store'
+import type { Car as FleetCar } from '@/lib/types'
 import { uploadCarImage } from '@/lib/uploadImage'
 
 interface CarFormProps {

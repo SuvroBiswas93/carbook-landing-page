@@ -21,19 +21,6 @@ export async function getRoute(
   return data
 }
 
-export function formatDuration(seconds: number): string {
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.round((seconds % 3600) / 60)
-
-  if (hours > 0 && minutes > 0) {
-    return `${hours} hr ${minutes} min`
-  }
-  if (hours > 0) {
-    return `${hours} hr`
-  }
-  return `${minutes} min`
-}
-
 export function formatDistance(meters: number): string {
   const km = meters / 1000
   if (km >= 1) {

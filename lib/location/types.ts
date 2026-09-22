@@ -64,10 +64,3 @@ export interface OSRMResponse {
     legs: OSRMLeg[]
   }>
 }
-
-export interface BookingLocation {
-  name: string
-  latitude: number
-  longitude: number
-  formattedAddress?: string
-}
