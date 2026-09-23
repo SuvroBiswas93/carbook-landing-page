@@ -1,6 +1,6 @@
 import express from 'express'
 import type { Express } from 'express'
-import { applySecurity, httpLogger } from './middlewares/security'
+import { applySecurity, enforceAllowedOrigin, httpLogger } from './middlewares/security'
 import { requestId } from './middlewares/requestId'
 import { globalLimiter, healthLimiter } from './middlewares/rateLimiter'
 import { notFound } from './middlewares/notFound'
@@ -17,6 +17,7 @@ export function createApp(): Express {
   const app = express()
 
   applySecurity(app)
+  app.use(enforceAllowedOrigin)
   app.use(requestId)
   app.use(httpLogger)
 

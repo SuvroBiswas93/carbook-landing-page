@@ -212,7 +212,7 @@ export function FareCalculator() {
               <button
                 type="button"
                 onClick={() => { setShowCarDropdown(!showCarDropdown) }}
-                className="mt-4 flex w-full items-center justify-between text-left rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
+                className="mt-4 cursor-pointer flex w-full items-center justify-between text-left rounded-xl border border-[#eae5dd] bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
               >
                 <span>
                   {selectedCar ? (

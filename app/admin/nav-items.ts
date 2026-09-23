@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Settings,
   Star,
-  Users,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -19,6 +18,5 @@ export const navItems: NavItem[] = [
   { label: 'Bookings', href: '/admin/bookings', icon: BarChart3 },
   { label: 'Fleet', href: '/admin/fleet', icon: Car },
   { label: 'Reviews', href: '/admin/reviews', icon: Star },
-  { label: 'Customers', href: '/admin/customers', icon: Users },
   { label: 'Pricing', href: '/admin/pricing', icon: Settings },
 ]

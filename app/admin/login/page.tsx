@@ -56,11 +56,13 @@ export default function AdminLoginPage() {
       >
         <Link
           href="/"
-          className="font-serif text-xl font-bold text-[#282622]"
+          className="font-serif text-xl font-bold"
         >
-          Traveling <span className="text-[#a8865f]">Bangladesh</span>
+          <div className='text-center' >
+            <span className='text-[#FFB020]' >Traveling</span> <span className="text-[#25D366]">Bangladesh</span>
+          </div>
         </Link>
-        <p className="mt-6 text-xs font-bold uppercase tracking-[.22em] text-[#a49b8f]">
+        <p className="mt-3 text-center text-xs font-bold uppercase tracking-[.22em] text-[#a49b8f]">
           Admin Control Center
         </p>
         <h1 className="mt-2 font-serif text-2xl font-bold">Sign in</h1>
@@ -95,7 +97,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-6 w-full rounded-xl bg-[#292724] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#3a382f] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-6 w-full cursor-pointer rounded-xl bg-[#292724] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#3a382f] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? 'Signing in…' : 'Sign in'}
         </button>

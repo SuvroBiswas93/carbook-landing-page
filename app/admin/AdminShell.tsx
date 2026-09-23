@@ -93,7 +93,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className="p-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="font-serif text-2xl font-bold">
-            Traveling <span className="text-[#a8865f]">Bangladesh</span>
+            <span className='text-[#FFB020]' >Traveling</span> <span className="text-[#25D366]">Bangladesh</span>
           </Link>
           <button
             className="lg:hidden"
@@ -133,7 +133,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className="absolute bottom-6 left-6 grid gap-2">
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-3 text-sm font-semibold text-[#766e64] transition-colors hover:text-[#282622]"
+          className="flex cursor-pointer items-center gap-3 text-sm font-semibold text-[#766e64] transition-colors hover:text-[#282622]"
         >
           <LogOut size={18} />
           Sign out
@@ -198,7 +198,7 @@ function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
           onClick={handleSignOut}
           aria-label="Sign out"
           title="Sign out"
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-[#766e64] transition-colors hover:bg-[#f0ebe3] hover:text-[#282622]"
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[#766e64] transition-colors hover:bg-[#f0ebe3] hover:text-[#282622]"
         >
           <LogOut size={16} />
         </button>

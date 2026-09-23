@@ -17,7 +17,7 @@ export function createAuthController(service: AuthService) {
     httpOnly: true,
     secure: env.isProd,
     sameSite: 'lax' as const,
-    path: '/api/auth',
+    path: '/',
   }
 
   function setRefreshCookie(res: Response, refreshToken: string): void {

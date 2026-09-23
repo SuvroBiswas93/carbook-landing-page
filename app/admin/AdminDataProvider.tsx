@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react'
 import type { ReactNode } from 'react'
+import { usePathname } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { apiFetch, redirectToLogin } from '@/lib/apiClient'
 import type {
@@ -75,6 +76,9 @@ export interface AdminData {
 const AdminContext = createContext<AdminData | null>(null)
 
 export function AdminDataProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
+  const isLoginPage = pathname.startsWith('/admin/login')
+
   const [bookings, setBookings] = useState<Booking[]>([])
   const [cars, setCars] = useState<FleetCar[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
@@ -92,12 +96,6 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (refreshingRef.current) return
     refreshingRef.current = true
     try {
-      if (
-        typeof window !== 'undefined' &&
-        window.location.pathname.startsWith('/admin/login')
-      ) {
-        return
-      }
       const responses = await Promise.all([
         apiFetch('/api/bookings'),
         apiFetch('/api/cars?admin=1'),
@@ -106,10 +104,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       const [bookingRes, carRes, reviewRes] = responses
 
       if (responses.some((response) => response.status === 401)) {
-        if (
-          typeof window !== 'undefined' &&
-          !window.location.pathname.startsWith('/admin/login')
-        ) {
+        if (typeof window !== 'undefined') {
           redirectToLogin()
         }
         return
@@ -138,6 +133,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    if (isLoginPage) return
     refresh()
 
     const poll = () => {
@@ -154,7 +150,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       window.clearInterval(intervalId)
       document.removeEventListener('visibilitychange', onVisibilityChange)
     }
-  }, [refresh])
+  }, [isLoginPage, refresh])
 
   const resetCarForm = () => {
     setEditingCar(null)
