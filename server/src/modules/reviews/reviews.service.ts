@@ -24,9 +24,21 @@ export function createReviewsService(repos: Repos) {
     }
   }
 
+  // Newest reviews first, with the most recently added breaking ties. Falls back
+  // to an increasing id when createdAt is empty (legacy seed data).
+  function sortNewestFirst(reviews: Review[]): Review[] {
+    return [...reviews].sort((a, b) => {
+      const timeA = Date.parse(a.createdAt) || a.id
+      const timeB = Date.parse(b.createdAt) || b.id
+      if (timeB !== timeA) return timeB - timeA
+      return b.id - a.id
+    })
+  }
+
   return {
     async list(includeHidden: boolean) {
-      return repos.reviews.list(includeHidden)
+      const reviews = await repos.reviews.list(includeHidden)
+      return sortNewestFirst(reviews)
     },
 
     async create(body: unknown) {

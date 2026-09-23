@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { LocationResult } from '@/lib/location/types'
-import { formatDistance, getRoute } from '@/lib/location/osrm'
+import { formatDistance } from '@/lib/location/osrm'
+import { useClickOutside } from '@/lib/useClickOutside'
+import { useRouteDistance } from '@/lib/useRouteDistance'
 import { LocationAutocomplete } from './LocationAutocomplete'
 
 interface PickupDropoffProps {
@@ -28,61 +30,15 @@ export function PickupDropoff({
 }: PickupDropoffProps) {
   const [openPickup, setOpenPickup] = useState(false)
   const [openDropoff, setOpenDropoff] = useState(false)
-  const [routeDistance, setRouteDistance] = useState<number | null>(null)
-  const [isRouteLoading, setIsRouteLoading] = useState(false)
-  const [routeError, setRouteError] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  const routeRequestRef = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setOpenPickup(false)
-        setOpenDropoff(false)
-      }
-    }
-    document.addEventListener('pointerdown', handleClickOutside)
-    return () => document.removeEventListener('pointerdown', handleClickOutside)
-  }, [])
+  const { distanceMeters: routeDistance, isLoading: isRouteLoading, error: routeError } =
+    useRouteDistance(pickupLocation, dropoffLocation, { onDistanceChange })
 
-  useEffect(() => {
-    routeRequestRef.current?.abort()
-    setRouteDistance(null)
-    onDistanceChange?.(null)
-    setRouteError(false)
-
-    if (!pickupLocation || !dropoffLocation) {
-      setIsRouteLoading(false)
-      return
-    }
-
-    const controller = new AbortController()
-    routeRequestRef.current = controller
-    setIsRouteLoading(true)
-
-    getRoute(
-      pickupLocation.longitude,
-      pickupLocation.latitude,
-      dropoffLocation.longitude,
-      dropoffLocation.latitude,
-      controller.signal,
-    )
-      .then((data) => {
-        if (controller.signal.aborted) return
-        const route = data.routes[0]
-        if (!route) throw new Error('No driving route found')
-        setRouteDistance(route.distance)
-        onDistanceChange?.(route.distance)
-        setIsRouteLoading(false)
-      })
-      .catch(() => {
-        if (controller.signal.aborted) return
-        setIsRouteLoading(false)
-        setRouteError(true)
-      })
-
-    return () => controller.abort()
-  }, [dropoffLocation, onDistanceChange, pickupLocation])
+  useClickOutside([containerRef], () => {
+    setOpenPickup(false)
+    setOpenDropoff(false)
+  })
 
   return (
     <div ref={containerRef} className="space-y-4">

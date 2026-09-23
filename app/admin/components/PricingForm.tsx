@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import type { Car } from '@/lib/types'
 
 export interface CarPricingUpdate {
@@ -83,10 +84,12 @@ export function PricingForm({ cars, onSave }: PricingFormProps) {
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={car.image}
                         alt={`${car.brand} ${car.model}`}
-                        className="h-12 w-16 rounded-lg border border-[#e7e0d5] object-cover"
+                        width={64}
+                        height={48}
+                        className="h-12 w-16 shrink-0 rounded-lg border border-[#e7e0d5] object-cover"
                       />
                       <div className="min-w-0">
                         <p className="font-semibold text-[#292724]">

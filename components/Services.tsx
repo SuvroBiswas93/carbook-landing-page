@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Phone,
@@ -24,6 +25,23 @@ const iconMap: Record<string, React.ReactNode> = {
 
 export function Services() {
   const [selectedService, setSelectedService] = useState<(typeof servicesData)[0] | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const updateIsMobile = () => setIsMobile(window.innerWidth < 768)
+    updateIsMobile()
+    window.addEventListener('resize', updateIsMobile)
+    return () => window.removeEventListener('resize', updateIsMobile)
+  }, [])
+
+  const animationProps = isMobile
+    ? { initial: false }
+    : {
+        initial: { opacity: 0, y: 20 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true },
+        whileHover: { y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' },
+      }
 
   return (
     <section id="services" className="py-14 bg-stone-50 sm:py-20">
@@ -44,16 +62,13 @@ export function Services() {
         </motion.div>
 
         {/* Services Grid */}
-        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible lg:grid-cols-3 lg:gap-6">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
           {servicesData.map((service, index) => (
             <motion.div
               key={service.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-              className="min-w-[86%] snap-start cursor-pointer rounded-xl bg-white p-4 shadow-lg transition-all sm:min-w-[58%] md:min-w-0 md:p-7"
+              {...animationProps}
+              transition={isMobile ? undefined : { delay: index * 0.1 }}
+              className="cursor-pointer rounded-xl bg-white p-4 shadow-lg transition-all md:p-7"
               onClick={() => setSelectedService(service)}
             >
               <div className="mb-3 text-brand-navy sm:mb-4">
@@ -89,15 +104,13 @@ export function Services() {
               >
                 বন্ধ করুন
               </button>
-              <button
-                onClick={() => {
-                  setSelectedService(null)
-                  document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
-                }}
-                className="flex-1 cursor-pointer bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all"
+              <Link
+                href="#hero"
+                onClick={() => setSelectedService(null)}
+                className="flex-1 cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 text-center font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800"
               >
                 বুকিং সম্পর্কে জানুন
-              </button>
+              </Link>
             </div>
           </div>
         )}

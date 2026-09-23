@@ -1,14 +1,17 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Users, Fuel, Zap, Snowflake } from 'lucide-react'
 import { Modal } from './Modal'
 import type { Car } from '@/lib/types'
+import { useCars } from '@/lib/useCars'
 
 export function CarSlider() {
+  const cars = useCars()
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [cars, setCars] = useState<Car[]>([])
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
   const [itemsPerView, setItemsPerView] = useState(3)
   const [isMobile, setIsMobile] = useState(false)
@@ -24,13 +27,6 @@ export function CarSlider() {
     updateItemsPerView()
     window.addEventListener('resize', updateItemsPerView)
     return () => window.removeEventListener('resize', updateItemsPerView)
-  }, [])
-
-  useEffect(() => {
-    fetch('/api/cars')
-      .then((response) => response.json())
-      .then((data: Car[]) => setCars(data))
-      .catch(() => setCars([]))
   }, [])
 
   useEffect(() => {
@@ -114,7 +110,9 @@ export function CarSlider() {
                   className={`${isMobile ? 'min-w-[86%] snap-start snap-always' : cardWidthClass} shrink-0 overflow-hidden rounded-xl bg-stone-50 shadow-lg transition-all hover:shadow-2xl`}
                   style={isMobile ? { scrollSnapAlign: 'start', scrollSnapStop: 'always' } : undefined}
                 >
-                  <img src={car.image} alt={`${car.brand} ${car.model}`} className={isMobile ? 'h-40 w-full object-cover' : 'h-48 w-full object-cover'} />
+                  <div className={`relative ${isMobile ? 'h-40 w-full' : 'h-48 w-full'}`}>
+                    <Image src={car.image} alt={`${car.brand} ${car.model}`} fill sizes={isMobile ? '86vw' : '(min-width: 1280px) 405px, 33vw'} className="object-cover" />
+                  </div>
 
                   <div className={isMobile ? 'space-y-3 p-4' : 'space-y-4 p-6'}>
                     <div>
@@ -156,15 +154,15 @@ export function CarSlider() {
                       <p className="text-[10px] text-stone-500 sm:text-xs">৳{car.pricePerKm}/কিমি</p>
                     </div>
 
-                    <button
+                    <Link
+                      href="#hero"
                       onClick={() => {
                         window.dispatchEvent(new CustomEvent('car-booking:selected', { detail: car }))
-                        document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
                       }}
-                      className={isMobile ? 'w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-2.5 text-sm font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800' : 'w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800'}
+                      className={isMobile ? 'block w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-2.5 text-center text-sm font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800' : 'block w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 text-center font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800'}
                     >
                       বুক করুন
-                    </button>
+                    </Link>
                   </div>
                 </motion.div>
               ))}
@@ -204,7 +202,9 @@ export function CarSlider() {
       >
         {selectedCar && (
           <div className="space-y-6">
-            <img src={selectedCar.image} alt={`${selectedCar.brand} ${selectedCar.model}`} className="h-64 w-full object-cover rounded-lg" />
+            <div className="relative h-64 w-full overflow-hidden rounded-lg">
+              <Image src={selectedCar.image} alt={`${selectedCar.brand} ${selectedCar.model}`} fill sizes="(min-width: 1280px) 40vw, 90vw" className="object-cover" />
+            </div>
 
             <div className="grid grid-cols-2 gap-6">
               <div>
@@ -265,16 +265,16 @@ export function CarSlider() {
               >
                 Close
               </button>
-              <button
+              <Link
+                href="#hero"
                 onClick={() => {
                   setSelectedCar(null)
                   window.dispatchEvent(new CustomEvent('car-booking:selected', { detail: selectedCar }))
-                  document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className="flex-1 bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold py-3 rounded-lg transition-all"
+                className="flex-1 cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 text-center font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800"
               >
                 বুক করুন
-              </button>
+              </Link>
             </div>
           </div>
         )}

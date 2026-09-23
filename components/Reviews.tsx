@@ -1,28 +1,109 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Edit3 } from 'lucide-react'
 import { toast } from 'react-toastify'
 import type { Review } from '@/lib/types'
+import { sortReviewsNewestFirst } from '@/lib/types'
 import { Modal } from './Modal'
+
+const REVIEW_SLIDE_INTERVAL_MS = 2000
+const REVIEW_GRID_GAP_PX = 20
 
 export function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [form, setForm] = useState({ name: '', location: '', rating: 5, text: '' })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isReviewTriggerExpanded, setIsReviewTriggerExpanded] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const scrollerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const updateIsMobile = () => setIsMobile(window.innerWidth < 768)
+    updateIsMobile()
+    window.addEventListener('resize', updateIsMobile)
+    return () => window.removeEventListener('resize', updateIsMobile)
+  }, [])
 
   const loadReviews = () => {
-    fetch('/api/reviews')
+    fetch('/api/reviews', { cache: 'no-store' })
       .then((response) => response.json())
-      .then((data: Review[]) => setReviews(data))
+      .then((data: Review[]) => setReviews(sortReviewsNewestFirst(data)))
       .catch(() => setReviews([]))
   }
 
   useEffect(() => {
     loadReviews()
+
+    let pollId: number | undefined
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        loadReviews()
+      }
+    }
+    const startPolling = () => {
+      stopPolling()
+      pollId = window.setInterval(refresh, 15000)
+    }
+    const stopPolling = () => {
+      if (pollId !== undefined) window.clearInterval(pollId)
+      pollId = undefined
+    }
+
+    startPolling()
+    document.addEventListener('visibilitychange', refresh)
+    window.addEventListener('focus', refresh)
+
+    return () => {
+      stopPolling()
+      document.removeEventListener('visibilitychange', refresh)
+      window.removeEventListener('focus', refresh)
+    }
   }, [])
+
+  // Auto-slide the review strip right-to-left on mobile only.
+  useEffect(() => {
+    if (!isMobile) return
+
+    const scroller = scrollerRef.current
+    if (!scroller) return
+
+    let userGesture = false
+
+    const pause = () => {
+      userGesture = true
+    }
+    const resume = () => {
+      userGesture = false
+    }
+
+    scroller.addEventListener('touchstart', pause, { passive: true })
+    window.addEventListener('touchend', resume)
+    window.addEventListener('touchcancel', resume)
+
+    const slide = () => {
+      if (userGesture || scroller.scrollWidth <= scroller.clientWidth) return
+      const cardWidth = scroller.children[0]?.clientWidth ?? 0
+      const step = cardWidth + REVIEW_GRID_GAP_PX
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth
+
+      if (scroller.scrollLeft >= maxScroll - step) {
+        scroller.scrollTo({ left: 0, behavior: 'smooth' })
+      } else {
+        scroller.scrollTo({ left: scroller.scrollLeft + step, behavior: 'smooth' })
+      }
+    }
+
+    const intervalId = window.setInterval(slide, REVIEW_SLIDE_INTERVAL_MS)
+
+    return () => {
+      window.clearInterval(intervalId)
+      scroller.removeEventListener('touchstart', pause)
+      window.removeEventListener('touchend', resume)
+      window.removeEventListener('touchcancel', resume)
+    }
+  }, [isMobile])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -76,21 +157,23 @@ export function Reviews() {
               কাস্টমাররা যা বলছেন
             </h2>
             <p className="text-base sm:text-xl text-stone-600">
-              Trusted by thousands for premium car rental experiences
+              হাজারো গ্রাহকের বিশ্বস্ত, প্রিমিয়াম গাড়ি ভাড়ার অভিজ্ঞতা।
             </p>
           </motion.div>
 
           {/* Reviews Grid */}
           <motion.div
+            ref={scrollerRef}
             variants={container}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-8 md:overflow-visible lg:grid-cols-3"
           >
-            {reviews.map((review) => (
+            {reviews.slice(0, 6).map((review) => (
               <motion.div
                 key={review.id}
+                initial={false}
                 variants={item}
                 className="min-w-[86%] snap-start rounded-xl bg-white p-6 shadow-lg transition-shadow hover:shadow-xl sm:min-w-[58%] md:min-w-0 md:p-8"
               >

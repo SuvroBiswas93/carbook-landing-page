@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { ReactNode } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import { usePathname } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { apiFetch, redirectToLogin } from '@/lib/apiClient'
@@ -18,6 +18,7 @@ import type {
   Car as FleetCar,
   Review,
 } from '@/lib/types'
+import { sortReviewsNewestFirst } from '@/lib/types'
 
 const emptyCar: Omit<FleetCar, 'id'> = {
   brand: '',
@@ -75,65 +76,9 @@ export interface AdminData {
 
 const AdminContext = createContext<AdminData | null>(null)
 
-export function AdminDataProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname()
-  const isLoginPage = pathname.startsWith('/admin/login')
-
-  const [bookings, setBookings] = useState<Booking[]>([])
-  const [cars, setCars] = useState<FleetCar[]>([])
-  const [reviews, setReviews] = useState<Review[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const [editingCar, setEditingCar] = useState<FleetCar | null>(null)
-  const [carForm, setCarForm] = useState(emptyCar)
-
-  const [editingReview, setEditingReview] = useState<Review | null>(null)
-  const [reviewForm, setReviewForm] = useState(emptyReview)
-
-  const refreshingRef = useRef(false)
-
-  const refresh = useCallback(async () => {
-    if (refreshingRef.current) return
-    refreshingRef.current = true
-    try {
-      const responses = await Promise.all([
-        apiFetch('/api/bookings'),
-        apiFetch('/api/cars?admin=1'),
-        apiFetch('/api/reviews?admin=1'),
-      ])
-      const [bookingRes, carRes, reviewRes] = responses
-
-      if (responses.some((response) => response.status === 401)) {
-        if (typeof window !== 'undefined') {
-          redirectToLogin()
-        }
-        return
-      }
-
-      if (!responses.every((response) => response.ok)) {
-        // Keep existing data on failure so routes never appear to hang.
-        return
-      }
-
-      const [bookingData, carData, reviewData] = await Promise.all([
-        bookingRes.json(),
-        carRes.json(),
-        reviewRes.json(),
-      ])
-
-      if (Array.isArray(bookingData)) setBookings(bookingData)
-      if (Array.isArray(carData)) setCars(carData)
-      if (Array.isArray(reviewData)) setReviews(reviewData)
-    } catch {
-      // Keep existing data on failure so routes never appear to hang.
-    } finally {
-      refreshingRef.current = false
-      setLoading(false)
-    }
-  }, [])
-
+function usePollingRefresh(refresh: () => Promise<void>, enabled: boolean): void {
   useEffect(() => {
-    if (isLoginPage) return
+    if (!enabled) return
     refresh()
 
     const poll = () => {
@@ -150,7 +95,12 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       window.clearInterval(intervalId)
       document.removeEventListener('visibilitychange', onVisibilityChange)
     }
-  }, [isLoginPage, refresh])
+  }, [enabled, refresh])
+}
+
+function useCarEditor(refresh: () => Promise<void>) {
+  const [editingCar, setEditingCar] = useState<FleetCar | null>(null)
+  const [carForm, setCarForm] = useState(emptyCar)
 
   const resetCarForm = () => {
     setEditingCar(null)
@@ -204,6 +154,22 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     refresh()
   }
 
+  return {
+    editingCar,
+    carForm,
+    setCarForm,
+    startEditCar,
+    resetCarForm,
+    saveCar,
+    deleteCar,
+    toggleCar,
+  }
+}
+
+function useReviewEditor(refresh: () => Promise<void>) {
+  const [editingReview, setEditingReview] = useState<Review | null>(null)
+  const [reviewForm, setReviewForm] = useState(emptyReview)
+
   const resetReviewForm = () => {
     setEditingReview(null)
     setReviewForm(emptyReview)
@@ -214,7 +180,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     setReviewForm({ ...review })
   }
 
-  const saveReview = async () => {
+  const saveReview = async (): Promise<void> => {
     if (!editingReview) return
     await apiFetch(`/api/reviews/${editingReview.id}`, {
       method: 'PUT',
@@ -239,6 +205,19 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     refresh()
   }
 
+  return {
+    editingReview,
+    reviewForm,
+    setReviewForm,
+    startEditReview,
+    resetReviewForm,
+    saveReview,
+    deleteReview,
+    toggleReview,
+  }
+}
+
+function usePricingEditor(refresh: () => Promise<void>) {
   const saveCarPricing = async (
     updates: Array<{ id: number; pricePerDay: number; pricePerKm: number }>
   ): Promise<boolean> => {
@@ -266,6 +245,13 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  return { saveCarPricing }
+}
+
+function useBookingActions(
+  refresh: () => Promise<void>,
+  setBookings: Dispatch<SetStateAction<Booking[]>>
+) {
   const updateBookingStatus = async (id: string, status: BookingStatus) => {
     setBookings((current) =>
       current.map((booking) =>
@@ -296,26 +282,76 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  return { updateBookingStatus, deleteBooking }
+}
+
+export function AdminDataProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
+  const isLoginPage = pathname.startsWith('/admin/login')
+
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [cars, setCars] = useState<FleetCar[]>([])
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const refreshingRef = useRef(false)
+
+  const refresh = useCallback(async () => {
+    if (refreshingRef.current) return
+    refreshingRef.current = true
+    try {
+      const responses = await Promise.all([
+        apiFetch('/api/bookings'),
+        apiFetch('/api/cars?admin=1'),
+        apiFetch('/api/reviews?admin=1'),
+      ])
+      const [bookingRes, carRes, reviewRes] = responses
+
+      if (responses.some((response) => response.status === 401)) {
+        if (typeof window !== 'undefined') {
+          redirectToLogin()
+        }
+        return
+      }
+
+      if (!responses.every((response) => response.ok)) {
+        // Keep existing data on failure so routes never appear to hang.
+        return
+      }
+
+      const [bookingData, carData, reviewData] = await Promise.all([
+        bookingRes.json(),
+        carRes.json(),
+        reviewRes.json(),
+      ])
+
+      if (Array.isArray(bookingData)) setBookings(bookingData)
+      if (Array.isArray(carData)) setCars(carData)
+      if (Array.isArray(reviewData)) setReviews(sortReviewsNewestFirst(reviewData))
+    } catch {
+      // Keep existing data on failure so routes never appear to hang.
+    } finally {
+      refreshingRef.current = false
+      setLoading(false)
+    }
+  }, [])
+
+  usePollingRefresh(refresh, !isLoginPage)
+
+  const carEditor = useCarEditor(refresh)
+  const reviewEditor = useReviewEditor(refresh)
+  const { saveCarPricing } = usePricingEditor(refresh)
+  const { updateBookingStatus, deleteBooking } = useBookingActions(
+    refresh,
+    setBookings
+  )
+
   const value: AdminData = {
     bookings,
     cars,
     reviews,
-    editingCar,
-    carForm,
-    setCarForm,
-    startEditCar,
-    resetCarForm,
-    saveCar,
-    deleteCar,
-    toggleCar,
-    editingReview,
-    reviewForm,
-    setReviewForm,
-    startEditReview,
-    resetReviewForm,
-    saveReview,
-    deleteReview,
-    toggleReview,
+    ...carEditor,
+    ...reviewEditor,
     saveCarPricing,
     updateBookingStatus,
     deleteBooking,

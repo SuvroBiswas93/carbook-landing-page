@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react'
 import type { Car as FleetCar } from '@/lib/types'
 
@@ -22,9 +23,11 @@ export function CarCards({
           className="rounded-2xl border border-[#e7e0d5] bg-[#fffdf9] p-4 sm:p-5"
         >
           <div className="flex gap-3 sm:gap-4">
-            <img
+            <Image
               src={car.image}
               alt={`${car.brand} ${car.model}`}
+              width={128}
+              height={96}
               className="h-20 w-24 shrink-0 rounded-xl object-cover sm:h-24 sm:w-32"
             />
             <div className="min-w-0 flex-1">

@@ -17,13 +17,6 @@ import { HowItWorks } from '@/components/HowItWorks'
 import { FinalCTA } from '@/components/FinalCTA'
 
 export default function Page() {
-  const handleNavigate = (section: string) => {
-    if (!section) return
-    const target = document.getElementById(section)
-    if (!target) return
-    target.scrollIntoView({ behavior: 'smooth' })
-  }
-
   return (
     <div className="min-h-screen bg-white pb-13 sm:pb-0">
       <Navbar />
@@ -37,7 +30,7 @@ export default function Page() {
       <FAQ />
       <FinalCTA />
       <Contact />
-      <Footer onNavigate={handleNavigate} />
+      <Footer />
       <FloatingButtons />
       <StickyMobileBar />
       <ToastContainer

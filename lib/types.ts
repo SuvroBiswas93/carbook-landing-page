@@ -2,6 +2,17 @@ export type BookingStatus = 'New' | 'Called' | 'Confirmed' | 'Cancelled'
 
 export type BookingCategory = 'city' | 'hourly' | 'intercity' | 'airport'
 
+// Newest reviews first (by createdAt, with id as tiebreaker for legacy seeds
+// that have an empty timestamp).
+export function sortReviewsNewestFirst<T extends { createdAt: string; id: number }>(reviews: T[]): T[] {
+  return [...reviews].sort((a, b) => {
+    const timeA = Date.parse(a.createdAt) || a.id
+    const timeB = Date.parse(b.createdAt) || b.id
+    if (timeB !== timeA) return timeB - timeA
+    return b.id - a.id
+  })
+}
+
 export interface Car {
   id: number
   brand: string

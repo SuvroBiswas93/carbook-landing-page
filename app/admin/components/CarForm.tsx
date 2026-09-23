@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import Image from 'next/image'
 import { toast } from 'react-toastify'
 import type { Car as FleetCar } from '@/lib/types'
 import { uploadCarImage } from '@/lib/uploadImage'
@@ -58,6 +59,42 @@ function CheckField({
         {text}
       </label>
       <span className="text-xs leading-snug text-[#8c8378]">{hint}</span>
+    </div>
+  )
+}
+
+function AcSelector({
+  value,
+  onChange,
+}: {
+  value: boolean
+  onChange: (hasAc: boolean) => void
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-sm font-bold text-[#292724]">Air-conditioned</span>
+      <div className="grid grid-cols-2 gap-2 rounded-xl border border-[#e7e0d5] p-1.5">
+        {([
+          { label: 'AC', hasAc: true },
+          { label: 'Non-AC', hasAc: false },
+        ] as const).map((option) => (
+          <button
+            key={option.label}
+            type="button"
+            onClick={() => onChange(option.hasAc)}
+            className={`rounded-lg px-4 py-2.5 text-sm font-bold transition-colors ${
+              value === option.hasAc
+                ? 'bg-[#292724] text-white'
+                : 'bg-transparent text-[#766e64] hover:bg-[#f0ebe3]'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <span className="text-xs leading-snug text-[#8c8378]">
+        Shown as AC with the snowflake icon on the car card.
+      </span>
     </div>
   )
 }
@@ -175,6 +212,11 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
           />
         </Field>
 
+        <AcSelector
+          value={form.hasAc}
+          onChange={(hasAc) => update('hasAc', hasAc)}
+        />
+
         <Field
           label="Price per day"
           hint="Card shows “From ৳… শুরু” using this value."
@@ -244,9 +286,11 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
             {uploading ? 'Uploading…' : 'Choose image'}
           </button>
           {form.image ? (
-            <img
+            <Image
               src={form.image}
               alt="Car preview"
+              width={64}
+              height={48}
               className="h-12 w-16 rounded-lg border border-[#e7e0d5] object-cover"
             />
           ) : (

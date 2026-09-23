@@ -1,42 +1,19 @@
 import type { Request, Response } from 'express'
 import type { AuthService } from './auth.service'
-import { env } from '../../config/env'
-import { ttlToSeconds } from '../../utils/token'
+import {
+  clearRefreshCookie,
+  readRefreshToken,
+  setRefreshCookie,
+} from './auth.cookies'
 import { Unauthorized } from '../../lib/apiError'
 
-export const REFRESH_COOKIE = 'refresh_token'
-
-export interface AuthResultWin {
+interface AuthResultWin {
   admin: { id: string; email: string }
   accessToken: string
   accessExpiresIn: number
 }
 
 export function createAuthController(service: AuthService) {
-  const cookieOptions = {
-    httpOnly: true,
-    secure: env.isProd,
-    sameSite: 'lax' as const,
-    path: '/',
-  }
-
-  function setRefreshCookie(res: Response, refreshToken: string): void {
-    res.cookie(REFRESH_COOKIE, refreshToken, {
-      ...cookieOptions,
-      maxAge: ttlToSeconds(env.REFRESH_TOKEN_TTL) * 1000,
-    })
-  }
-
-  function clearRefreshCookie(res: Response): void {
-    res.clearCookie(REFRESH_COOKIE, cookieOptions)
-  }
-
-  function readRefreshToken(req: Request): string | null {
-    const fromCookie = (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE]
-    const fromBody = (req.body as { refreshToken?: string } | undefined)?.refreshToken
-    return fromCookie ?? fromBody ?? null
-  }
-
   function stripRefresh(result: Awaited<ReturnType<AuthService['login']>>): AuthResultWin {
     return {
       admin: result.admin,
@@ -74,5 +51,3 @@ export function createAuthController(service: AuthService) {
     },
   }
 }
-
-export type AuthController = ReturnType<typeof createAuthController>

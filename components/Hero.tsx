@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, LoaderCircle } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
@@ -11,6 +12,8 @@ import type { Car } from '@/lib/types'
 import type { LocationResult } from '@/lib/location/types'
 import { PickupDropoff } from '@/components/car-rental/PickupDropoff'
 import type { BookingLocation } from '@/lib/types'
+import { useCars } from '@/lib/useCars'
+import { useClickOutside } from '@/lib/useClickOutside'
 
 type BookingTab = 'city' | 'hourly' | 'intercity' | 'airport'
 type TripType = 'One Way' | 'Round Trip'
@@ -74,7 +77,7 @@ function CarPicker({ value, cars, onChange, error, open, onOpenChange }: { value
         <div className="absolute inset-x-0 top-full z-50 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-[#eae5dd] bg-white p-2 shadow-[0_18px_35px_rgba(50,44,35,.18)]">
           {availableCars.length > 0 ? availableCars.map((car) => (
             <button key={car.id} type="button" onClick={() => { onChange(`${car.brand} ${car.model}`); onOpenChange(false) }} className="flex w-full cursor-pointer items-center gap-3 rounded-xl p-2 text-left transition hover:bg-amber-50">
-              <img src={car.image} alt={`${car.brand} ${car.model}`} className="size-14 rounded-lg bg-stone-100 object-cover" />
+              <Image src={car.image} alt={`${car.brand} ${car.model}`} width={56} height={56} className="size-14 shrink-0 rounded-lg bg-stone-100 object-cover" />
               <span className="min-w-0"><span className="block truncate font-bold text-stone-800">{car.brand} {car.model}</span><span className="block text-xs font-normal text-stone-500">{car.category} · {banglaDigits(car.seats)} সিট · {car.hasAc ? 'এসি' : 'নন-এসি'}</span></span>
             </button>
           )) : <span className="block px-3 py-3 text-sm font-normal text-stone-500">গাড়ির তালিকা পাওয়া যায়নি</span>}
@@ -139,7 +142,7 @@ export function Hero() {
   const [pickupLocation, setPickupLocation] = useState<LocationResult | null>(null)
   const [dropoffLocation, setDropoffLocation] = useState<LocationResult | null>(null)
   const [routeDistanceMeters, setRouteDistanceMeters] = useState<number | null>(null)
-  const [cars, setCars] = useState<Car[]>([])
+  const cars = useCars(() => toast.error('গাড়ির তালিকা লোড করা যায়নি'))
   const [openPicker, setOpenPicker] = useState<PickerId>(null)
   const heroCardRef = useRef<HTMLDivElement>(null)
   const {
@@ -157,20 +160,7 @@ export function Hero() {
   const pickupDate = watch('pickupDate')
   const returnDate = watch('returnDate')
 
-  useEffect(() => {
-    fetch('/api/cars')
-      .then((response) => response.json())
-      .then((data: Car[]) => setCars(data))
-      .catch(() => toast.error('গাড়ির তালিকা লোড করা যায়নি'))
-  }, [])
-
-  useEffect(() => {
-    const handleOutsidePointer = (event: PointerEvent) => {
-      if (heroCardRef.current && !heroCardRef.current.contains(event.target as Node)) setOpenPicker(null)
-    }
-    document.addEventListener('pointerdown', handleOutsidePointer)
-    return () => document.removeEventListener('pointerdown', handleOutsidePointer)
-  }, [])
+  useClickOutside([heroCardRef], () => setOpenPicker(null))
 
   useEffect(() => {
     const handleCarBooking = (event: Event) => {
