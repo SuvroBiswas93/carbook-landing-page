@@ -1,5 +1,4 @@
 # Environment variables
-.env
 .env*.local
 .env.example
 
@@ -18,3 +17,4 @@ node_modules/
 
 # Stale npm lockfile (project uses pnpm)
 package-lock.json
+config.bat

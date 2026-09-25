@@ -4,12 +4,12 @@
   "private": true,
   "packageManager": "pnpm@12.3.4",
   "scripts": {
-    "dev": "concurrently -k -n server,next -c blue,green \"pnpm:dev:server\" \"pnpm:dev:web\"",
-    "dev:server": "tsx watch server/src/index.ts",
-    "dev:web": "next dev",
+    "dev": "node api.js && concurrently -k -n server,next -c blue,green \"pnpm:dev:server\" \"pnpm:dev:web\"",
+    "dev:server": "node api.js && tsx watch server/src/index.ts",
+    "dev:web": "node api.js && next dev",
     "build": "next build",
-    "start": "next start",
-    "start:server": "tsx server/src/index.ts",
+    "start": "node api.js && next start",
+    "start:server": "node api.js && tsx server/src/index.ts",
     "seed:admin": "tsx server/scripts/seed-admin.ts",
     "configure:r2-cors": "tsx server/scripts/configure-r2-cors.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p server/tsconfig.json"
