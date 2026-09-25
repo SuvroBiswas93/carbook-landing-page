@@ -28,7 +28,7 @@ export function Module({
         {action && (
           <button
             onClick={onAction}
-            className="flex items-center gap-2 rounded-xl bg-[#292724] px-4 py-3 text-sm font-bold text-white"
+            className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#292724] px-4 py-3 text-sm font-bold text-white"
           >
             {actionIcon}
             {action}

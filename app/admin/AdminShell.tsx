@@ -96,7 +96,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
             <span className='text-[#FFB020]' >Traveling</span> <span className="text-[#25D366]">Bangladesh</span>
           </Link>
           <button
-            className="lg:hidden"
+            className="cursor-pointer lg:hidden"
             onClick={onClose}
             aria-label="Close menu"
           >
@@ -172,7 +172,7 @@ function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-[#e7e0d5] bg-[#fffdf9] px-4 sm:h-20 sm:px-8">
       <button
-        className="shrink-0 lg:hidden"
+        className="shrink-0 cursor-pointer lg:hidden"
         onClick={onMenuOpen}
         aria-label="Open menu"
       >
@@ -190,7 +190,7 @@ function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
           disabled={loading}
           aria-label="Refresh data"
           title="Refresh data"
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-[#766e64] transition-colors hover:bg-[#f0ebe3] hover:text-[#282622] disabled:cursor-not-allowed"
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-[#766e64] transition-colors hover:bg-[#f0ebe3] hover:text-[#282622] disabled:cursor-not-allowed"
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
         </button>

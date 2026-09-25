@@ -75,7 +75,7 @@ export function Pagination({
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="rounded-lg border border-[#e7e0d5] p-2 text-[#766e64] transition-colors hover:bg-[#f0ebe3] disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-lg border border-[#e7e0d5] p-2 text-[#766e64] transition-colors hover:bg-[#f0ebe3] disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Previous page"
           >
             <ChevronLeft size={16} />
@@ -86,7 +86,7 @@ export function Pagination({
               <button
                 key={page}
                 onClick={() => onPageChange(page)}
-                className={`min-w-9 rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
+                className={`min-w-9 cursor-pointer rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
                   currentPage === page
                     ? 'bg-[#292724] text-white'
                     : 'text-[#766e64] hover:bg-[#f0ebe3]'
@@ -108,7 +108,7 @@ export function Pagination({
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="rounded-lg border border-[#e7e0d5] p-2 text-[#766e64] transition-colors hover:bg-[#f0ebe3] disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-lg border border-[#e7e0d5] p-2 text-[#766e64] transition-colors hover:bg-[#f0ebe3] disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Next page"
           >
             <ChevronRight size={16} />

@@ -54,21 +54,21 @@ export function CarCards({
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               onClick={() => onEdit(car)}
-              className="flex items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
+              className="flex cursor-pointer items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
             >
               <Pencil size={15} />
               Edit
             </button>
             <button
               onClick={() => onToggle(car)}
-              className="flex items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
+              className="flex cursor-pointer items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
             >
               {car.published ? <EyeOff size={15} /> : <Eye size={15} />}
               {car.published ? 'Unpublish' : 'Publish'}
             </button>
             <button
               onClick={() => onDelete(car.id)}
-              className="flex items-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-bold text-red-700"
+              className="flex cursor-pointer items-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-bold text-red-700"
             >
               <Trash2 size={15} />
               Delete

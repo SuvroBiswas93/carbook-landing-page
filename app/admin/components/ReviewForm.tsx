@@ -48,7 +48,7 @@ export function ReviewForm({ form, setForm, onSave }: ReviewFormProps) {
       </label>
       <button
         onClick={onSave}
-        className="rounded-xl bg-[#292724] py-3 font-bold text-white"
+        className="cursor-pointer rounded-xl bg-[#292724] py-3 font-bold text-white"
       >
         Save Review
       </button>

@@ -143,7 +143,7 @@ export function Hero() {
   const [pickupLocation, setPickupLocation] = useState<LocationResult | null>(null)
   const [dropoffLocation, setDropoffLocation] = useState<LocationResult | null>(null)
   const [routeDistanceMeters, setRouteDistanceMeters] = useState<number | null>(null)
-  const cars = useCars(() => toast.error('গাড়ির তালিকা লোড করা যায়নি'))
+  const { cars } = useCars(() => toast.error('গাড়ির তালিকা লোড করা যায়নি'))
   const [openPicker, setOpenPicker] = useState<PickerId>(null)
   const heroCardRef = useRef<HTMLDivElement>(null)
   const {
@@ -270,7 +270,7 @@ export function Hero() {
   const inputClass = (field: keyof BookingFormValues) => `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100 ${errors[field] ? 'border-red-400 ring-2 ring-red-100' : 'border-[#eae5dd]'}`
 
   return (
-    <section id="hero" className="relative z-20 scroll-mt-[88px] bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32" style={{ scrollMarginTop: '88px' }}>
+    <section id="hero" className="pb-4 relative z-20 scroll-mt-[88px] bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32" style={{ scrollMarginTop: '88px' }}>
       {/* alias for new booking id — keeps both #hero and #booking anchors working */}
       <span id="booking" className="sr-only" aria-hidden="true" />
       <span id="booking-form" className="sr-only" aria-hidden="true" />
@@ -279,7 +279,7 @@ export function Hero() {
           {/* <h1 aria-label={heroHeadline} className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl">
             <span className="bg-linear-to-r from-[#FFB020] via-[#E08E00] to-[#16365C] bg-clip-text text-transparent">{heroHeadline}</span>
           </h1> */}
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-brand-muted sm:text-xl">
+          <p className="mb-8 max-w-2xl text-base leading-relaxed text-brand-muted sm:text-xl">
             ফিক্সড প্রাইস, কোনো হিডেন চার্জ নেই। ফর্ম পূরণ করুন, <span className="font-bold text-brand-navy">১০ মিনিটে আমরা কল করবো।</span>
           </p>
         </div>

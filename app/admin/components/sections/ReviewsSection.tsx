@@ -47,7 +47,7 @@ export function ReviewsSection({ admin }: { admin: AdminData }) {
           <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-[#fffdf9] p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-serif text-2xl font-bold">Edit Review</h2>
-              <button onClick={admin.resetReviewForm} aria-label="Close">
+              <button onClick={admin.resetReviewForm} aria-label="Close" className="cursor-pointer">
                 <X />
               </button>
             </div>

@@ -146,7 +146,7 @@ export function PricingForm({ cars, onSave }: PricingFormProps) {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="mt-5 rounded-xl bg-[#292724] px-5 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-5 cursor-pointer rounded-xl bg-[#292724] px-5 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? 'Saving...' : 'Save pricing'}
       </button>

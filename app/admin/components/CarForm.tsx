@@ -82,7 +82,7 @@ function AcSelector({
             key={option.label}
             type="button"
             onClick={() => onChange(option.hasAc)}
-            className={`rounded-lg px-4 py-2.5 text-sm font-bold transition-colors ${
+            className={`cursor-pointer rounded-lg px-4 py-2.5 text-sm font-bold transition-colors ${
               value === option.hasAc
                 ? 'bg-[#292724] text-white'
                 : 'bg-transparent text-[#766e64] hover:bg-[#f0ebe3]'
@@ -281,7 +281,7 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="rounded-xl bg-[#a8865f] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#97744e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer rounded-xl bg-[#a8865f] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#97744e] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {uploading ? 'Uploading…' : 'Choose image'}
           </button>
@@ -304,7 +304,7 @@ export function CarForm({ form, setForm, onSave, editing }: CarFormProps) {
 
       <button
         onClick={onSave}
-        className="mt-4 rounded-xl bg-[#292724] px-5 py-3 text-sm font-bold text-white"
+        className="mt-4 cursor-pointer rounded-xl bg-[#292724] px-5 py-3 text-sm font-bold text-white"
       >
         {editing ? 'Save Changes' : 'Add Car'}
       </button>

@@ -174,7 +174,7 @@ const createColumns = (
               type="button"
               onClick={() => onRequestDelete(booking)}
               aria-label={`Delete booking ${booking.id}`}
-              className="rounded-lg bg-red-50 p-2 text-red-600 transition-colors hover:bg-red-100 hover:text-red-700"
+              className="cursor-pointer rounded-lg bg-red-50 p-2 text-red-600 transition-colors hover:bg-red-100 hover:text-red-700"
             >
               <Trash2 size={16} />
             </button>
@@ -231,14 +231,14 @@ export function BookingTable({ bookings, onStatusChange, onDelete }: BookingTabl
               <button
                 type="button"
                 onClick={() => setBookingToDelete(null)}
-                className="flex-1 rounded-xl border border-[#e7e0d5] bg-white px-4 py-2.5 text-sm font-bold text-[#292724] transition-colors hover:bg-[#f7f3ec]"
+                className="flex-1 cursor-pointer rounded-xl border border-[#e7e0d5] bg-white px-4 py-2.5 text-sm font-bold text-[#292724] transition-colors hover:bg-[#f7f3ec]"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDelete}
-                className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-red-700"
+                className="flex-1 cursor-pointer rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-red-700"
               >
                 Delete
               </button>

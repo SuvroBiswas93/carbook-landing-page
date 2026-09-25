@@ -271,7 +271,7 @@ export function FareCalculator() {
   const carDropdownRef = useRef<HTMLDivElement>(null)
   const locationContainerRef = useRef<HTMLDivElement>(null)
 
-  const cars = useCars()
+  const { cars } = useCars()
   const { distanceMeters: routeDistanceMeters, isLoading: isRouteLoading, error: routeError } =
     useRouteDistance(pickupLocation, dropoffLocation, { onReset: () => setResult(null) })
 

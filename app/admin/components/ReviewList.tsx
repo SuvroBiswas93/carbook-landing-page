@@ -65,21 +65,21 @@ export function ReviewList({
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => onEdit(review)}
-                className="flex items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
+                className="flex cursor-pointer items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
               >
                 <Pencil size={15} />
                 Edit
               </button>
               <button
                 onClick={() => onToggle(review)}
-                className="flex items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
+                className="flex cursor-pointer items-center gap-2 rounded-lg bg-[#f0ebe3] px-3 py-2 text-sm font-bold"
               >
                 {review.hidden ? <Eye size={15} /> : <EyeOff size={15} />}
                 {review.hidden ? 'Publish' : 'Unpublish'}
               </button>
               <button
                 onClick={() => onDelete(review.id)}
-                className="flex items-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-bold text-red-700"
+                className="flex cursor-pointer items-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-bold text-red-700"
               >
                 <Trash2 size={15} />
                 Remove

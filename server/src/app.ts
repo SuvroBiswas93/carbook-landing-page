@@ -12,6 +12,7 @@ import { createCarsRouter } from './modules/cars/cars.routes'
 import { createBookingsRouter } from './modules/bookings/bookings.routes'
 import { createReviewsRouter } from './modules/reviews/reviews.routes'
 import { createPricingRouter } from './modules/pricing/pricing.routes'
+import { createAdminRouter } from './modules/admin/admin.routes'
 
 export function createApp(): Express {
   const app = express()
@@ -36,6 +37,7 @@ export function createApp(): Express {
   })
 
   app.use('/api/auth', createAuthRouter(repos))
+  app.use('/api/admin', createAdminRouter(repos))
   app.use('/api/uploads', createUploadsRouter())
   app.use('/api/cars', createCarsRouter(repos))
   app.use('/api/bookings', createBookingsRouter(repos))

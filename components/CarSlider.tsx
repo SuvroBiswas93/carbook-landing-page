@@ -7,11 +7,63 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Users, Fuel, Zap, Snowflake } from 'lucide-react'
 import { Modal } from './Modal'
 import type { Car } from '@/lib/types'
-import { useCars } from '@/lib/useCars'
+import { useCarsWithLoading } from '@/lib/useCars'
 import { handleBookingLinkClick } from '@/lib/scroll'
 
+function CarCardSkeleton({ isMobile }: { isMobile: boolean }) {
+  return (
+    <div
+      className={`${isMobile ? 'min-w-[86%] snap-start snap-always' : 'w-[calc((100%_-_4rem)_/_3)]'} shrink-0 overflow-hidden rounded-xl bg-stone-50 shadow-lg`}
+      style={isMobile ? { scrollSnapAlign: 'start', scrollSnapStop: 'always' } : undefined}
+      aria-hidden="true"
+    >
+      {/* Image placeholder */}
+      <div className={`relative ${isMobile ? 'h-40 w-full' : 'h-48 w-full'} bg-stone-200 animate-pulse`} />
+      <div className={isMobile ? 'space-y-3 p-4' : 'space-y-4 p-6'}>
+        {/* Title */}
+        <div className="space-y-2">
+          <div className="h-6 w-3/4 rounded-lg bg-stone-200 animate-pulse" />
+          <div className="h-4 w-1/2 rounded bg-stone-200 animate-pulse" />
+        </div>
+        {/* Specs grid - matches 4 specs */}
+        <div className={isMobile ? 'grid grid-cols-2 gap-2 border-y border-stone-200 py-3' : 'grid grid-cols-2 gap-3 border-y border-stone-200 py-4 sm:grid-cols-4'}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-1.5">
+              <div className="size-5 rounded-full bg-stone-200 animate-pulse" />
+              <div className="h-3 w-8 rounded bg-stone-200 animate-pulse" />
+              <div className="h-2 w-10 rounded bg-stone-200 animate-pulse" />
+            </div>
+          ))}
+        </div>
+        {/* Pricing */}
+        <div className="space-y-2">
+          <div className="h-3 w-16 rounded bg-stone-200 animate-pulse" />
+          <div className="flex items-baseline gap-2">
+            <div className="h-7 w-24 rounded bg-amber-100 animate-pulse" />
+            <div className="h-3 w-12 rounded bg-stone-200 animate-pulse" />
+          </div>
+          <div className="h-3 w-20 rounded bg-stone-200 animate-pulse" />
+        </div>
+        {/* CTA button */}
+        <div className="h-10 w-full rounded-lg bg-stone-200 animate-pulse sm:h-11" />
+      </div>
+    </div>
+  )
+}
+
+function CarSliderSkeleton({ isMobile, itemsPerView }: { isMobile: boolean; itemsPerView: number }) {
+  const count = itemsPerView
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <CarCardSkeleton key={`skeleton-${i}`} isMobile={isMobile} />
+      ))}
+    </>
+  )
+}
+
 export function CarSlider() {
-  const cars = useCars()
+  const { cars, loading } = useCarsWithLoading()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedCar, setSelectedCar] = useState<Car | null>(null)
   const [itemsPerView, setItemsPerView] = useState(3)
@@ -102,12 +154,14 @@ export function CarSlider() {
               transition={{ type: 'tween', duration: 0.5 }}
               className={`flex ${isMobile ? 'gap-4 snap-x snap-mandatory' : 'gap-8'}`}
             >
-              {cars.length === 0 && (
+              {loading ? (
+                <CarSliderSkeleton isMobile={isMobile} itemsPerView={itemsPerView} />
+              ) : cars.length === 0 ? (
                 <div className="w-full rounded-xl border border-stone-200 bg-stone-50 p-8 text-center text-stone-500">
                   No cars are published yet.
                 </div>
-              )}
-              {cars.map((car, index) => (
+              ) : (
+                cars.map((car, index) => (
                 <motion.div
                   key={car.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -172,7 +226,8 @@ export function CarSlider() {
                     </Link>
                   </div>
                 </motion.div>
-              ))}
+              ))
+              )}
             </motion.div>
           </div>
 
