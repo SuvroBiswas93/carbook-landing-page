@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Modal } from './Modal'
 import servicesData from '@/data/services.json'
+import { handleBookingLinkClick } from '@/lib/scroll'
 
 const iconMap: Record<string, React.ReactNode> = {
   'verified-icon': <BadgeCheck size={32} />,
@@ -105,8 +106,8 @@ export function Services() {
                 বন্ধ করুন
               </button>
               <Link
-                href="#hero"
-                onClick={() => setSelectedService(null)}
+                href="#booking"
+                onClick={(e) => handleBookingLinkClick(e, () => setSelectedService(null))}
                 className="flex-1 cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 text-center font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800"
               >
                 বুকিং সম্পর্কে জানুন

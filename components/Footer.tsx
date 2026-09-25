@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, PhoneCall } from 'lucide-react'
 import config from '@/data/config.json'
+import { handleBookingLinkClick } from '@/lib/scroll'
 
 export function Footer() {
   const whatsappNumber = config.company.phone.replace(/\D/g, '')
@@ -13,7 +14,7 @@ export function Footer() {
     <footer className="bg-brand-navy text-white">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <Link href="#hero" className="flex items-center gap-3 text-left">
+          <Link href="#booking" onClick={handleBookingLinkClick} className="flex items-center gap-3 text-left">
             <Image
               src="/logo.jpg"
               alt="Traveling Bangladesh logo"

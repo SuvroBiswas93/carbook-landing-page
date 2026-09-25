@@ -98,11 +98,20 @@ export function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-brand-navy/95 text-white shadow-[0_14px_40px_rgba(11,37,69,0.22)] backdrop-blur-xl">
-      <div className="mx-auto flex min-h-18 max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6 md:max-lg:gap-2 md:max-lg:px-4 lg:px-8">
+      <div className="relative mx-auto flex min-h-18 max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6 md:max-lg:gap-2 md:max-lg:px-4 lg:px-8">
+        <button
+          type="button"
+          onClick={() => setIsMobileMenuOpen((open) => !open)}
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/6 text-[#fff8ef] transition hover:bg-white/10 md:hidden"
+          aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
+        </button>
         <a
           href="#top"
           onClick={(event) => handleNavClick(event, '#top')}
-          className="flex min-w-0 items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-2 py-1.5 transition hover:border-white/30 hover:bg-white/15 sm:gap-3 sm:rounded-full sm:px-3 sm:py-2"
+          className="absolute left-1/2 top-1/2 flex min-w-0 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-2 py-1.5 transition hover:border-white/30 hover:bg-white/15 sm:gap-3 sm:rounded-full sm:px-3 sm:py-2 md:static md:left-auto md:top-auto md:translate-x-0 md:translate-y-0"
           aria-label="Traveling Bangladesh home"
         >
           <Image
@@ -112,7 +121,7 @@ export function Navbar() {
             height={36}
             className="size-8 shrink-0 rounded-xl object-cover sm:size-9 sm:rounded-full"
           />
-<span className="max-w-36 font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
+ <span className="max-w-36 font-serif text-[11px] font-bold leading-tight tracking-tight sm:max-w-none sm:text-base sm:tracking-normal md:max-lg:text-sm lg:text-lg">
               <span className="text-[#FFB020]">Traveling</span><span className="text-[#25D366]">Bangladesh</span>
            </span>
         </a>
@@ -160,15 +169,7 @@ export function Navbar() {
           </a>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsMobileMenuOpen((open) => !open)}
-          className="inline-flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/6 text-[#fff8ef] transition hover:bg-white/10 md:hidden"
-          aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          aria-expanded={isMobileMenuOpen}
-        >
-          {isMobileMenuOpen ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
-        </button>
+        <span className="size-11 shrink-0 md:hidden" aria-hidden="true" />
       </div>
 
       {isMobileMenuOpen && (

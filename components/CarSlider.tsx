@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Users, Fuel, Zap, Snowflake } from 'lucide-r
 import { Modal } from './Modal'
 import type { Car } from '@/lib/types'
 import { useCars } from '@/lib/useCars'
+import { handleBookingLinkClick } from '@/lib/scroll'
 
 export function CarSlider() {
   const cars = useCars()
@@ -17,6 +18,9 @@ export function CarSlider() {
   const [isMobile, setIsMobile] = useState(false)
   const [sliderWidth, setSliderWidth] = useState(0)
   const sliderRef = useRef<HTMLDivElement>(null)
+
+  const heroHeadline = 'গাড়ি ভাড়া, ঢাকা ও সারাদেশে'
+
 
   useEffect(() => {
     const updateItemsPerView = () => {
@@ -66,7 +70,10 @@ export function CarSlider() {
     itemsPerView === 3 ? 'w-[calc((100%_-_4rem)_/_3)]' : 'w-full'
 
   return (
-    <section id="cars" className="py-14 bg-white sm:py-20">
+    <section id="cars" className="py-14 bg-white mt-10 sm:py-20">
+      <h1 aria-label={heroHeadline} className="font-serif text-center text-4xl font-bold leading-tight text-[#282622] sm:text-6xl">
+          <span className="bg-linear-to-r from-[#FFB020] via-[#E08E00] to-[#16365C] bg-clip-text text-transparent">{heroHeadline}</span>
+      </h1>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -75,9 +82,9 @@ export function CarSlider() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          {/* <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
             আমাদের গাড়ির তালিকা
-          </h2>
+          </h2> */}
           <p className="text-base sm:text-xl text-stone-600">
             আপনার প্রয়োজন অনুযায়ী গাড়ি বেছে নিন
           </p>
@@ -155,10 +162,10 @@ export function CarSlider() {
                     </div>
 
                     <Link
-                      href="#hero"
-                      onClick={() => {
+                      href="#booking"
+                      onClick={(e) => handleBookingLinkClick(e, () => {
                         window.dispatchEvent(new CustomEvent('car-booking:selected', { detail: car }))
-                      }}
+                      })}
                       className={isMobile ? 'block w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-2.5 text-center text-sm font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800' : 'block w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 text-center font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800'}
                     >
                       বুক করুন
@@ -266,11 +273,11 @@ export function CarSlider() {
                 Close
               </button>
               <Link
-                href="#hero"
-                onClick={() => {
+                href="#booking"
+                onClick={(e) => handleBookingLinkClick(e, () => {
                   setSelectedCar(null)
                   window.dispatchEvent(new CustomEvent('car-booking:selected', { detail: selectedCar }))
-                }}
+                })}
                 className="flex-1 cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-3 text-center font-semibold text-white transition-all hover:from-amber-700 hover:to-amber-800"
               >
                 বুক করুন

@@ -17,6 +17,7 @@ import { useRouteDistance } from '@/lib/useRouteDistance'
 import { calculateFare } from '@/lib/fare'
 import type { FareEstimate } from '@/lib/fare'
 import { LocationAutocomplete } from './car-rental/LocationAutocomplete'
+import { handleBookingLinkClick } from '@/lib/scroll'
 
 type FareResult = FareEstimate & { car: Car }
 
@@ -198,7 +199,7 @@ function FareResultCard({ result, onBookNow }: { result: FareResult; onBookNow: 
             *This is an estimated fare based on current rates
           </p>
         </div>
-<Link href="#hero" onClick={onBookNow} className="block w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-4 text-center font-bold text-white transition-all hover:from-amber-700 hover:to-amber-800">Book Now</Link>
+<Link href="#booking" onClick={(e) => handleBookingLinkClick(e, onBookNow)} className="block w-full cursor-pointer rounded-lg bg-linear-to-r from-amber-600 to-amber-700 py-4 text-center font-bold text-white transition-all hover:from-amber-700 hover:to-amber-800">Book Now</Link>
       </div>
     </motion.div>
   )

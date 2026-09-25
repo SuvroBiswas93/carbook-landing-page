@@ -3,13 +3,13 @@
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Clock3, MapPin, Phone, PhoneCall } from 'lucide-react'
 import config from '@/data/config.json'
+import { handleBookingLinkClick } from '@/lib/scroll'
 
 export function Contact() {
   const whatsappNumber = config.company.phone.replace(/\D/g, '')
 
   const scrollToBookingForm = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault()
-    document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })
+    handleBookingLinkClick(event)
   }
 
   return (
@@ -103,7 +103,7 @@ export function Contact() {
           className="mt-12 text-center"
         >
           <a
-            href="#hero"
+            href="#booking"
             onClick={scrollToBookingForm}
             className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-8 py-4 font-bold text-slate-950 shadow-[0_10px_35px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 hover:from-amber-300 hover:to-amber-400 hover:shadow-[0_15px_40px_rgba(245,158,11,0.4)]"
           >

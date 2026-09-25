@@ -14,12 +14,13 @@ import { PickupDropoff } from '@/components/car-rental/PickupDropoff'
 import type { BookingLocation } from '@/lib/types'
 import { useCars } from '@/lib/useCars'
 import { useClickOutside } from '@/lib/useClickOutside'
+import { scrollToBookingForm } from '@/lib/scroll'
 
 type BookingTab = 'city' | 'hourly' | 'intercity' | 'airport'
 type TripType = 'One Way' | 'Round Trip'
 type PickerId = 'car' | 'pickupDate' | 'returnDate' | null
 
-const heroHeadline = 'চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে'
+// const heroHeadline = 'চালকসহ গাড়ি ভাড়া, ঢাকা ও সারাদেশে'
 const mobilePattern = /^01[3-9]\d{8}$/
 const banglaMonths = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর']
 const banglaWeekdays = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহস্পতি', 'শুক্র', 'শনি']
@@ -168,6 +169,8 @@ export function Hero() {
       if (!car) return
       setSelectedCar(car)
       setValue('carName', `${car.brand} ${car.model}`, { shouldValidate: true })
+      // Scroll to booking form with navbar offset (works even though Hero is no longer at top)
+      scrollToBookingForm()
     }
 
     const handlePrefill = (event: Event) => {
@@ -181,7 +184,7 @@ export function Hero() {
       setValue('carName', `${detail.car.brand} ${detail.car.model}`, { shouldValidate: true })
       if (detail.pickupLocation) setPickupLocation(detail.pickupLocation)
       if (detail.dropoffLocation) setDropoffLocation(detail.dropoffLocation)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      scrollToBookingForm()
     }
 
     window.addEventListener('car-booking:selected', handleCarBooking)
@@ -190,7 +193,7 @@ export function Hero() {
       window.removeEventListener('car-booking:selected', handleCarBooking)
       window.removeEventListener('hero-booking:prefill', handlePrefill)
     }
-  }, [])
+  }, [setValue])
 
   const isHourly = activeTab === 'hourly'
   const isIntercity = activeTab === 'intercity'
@@ -267,12 +270,15 @@ export function Hero() {
   const inputClass = (field: keyof BookingFormValues) => `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100 ${errors[field] ? 'border-red-400 ring-2 ring-red-100' : 'border-[#eae5dd]'}`
 
   return (
-    <section id="hero" className="relative z-20 bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32">
+    <section id="hero" className="relative z-20 scroll-mt-[88px] bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32" style={{ scrollMarginTop: '88px' }}>
+      {/* alias for new booking id — keeps both #hero and #booking anchors working */}
+      <span id="booking" className="sr-only" aria-hidden="true" />
+      <span id="booking-form" className="sr-only" aria-hidden="true" />
       <div className="mx-auto max-w-345 px-3 sm:px-8">
         <div className="mb-8 max-w-3xl">
-          <h1 aria-label={heroHeadline} className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl">
+          {/* <h1 aria-label={heroHeadline} className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl">
             <span className="bg-linear-to-r from-[#FFB020] via-[#E08E00] to-[#16365C] bg-clip-text text-transparent">{heroHeadline}</span>
-          </h1>
+          </h1> */}
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-brand-muted sm:text-xl">
             ফিক্সড প্রাইস, কোনো হিডেন চার্জ নেই। ফর্ম পূরণ করুন, <span className="font-bold text-brand-navy">১০ মিনিটে আমরা কল করবো।</span>
           </p>

@@ -20,9 +20,9 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white pb-13 sm:pb-0">
       <Navbar />
+      <CarSlider />
       <Hero />
       <TrustBar />
-      <CarSlider />
       <HowItWorks />
       <FareCalculator />
       <Reviews />
