@@ -5,6 +5,9 @@ import config from '@/data/config.json'
 
 export default function ThankYouPage() {
   const whatsappNumber = config.company.phone.replace(/\D/g, '')
+  const whatsappMessage = encodeURIComponent(
+    'Assalamu alaikum, I want to rent a car. Please share the available options and pricing.'
+  )
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f3f1ed] px-4 py-12">
@@ -19,7 +22,7 @@ export default function ThankYouPage() {
           <a href={`tel:${config.company.phone}`} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 py-3 font-bold text-white transition hover:bg-amber-700">
             <PhoneCall size={18} /> ফোন করুন
           </a>
-          <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer" className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white transition hover:bg-emerald-700">
+          <a href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`} target="_blank" rel="noreferrer" className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white transition hover:bg-emerald-700">
             WhatsApp করুন
           </a>
         </div>

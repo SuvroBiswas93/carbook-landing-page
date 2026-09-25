@@ -14,8 +14,12 @@ export function HowItWorks() {
     <section className="bg-white py-14 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-bold text-brand-navy sm:text-3xl">যেভাবে কাজ করে</h2>
-          <p className="mt-3 text-base text-brand-muted">সহজ তিন ধাপে আপনার গাড়ি বুক করুন</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+            যেভাবে কাজ করে
+          </h2>
+          <p className="text-base sm:text-xl text-stone-600">
+            সহজ তিন ধাপে আপনার গাড়ি বুক করুন
+          </p>
         </div>
         <div className="mt-10 grid gap-8 md:grid-cols-3">
           {steps.map(({ icon: Icon, number, title, text }, index) => (

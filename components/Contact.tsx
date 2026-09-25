@@ -7,6 +7,9 @@ import { handleBookingLinkClick } from '@/lib/scroll'
 
 export function Contact() {
   const whatsappNumber = config.company.phone.replace(/\D/g, '')
+  const whatsappMessage = encodeURIComponent(
+    'Assalamu alaikum, I want to rent a car. Please share the available options and pricing.'
+  )
 
   const scrollToBookingForm = (event: React.MouseEvent<HTMLAnchorElement>) => {
     handleBookingLinkClick(event)
@@ -60,7 +63,7 @@ export function Contact() {
 
           {/* WhatsApp Card */}
           <a
-            href={`https://wa.me/${whatsappNumber}`}
+            href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
             target="_blank"
             rel="noreferrer"
             className="group rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-500/40 hover:bg-white/[0.08] hover:shadow-[0_10px_30px_rgba(16,185,129,0.1)]"
