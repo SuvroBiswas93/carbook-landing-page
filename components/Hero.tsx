@@ -270,16 +270,16 @@ export function Hero() {
   const inputClass = (field: keyof BookingFormValues) => `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100 ${errors[field] ? 'border-red-400 ring-2 ring-red-100' : 'border-[#eae5dd]'}`
 
   return (
-    <section id="hero" className="pb-4 relative z-20 scroll-mt-[88px] bg-[#f3f1ed] pb-12 pt-24 sm:pb-24 sm:pt-32" style={{ scrollMarginTop: '88px' }}>
+    <section id="hero" className="relative z-20 scroll-mt-[88px] bg-[#f3f1ed] pb-12 pt-16 sm:pb-16 sm:pt-20" style={{ scrollMarginTop: '88px' }}>
       {/* alias for new booking id — keeps both #hero and #booking anchors working */}
       <span id="booking" className="sr-only" aria-hidden="true" />
       <span id="booking-form" className="sr-only" aria-hidden="true" />
       <div className="mx-auto max-w-345 px-3 sm:px-8">
-        <div className="mb-8 max-w-3xl">
-          {/* <h1 aria-label={heroHeadline} className="font-serif text-4xl font-bold leading-tight text-[#282622] sm:text-6xl">
-            <span className="bg-linear-to-r from-[#FFB020] via-[#E08E00] to-[#16365C] bg-clip-text text-transparent">{heroHeadline}</span>
-          </h1> */}
-          <p className="mb-8 max-w-2xl text-base leading-relaxed text-brand-muted sm:text-xl">
+        <div className="mx-auto mb-10 max-w-3xl text-center">
+          <h2 className="font-serif text-3xl font-bold leading-tight text-stone-900 sm:text-4xl lg:text-[42px]">
+            সহজ বুকিং, ২ মিনিটে গাড়ি বুক করুন
+          </h2>
+          <p className="mx-auto mt-3 mb-2 max-w-2xl text-center text-base leading-relaxed text-brand-muted sm:text-xl">
             ফিক্সড প্রাইস, কোনো হিডেন চার্জ নেই। ফর্ম পূরণ করুন, <span className="font-bold text-brand-navy">১০ মিনিটে আমরা কল করবো।</span>
           </p>
         </div>
